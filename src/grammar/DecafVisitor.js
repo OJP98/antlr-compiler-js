@@ -1,4 +1,4 @@
-// Generated from .\Decaf\Decaf.g4 by ANTLR 4.9.2
+// Generated from .\Decaf.g4 by ANTLR 4.9.2
 // jshint ignore: start
 import antlr4 from 'antlr4';
 
@@ -102,8 +102,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
-	// Visit a parse tree produced by DecafParser#arith_op.
-	visitArith_op(ctx) {
+	// Visit a parse tree produced by DecafParser#arith_op1.
+	visitArith_op1(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#arith_op2.
+	visitArith_op2(ctx) {
 	  return this.visitChildren(ctx);
 	}
 

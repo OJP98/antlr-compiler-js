@@ -34,8 +34,8 @@ location : (id | id '[' expression ']') ('.' location)? ;
 expression : location
             | methodCall
             | literal
-            | expression ('*' | '/') expression
-            | expression ('+' | '-') expression
+            | expression arith_op1 expression      
+            | expression arith_op2 expression          
             | expression op expression
             | '-' expression
             | '!' expression
@@ -46,9 +46,11 @@ methodCall : id '(' (arg (',' arg)*)* ')' ;
 
 arg : expression ;
 
-op : arith_op | rel_op | eq_op | cond_op ;
+op : rel_op | eq_op | cond_op ;
 
-arith_op : '*' | '/' | '+' | '-' | '%' ;
+arith_op1 : '*' | '/' | '%' ;
+
+arith_op2 : '+' | '-' ;
 
 rel_op : '<' | '>' | '<=' | '>=' ;
 

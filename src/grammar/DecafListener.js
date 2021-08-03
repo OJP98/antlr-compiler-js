@@ -1,4 +1,4 @@
-// Generated from .\Decaf\Decaf.g4 by ANTLR 4.9.2
+// Generated from .\Decaf.g4 by ANTLR 4.9.2
 // jshint ignore: start
 import antlr4 from 'antlr4';
 
@@ -149,12 +149,21 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#arith_op.
-	enterArith_op(ctx) {
+	// Enter a parse tree produced by DecafParser#arith_op1.
+	enterArith_op1(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#arith_op.
-	exitArith_op(ctx) {
+	// Exit a parse tree produced by DecafParser#arith_op1.
+	exitArith_op1(ctx) {
+	}
+
+
+	// Enter a parse tree produced by DecafParser#arith_op2.
+	enterArith_op2(ctx) {
+	}
+
+	// Exit a parse tree produced by DecafParser#arith_op2.
+	exitArith_op2(ctx) {
 	}
 
 

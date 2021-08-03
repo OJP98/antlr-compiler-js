@@ -1,7 +1,7 @@
 import antlr4 from 'antlr4';
-import DecafLexer from './DecafLexer.js';
-import DecafParser from './DecafParser.js';
-import DecafListener from './DecafListener.js';
+import DecafLexer from './grammar/DecafLexer.js';
+import DecafParser from './grammar/DecafParser.js';
+import DecafListener from './grammar/DecafListener.js';
 
 const input = "class Program { char var1; int var2; int var3; }"
 const chars = new antlr4.InputStream(input);
@@ -37,16 +37,16 @@ tree.accept(new Visitor());
 class ProgramPrinter extends DecafListener {
     // override default listener behavior
     exitId(ctx) {
-        if (ctx.children) {
-          return ctx.children.map((child) => {
-            if (child.children && child.children.length != 0) {
-              return child.accept(this);
-            } else {
-              const text = child.getText();
-              console.log(text);
-              return text;
-            }
-          });
-        }
+      if (ctx.children) {
+        return ctx.children.map((child) => {
+          if (child.children && child.children.length != 0) {
+            return child.accept(this);
+          } else {
+            const text = child.getText();
+            console.log(text);
+            return text;
+          }
+        });
+      }
     }
 }

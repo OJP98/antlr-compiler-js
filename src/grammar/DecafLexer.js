@@ -1,4 +1,4 @@
-// Generated from .\Decaf\Decaf.g4 by ANTLR 4.9.2
+// Generated from .\Decaf.g4 by ANTLR 4.9.2
 // jshint ignore: start
 import antlr4 from 'antlr4';
 
@@ -117,11 +117,11 @@ const serializedATN = ["\u0003\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786",
     "\u0007t\u0002\u0002\u00a7\u00a8\u0007p\u0002\u0002\u00a8(\u0003\u0002",
     "\u0002\u0002\u00a9\u00aa\u0007?\u0002\u0002\u00aa*\u0003\u0002\u0002",
     "\u0002\u00ab\u00ac\u00070\u0002\u0002\u00ac,\u0003\u0002\u0002\u0002",
-    "\u00ad\u00ae\u0007,\u0002\u0002\u00ae.\u0003\u0002\u0002\u0002\u00af",
-    "\u00b0\u00071\u0002\u0002\u00b00\u0003\u0002\u0002\u0002\u00b1\u00b2",
-    "\u0007-\u0002\u0002\u00b22\u0003\u0002\u0002\u0002\u00b3\u00b4\u0007",
-    "/\u0002\u0002\u00b44\u0003\u0002\u0002\u0002\u00b5\u00b6\u0007#\u0002",
-    "\u0002\u00b66\u0003\u0002\u0002\u0002\u00b7\u00b8\u0007\'\u0002\u0002",
+    "\u00ad\u00ae\u0007/\u0002\u0002\u00ae.\u0003\u0002\u0002\u0002\u00af",
+    "\u00b0\u0007#\u0002\u0002\u00b00\u0003\u0002\u0002\u0002\u00b1\u00b2",
+    "\u0007,\u0002\u0002\u00b22\u0003\u0002\u0002\u0002\u00b3\u00b4\u0007",
+    "1\u0002\u0002\u00b44\u0003\u0002\u0002\u0002\u00b5\u00b6\u0007\'\u0002",
+    "\u0002\u00b66\u0003\u0002\u0002\u0002\u00b7\u00b8\u0007-\u0002\u0002",
     "\u00b88\u0003\u0002\u0002\u0002\u00b9\u00ba\u0007>\u0002\u0002\u00ba",
     ":\u0003\u0002\u0002\u0002\u00bb\u00bc\u0007@\u0002\u0002\u00bc<\u0003",
     "\u0002\u0002\u0002\u00bd\u00be\u0007>\u0002\u0002\u00be\u00bf\u0007",
@@ -168,8 +168,8 @@ export default class DecafLexer extends antlr4.Lexer {
 	static literalNames = [ null, "'class'", "'Program'", "'{'", "'}'", "';'", 
                          "'['", "']'", "'struct'", "'int'", "'char'", "'boolean'", 
                          "'void'", "'('", "','", "')'", "'if'", "'else'", 
-                         "'while'", "'return'", "'='", "'.'", "'*'", "'/'", 
-                         "'+'", "'-'", "'!'", "'%'", "'<'", "'>'", "'<='", 
+                         "'while'", "'return'", "'='", "'.'", "'-'", "'!'", 
+                         "'*'", "'/'", "'%'", "'+'", "'<'", "'>'", "'<='", 
                          "'>='", "'=='", "'!='", "'&&'", "'||'", "'''", 
                          "'true'", "'false'" ];
 	static symbolicNames = [ null, null, null, null, null, null, null, null, 

@@ -1,4 +1,4 @@
-// Generated from c:\Users\Oscar\Desktop\UVG\Semestre10\Compis\js-antlr\Decaf\Decaf.g4 by ANTLR 4.8
+// Generated from c:\Users\Oscar\Desktop\UVG\Semestre10\Compis\js-antlr\src\grammar\Decaf.g4 by ANTLR 4.8
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;
@@ -46,8 +46,8 @@ public class DecafLexer extends Lexer {
 		return new String[] {
 			null, "'class'", "'Program'", "'{'", "'}'", "';'", "'['", "']'", "'struct'", 
 			"'int'", "'char'", "'boolean'", "'void'", "'('", "','", "')'", "'if'", 
-			"'else'", "'while'", "'return'", "'='", "'.'", "'*'", "'/'", "'+'", "'-'", 
-			"'!'", "'%'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'", 
+			"'else'", "'while'", "'return'", "'='", "'.'", "'-'", "'!'", "'*'", "'/'", 
+			"'%'", "'+'", "'<'", "'>'", "'<='", "'>='", "'=='", "'!='", "'&&'", "'||'", 
 			"'''", "'true'", "'false'"
 		};
 	}
@@ -171,10 +171,10 @@ public class DecafLexer extends Lexer {
 		"\2\u009f\u00a0\7n\2\2\u00a0\u00a1\7g\2\2\u00a1&\3\2\2\2\u00a2\u00a3\7"+
 		"t\2\2\u00a3\u00a4\7g\2\2\u00a4\u00a5\7v\2\2\u00a5\u00a6\7w\2\2\u00a6\u00a7"+
 		"\7t\2\2\u00a7\u00a8\7p\2\2\u00a8(\3\2\2\2\u00a9\u00aa\7?\2\2\u00aa*\3"+
-		"\2\2\2\u00ab\u00ac\7\60\2\2\u00ac,\3\2\2\2\u00ad\u00ae\7,\2\2\u00ae.\3"+
-		"\2\2\2\u00af\u00b0\7\61\2\2\u00b0\60\3\2\2\2\u00b1\u00b2\7-\2\2\u00b2"+
-		"\62\3\2\2\2\u00b3\u00b4\7/\2\2\u00b4\64\3\2\2\2\u00b5\u00b6\7#\2\2\u00b6"+
-		"\66\3\2\2\2\u00b7\u00b8\7\'\2\2\u00b88\3\2\2\2\u00b9\u00ba\7>\2\2\u00ba"+
+		"\2\2\2\u00ab\u00ac\7\60\2\2\u00ac,\3\2\2\2\u00ad\u00ae\7/\2\2\u00ae.\3"+
+		"\2\2\2\u00af\u00b0\7#\2\2\u00b0\60\3\2\2\2\u00b1\u00b2\7,\2\2\u00b2\62"+
+		"\3\2\2\2\u00b3\u00b4\7\61\2\2\u00b4\64\3\2\2\2\u00b5\u00b6\7\'\2\2\u00b6"+
+		"\66\3\2\2\2\u00b7\u00b8\7-\2\2\u00b88\3\2\2\2\u00b9\u00ba\7>\2\2\u00ba"+
 		":\3\2\2\2\u00bb\u00bc\7@\2\2\u00bc<\3\2\2\2\u00bd\u00be\7>\2\2\u00be\u00bf"+
 		"\7?\2\2\u00bf>\3\2\2\2\u00c0\u00c1\7@\2\2\u00c1\u00c2\7?\2\2\u00c2@\3"+
 		"\2\2\2\u00c3\u00c4\7?\2\2\u00c4\u00c5\7?\2\2\u00c5B\3\2\2\2\u00c6\u00c7"+
