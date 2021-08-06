@@ -1,8 +1,8 @@
 import { Data } from "./Data";
 
 export class Symbol extends Data {
-  constructor(type, name, signature, errors, value) {
-    super(type, name, signature, errors);
+  constructor(type, name, value, signature, error) {
+    super(type, name, signature, error);
     this.value = value;
   }
 }

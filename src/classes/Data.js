@@ -1,9 +1,9 @@
 export class Data
 {
-  constructor(type, name, signature = null, errors = null) {
+  constructor(type, name, signature, error) {
     this.type = type;
     this.name = name;
-    this.signature = signature;
-    this.errors = errors;
+    this.signature = signature || null;
+    this.error = error || null;
   }
 }

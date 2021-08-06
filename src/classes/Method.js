@@ -1,9 +1,9 @@
 import { Data } from "./Data";
 
 export class Method extends Data {
-  constructor(type, name, args, returnType, signature, errors) {
-    super(type, name, signature, errors);
+  constructor(type, name, args, returnType, signature, error) {
+    super(type, name, signature, error);
     this.args = args;
-    this.returnType = returnType;
+    this.returnType = returnType || undefined;
   }
 }
