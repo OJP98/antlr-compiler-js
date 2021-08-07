@@ -32,12 +32,12 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#declarationMethor.
-	enterDeclarationMethor(ctx) {
+	// Enter a parse tree produced by DecafParser#declarationMethod.
+	enterDeclarationMethod(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#declarationMethor.
-	exitDeclarationMethor(ctx) {
+	// Exit a parse tree produced by DecafParser#declarationMethod.
+	exitDeclarationMethod(ctx) {
 	}
 
 
@@ -167,57 +167,57 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#paramType.
-	enterParamType(ctx) {
+	// Enter a parse tree produced by DecafParser#idParam.
+	enterIdParam(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#paramType.
-	exitParamType(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#paramArrType.
-	enterParamArrType(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#paramArrType.
-	exitParamArrType(ctx) {
+	// Exit a parse tree produced by DecafParser#idParam.
+	exitIdParam(ctx) {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#paramVoid.
-	enterParamVoid(ctx) {
+	// Enter a parse tree produced by DecafParser#idArrParam.
+	enterIdArrParam(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#paramVoid.
-	exitParamVoid(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#paramInt.
-	enterParamInt(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#paramInt.
-	exitParamInt(ctx) {
+	// Exit a parse tree produced by DecafParser#idArrParam.
+	exitIdArrParam(ctx) {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#paramChar.
-	enterParamChar(ctx) {
+	// Enter a parse tree produced by DecafParser#voidParam.
+	enterVoidParam(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#paramChar.
-	exitParamChar(ctx) {
+	// Exit a parse tree produced by DecafParser#voidParam.
+	exitVoidParam(ctx) {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#paramBoolean.
-	enterParamBoolean(ctx) {
+	// Enter a parse tree produced by DecafParser#intParam.
+	enterIntParam(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#paramBoolean.
-	exitParamBoolean(ctx) {
+	// Exit a parse tree produced by DecafParser#intParam.
+	exitIntParam(ctx) {
+	}
+
+
+	// Enter a parse tree produced by DecafParser#charParam.
+	enterCharParam(ctx) {
+	}
+
+	// Exit a parse tree produced by DecafParser#charParam.
+	exitCharParam(ctx) {
+	}
+
+
+	// Enter a parse tree produced by DecafParser#booleanParam.
+	enterBooleanParam(ctx) {
+	}
+
+	// Exit a parse tree produced by DecafParser#booleanParam.
+	exitBooleanParam(ctx) {
 	}
 
 
@@ -239,6 +239,15 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by DecafParser#ifElseStmt.
+	enterIfElseStmt(ctx) {
+	}
+
+	// Exit a parse tree produced by DecafParser#ifElseStmt.
+	exitIfElseStmt(ctx) {
+	}
+
+
 	// Enter a parse tree produced by DecafParser#whileStmt.
 	enterWhileStmt(ctx) {
 	}
@@ -248,12 +257,12 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#returnTypeStmt.
-	enterReturnTypeStmt(ctx) {
+	// Enter a parse tree produced by DecafParser#returnExprStmt.
+	enterReturnExprStmt(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#returnTypeStmt.
-	exitReturnTypeStmt(ctx) {
+	// Exit a parse tree produced by DecafParser#returnExprStmt.
+	exitReturnExprStmt(ctx) {
 	}
 
 
@@ -365,12 +374,39 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
+	// Enter a parse tree produced by DecafParser#eqOpExpr.
+	enterEqOpExpr(ctx) {
+	}
+
+	// Exit a parse tree produced by DecafParser#eqOpExpr.
+	exitEqOpExpr(ctx) {
+	}
+
+
+	// Enter a parse tree produced by DecafParser#relOpExpr.
+	enterRelOpExpr(ctx) {
+	}
+
+	// Exit a parse tree produced by DecafParser#relOpExpr.
+	exitRelOpExpr(ctx) {
+	}
+
+
 	// Enter a parse tree produced by DecafParser#locationExpr.
 	enterLocationExpr(ctx) {
 	}
 
 	// Exit a parse tree produced by DecafParser#locationExpr.
 	exitLocationExpr(ctx) {
+	}
+
+
+	// Enter a parse tree produced by DecafParser#condOpExpr.
+	enterCondOpExpr(ctx) {
+	}
+
+	// Exit a parse tree produced by DecafParser#condOpExpr.
+	exitCondOpExpr(ctx) {
 	}
 
 
@@ -392,30 +428,21 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#arithExpr1.
-	enterArithExpr1(ctx) {
+	// Enter a parse tree produced by DecafParser#secondArithOpExpr.
+	enterSecondArithOpExpr(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#arithExpr1.
-	exitArithExpr1(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#arithExpr2.
-	enterArithExpr2(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#arithExpr2.
-	exitArithExpr2(ctx) {
+	// Exit a parse tree produced by DecafParser#secondArithOpExpr.
+	exitSecondArithOpExpr(ctx) {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#arithExpr3.
-	enterArithExpr3(ctx) {
+	// Enter a parse tree produced by DecafParser#firstArithOpExpr.
+	enterFirstArithOpExpr(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#arithExpr3.
-	exitArithExpr3(ctx) {
+	// Exit a parse tree produced by DecafParser#firstArithOpExpr.
+	exitFirstArithOpExpr(ctx) {
 	}
 
 
@@ -434,150 +461,6 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 
 	// Exit a parse tree produced by DecafParser#argDecl.
 	exitArgDecl(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#relOp.
-	enterRelOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#relOp.
-	exitRelOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#eqOp.
-	enterEqOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#eqOp.
-	exitEqOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#condOp.
-	enterCondOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#condOp.
-	exitCondOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#multOp.
-	enterMultOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#multOp.
-	exitMultOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#divOp.
-	enterDivOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#divOp.
-	exitDivOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#modOp.
-	enterModOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#modOp.
-	exitModOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#sumOp.
-	enterSumOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#sumOp.
-	exitSumOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#subOp.
-	enterSubOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#subOp.
-	exitSubOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#lowerOp.
-	enterLowerOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#lowerOp.
-	exitLowerOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#higherOp.
-	enterHigherOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#higherOp.
-	exitHigherOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#lowerEqOp.
-	enterLowerEqOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#lowerEqOp.
-	exitLowerEqOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#higherEqOp.
-	enterHigherEqOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#higherEqOp.
-	exitHigherEqOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#equalsOp.
-	enterEqualsOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#equalsOp.
-	exitEqualsOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#notEqualsOp.
-	enterNotEqualsOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#notEqualsOp.
-	exitNotEqualsOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#andOp.
-	enterAndOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#andOp.
-	exitAndOp(ctx) {
-	}
-
-
-	// Enter a parse tree produced by DecafParser#orOp.
-	enterOrOp(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#orOp.
-	exitOrOp(ctx) {
 	}
 
 

@@ -26,8 +26,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
-	// Visit a parse tree produced by DecafParser#declarationMethod.
-	visitDeclarationMethod(ctx) {
+	// Visit a parse tree produced by DecafParser#declarationMethor.
+	visitDeclarationMethor(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -55,19 +55,19 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Visit a parse tree produced by DecafParser#intVar.
 	visitIntVar(ctx) {
-		return ctx.getText();
+	  return ctx.getText();
 	}
 
 
 	// Visit a parse tree produced by DecafParser#charVar.
 	visitCharVar(ctx) {
-		return ctx.getText();
+	  return ctx.getText();
 	}
 
 
 	// Visit a parse tree produced by DecafParser#booleanVar.
 	visitBooleanVar(ctx) {
-		return ctx.getText();
+	  return ctx.getText();
 	}
 
 
@@ -85,7 +85,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Visit a parse tree produced by DecafParser#voidVar.
 	visitVoidVar(ctx) {
-		return ctx.getText();
+	  return ctx.getText();
 	}
 
 
@@ -106,63 +106,63 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Visit a parse tree produced by DecafParser#intMethod.
 	visitIntMethod(ctx) {
-	  return ctx.getText();
+	  return this.visitChildren(ctx);
 	}
 
 
 	// Visit a parse tree produced by DecafParser#charMethod.
 	visitCharMethod(ctx) {
-	  return ctx.getText();
+	  return this.visitChildren(ctx);
 	}
 
 
 	// Visit a parse tree produced by DecafParser#booleanMethod.
 	visitBooleanMethod(ctx) {
-	  return ctx.getText();
+	  return this.visitChildren(ctx);
 	}
 
 
 	// Visit a parse tree produced by DecafParser#voidMethod.
 	visitVoidMethod(ctx) {
-	  return ctx.getText();
+	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by DecafParser#idParam.
-	visitIdParam(ctx) {
+	// Visit a parse tree produced by DecafParser#paramType.
+	visitParamType(ctx) {
 		const paramType = ctx.parameterType();
 		const paramId = ctx.id();
 	  return { paramType, paramId };
 	}
 
 
-	// Visit a parse tree produced by DecafParser#idArrParam.
-	visitIdArrParam(ctx) {
+	// Visit a parse tree produced by DecafParser#paramArrType.
+	visitParamArrType(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by DecafParser#voidParam.
-	visitVoidParam(ctx) {
+	// Visit a parse tree produced by DecafParser#paramVoid.
+	visitParamVoid(ctx) {
 	  return ctx.getText();
 	}
 
 
-	// Visit a parse tree produced by DecafParser#intParam.
-	visitIntParam(ctx) {
+	// Visit a parse tree produced by DecafParser#paramInt.
+	visitParamInt(ctx) {
 	  return ctx.getText();
 	}
 
 
-	// Visit a parse tree produced by DecafParser#charParam.
-	visitCharParam(ctx) {
+	// Visit a parse tree produced by DecafParser#paramChar.
+	visitParamChar(ctx) {
 	  return ctx.getText();
 	}
 
 
-	// Visit a parse tree produced by DecafParser#booleanParam.
-	visitBooleanParam(ctx) {
-	  return ctx.getText();
+	// Visit a parse tree produced by DecafParser#paramBoolean.
+	visitParamBoolean(ctx) {
+	  return this.visitChildren(ctx);
 	}
 
 
@@ -180,6 +180,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 		console.log(stmts);
 
+
 		console.log(varDeclarations, statements);
 	  return this.visitChildren(ctx);
 	}
@@ -191,27 +192,21 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
-	// Visit a parse tree produced by DecafParser#ifElseStmt.
-	visitIfElseStmt(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by DecafParser#whileStmt.
 	visitWhileStmt(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by DecafParser#returnExprStmt.
-	visitReturnExprStmt(ctx) {
+	// Visit a parse tree produced by DecafParser#returnTypeStmt.
+	visitReturnTypeStmt(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
 	// Visit a parse tree produced by DecafParser#returnVoidStmt.
 	visitReturnVoidStmt(ctx) {
-	  return 'void';
+		return 'void';
 	}
 
 
@@ -281,26 +276,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
-	// Visit a parse tree produced by DecafParser#eqOpExpr.
-	visitEqOpExpr(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by DecafParser#relOpExpr.
-	visitRelOpExpr(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
 	// Visit a parse tree produced by DecafParser#locationExpr.
 	visitLocationExpr(ctx) {
-	  return this.visitChildren(ctx);
-	}
-
-
-	// Visit a parse tree produced by DecafParser#condOpExpr.
-	visitCondOpExpr(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -317,14 +294,20 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 	}
 
 
-	// Visit a parse tree produced by DecafParser#secondArithOpExpr.
-	visitSecondArithOpExpr(ctx) {
+	// Visit a parse tree produced by DecafParser#arithExpr1.
+	visitArithExpr1(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
 
-	// Visit a parse tree produced by DecafParser#firstArithOpExpr.
-	visitFirstArithOpExpr(ctx) {
+	// Visit a parse tree produced by DecafParser#arithExpr2.
+	visitArithExpr2(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#arithExpr3.
+	visitArithExpr3(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -337,6 +320,102 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Visit a parse tree produced by DecafParser#argDecl.
 	visitArgDecl(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#relOp.
+	visitRelOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#eqOp.
+	visitEqOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#condOp.
+	visitCondOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#multOp.
+	visitMultOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#divOp.
+	visitDivOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#modOp.
+	visitModOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#sumOp.
+	visitSumOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#subOp.
+	visitSubOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#lowerOp.
+	visitLowerOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#higherOp.
+	visitHigherOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#lowerEqOp.
+	visitLowerEqOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#higherEqOp.
+	visitHigherEqOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#equalsOp.
+	visitEqualsOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#notEqualsOp.
+	visitNotEqualsOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#andOp.
+	visitAndOp(ctx) {
+	  return this.visitChildren(ctx);
+	}
+
+
+	// Visit a parse tree produced by DecafParser#orOp.
+	visitOrOp(ctx) {
 	  return this.visitChildren(ctx);
 	}
 
@@ -373,13 +452,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Visit a parse tree produced by DecafParser#trueLiteral.
 	visitTrueLiteral(ctx) {
-	  return ctx.getText();
+	  return this.visitChildren(ctx);
 	}
 
 
 	// Visit a parse tree produced by DecafParser#falseLiteral.
 	visitFalseLiteral(ctx) {
-	  return ctx.getText();
+	  return this.visitChildren(ctx);
 	}
 
 
@@ -391,7 +470,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Visit a parse tree produced by DecafParser#numDecl.
 	visitNumDecl(ctx) {
-	  return ctx.getText();
+	  return this.visitChildren(ctx);
 	}
 
 
