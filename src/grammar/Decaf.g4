@@ -1,74 +1,96 @@
 grammar Decaf;
 
-program : 'class' 'Program' '{' declaration* '}' ;
+program : 'class' 'Program' '{' declaration* '}'         # programInit ;
 
-declaration : structDeclaration | varDeclaration | methodDeclaration ;
-
-varDeclaration : varType id ';' | varType id '[' num ']' ';' ;
-
-structDeclaration : 'struct' id '{' varDeclaration* '}' ';'? ;
-
-varType : 'int' | 'char' | 'boolean' | 'struct' id | structDeclaration | 'void' ;
-
-methodDeclaration : methodType id '(' (parameter (',' parameter)*)* ')' block ;
-
-methodType : 'int' | 'char' | 'boolean' | 'void' ;
-
-parameter : parameterType id | parameterType id '[' ']' | 'void' ;
-
-parameterType : 'int' | 'char' | 'boolean' ;
-
-block : '{' (varDeclaration)* (statement)* '}' ;
-
-statement : 'if' '(' expression ')' block ('else' block)?
-          | 'while' '(' expression ')' block
-          | 'return' expression? ';'
-          | methodCall ';'
-          | block
-          | location '=' expression
-          | expression? ';'
-          ;
-
-location : (id | id '[' expression ']') ('.' location)? ;
-
-expression : location
-            | methodCall
-            | literal
-            | expression arith_op1 expression      
-            | expression arith_op2 expression          
-            | expression op expression
-            | '-' expression
-            | '!' expression
-            | '(' expression ')'
+declaration : structDeclaration                          # declarationStruct
+            | varDeclaration                             # declarationVar
+            | methodDeclaration                          # declarationMethod
             ;
 
-methodCall : id '(' (arg (',' arg)*)* ')' ;
+varDeclaration : varType id ';'                          # varDecl
+               | varType id '[' num ']' ';'              # arrDecl
+               ;
 
-arg : expression ;
+structDeclaration : 'struct' id '{' varDeclaration* '}' ';'?  # structDecl ;
 
-op : rel_op | eq_op | cond_op ;
+varType : 'int'                                           # intVar
+        | 'char'                                          # charVar
+        | 'boolean'                                       # booleanVar
+        | 'struct' id                                     # structVar
+        | structDeclaration                               # structDeclarationVar
+        | 'void'                                          # voidVar
+        ;
 
-arith_op1 : '*' | '/' | '%' ;
+methodDeclaration : methodType id '(' (parameter (',' parameter)*)* ')' block # methodDecl ;
 
-arith_op2 : '+' | '-' ;
+methodType : 'int'                                        # intMethod
+           | 'char'                                       # charMethod
+           | 'boolean'                                    # booleanMethod
+           | 'void'                                       # voidMethod
+           ;
 
-rel_op : '<' | '>' | '<=' | '>=' ;
+parameter : parameterType id                              # idParam
+          | parameterType id '[' ']'                      # idArrParam
+          | 'void'                                        # voidParam
+          ;
 
-eq_op : '==' | '!=' ;
+parameterType : 'int'                                     # intParam
+              | 'char'                                    # charParam
+              | 'boolean'                                 # booleanParam
+              ;
 
-cond_op : '&&' | '||' ;
+block : '{' (varDeclaration)* (statement)* '}'            # blockDecl ;
 
-literal : int_literal | char_literal | bool_literal ;
+statement : 'if' '(' expression ')' block                 # ifStmt
+          | 'if' '(' expression ')' block 'else' block    # ifElseStmt
+          | 'while' '(' expression ')' block              # whileStmt
+          | 'return' expression ';'                       # returnExprStmt
+          | 'return' ';'                                  # returnVoidStmt 
+          | methodCall ';'                                # methodStmt
+          | block                                         # blockStmt
+          | location '=' expression                       # assignmentStmt
+          | expression ';'                                # expressionStmt
+          ;
 
-char_literal : '\'' LETTER '\'' ;
+location : id                                             # idLocation
+         | id '[' expression ']'                          # arrLocation
+         | id '.' location                                # idDotLocation
+         | id '[' expression ']' '.' location             # idArrDotLocation
+         ;
 
-int_literal : num ;
+expression : location                                     # locationExpr
+           | methodCall                                   # methodCallExpr
+           | literal                                      # literalExpr
+           | expression op=('*'|'/'|'%') expression       # firstArithOpExpr
+           | expression op=('+'|'-') expression           # secondArithOpExpr
+           | expression op=('<'|'>'|'<='|'>=') expression # relOpExpr
+           | expression op=('=='|'!=') expression         # eqOpExpr
+           | expression op=('&&'|'||') expression         # condOpExpr
+           | '-' expression                               # negativeExpr
+           | '!' expression                               # notExpr
+           | '(' expression ')'                           # parExpr
+           ;
 
-bool_literal : 'true' | 'false' ;
+methodCall : id '(' (arg (',' arg)*)* ')'                 # methodCallDecl ;
 
-id : ID ;
+arg : expression                                          # argDecl ;
 
-num : DIGIT+ ;
+literal : int_literal                                     # intLiteral
+        | char_literal                                    # charLiteral
+        | bool_literal                                    # boolLiteral
+        ;
+
+char_literal : '\'' LETTER '\''                           # charLiteralDecl ;
+
+int_literal : num                                         # numLiteral ;
+
+bool_literal : 'true'                                     # trueLiteral 
+             | 'false'                                    # falseLiteral
+             ;
+
+id : ID                                                   # idDecl ;
+
+num : DIGIT+                                              # numDecl ;
 
 ID : LETTER ALPHA_NUM* ;
 

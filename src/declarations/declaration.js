@@ -12,7 +12,7 @@ export class MethodDeclaration extends DecafListener {
   methods = [];
   symbols = [];
 
-  enterMethodDeclaration(ctx) {
+  enterMethodDecl(ctx) {
     let methodType = ctx.methodType().getText();
     let methodId = ctx.id().getText();
     let methodParams = [];
@@ -31,20 +31,34 @@ export class MethodDeclaration extends DecafListener {
     this.methods.push(
       new Method(methodType, methodId, methodParams)
     );
+
+    // Now, we should iterate through the return block
+    let returnBlock = ctx.block();
+
+    // returnBlock.children.map(child => {
+    //   if (child.ruleIndex === 10)
+    //   {
+    //     // console.log(child.statement().getText());
+    //   }
+    // });
   }
 
-  enterVarDeclaration(ctx) {
-    let varType = ctx.varType().getText();
-    let varId = ctx.id().getText();
+  
+
+  enterDeclarationVar(ctx) {
+    let varDecl = ctx.varDeclaration();
+    let varType = varDecl.varType().getText();
+    let varId = varDecl.id().getText();
     let arrayLength = 0;
     let arrayError = null;
     let isArray = false;
 
     // Let's check if there a num in here
-    ctx.children.map(child => {
+    varDecl.children.map(child => {
       if (child.ruleIndex == this.NUM_INDEX)
       {
-        arrayLength = +ctx.num().getText();
+        // Get the array length and check if it's not lower than 0
+        arrayLength = +varDecl.num().getText();
         if (arrayLength <= 0)
           arrayError = new ArrayLengthError();
         isArray = true;

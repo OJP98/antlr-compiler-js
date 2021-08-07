@@ -2,26 +2,18 @@ import antlr4 from 'antlr4';
 import { MainNotDefined, MainHasArgs } from './classes/Error.js';
 import DecafLexer from './grammar/DecafLexer.js';
 import DecafParser from './grammar/DecafParser.js';
-import { MethodDeclaration, Visitor } from './declarations/declaration.js';
+import { MethodDeclaration } from './declarations/declaration.js';
+import DecafVisitor from './grammar/DecafVisitor.js';
 // import DecafListener from './grammar/DecafListener.js';
-// import DecafVisitor from './grammar/DecafVisitor.js';
 
+const customListener = false;
 var errors = [];
 
 const input = `
 class Program {
-  int global1;
-  char global2;
-  int arr[0];
-
-  int iniciar_variables(int var1, int var2) {
-    global1 = 1;
-    return global1;
-  }
-
-    void main() {
+  void main(int param1, int param2) {
     int my_var1;
-    my_var = iniciar_variables();
+    return;
   }
 }
 `
@@ -36,29 +28,38 @@ console.log(parser.ruleNames);
 const numIndex = parser.ruleNames.findIndex(r => r == 'num');
 const parameterIndex = parser.ruleNames.findIndex(r => r == 'parameter');
 
-const metDeclVisitor = new MethodDeclaration();
-metDeclVisitor.NUM_INDEX = numIndex;
-metDeclVisitor.PARAMETER_INDEX = parameterIndex;
+if (customListener)
+{
+  const metDeclListener = new MethodDeclaration();
+  metDeclListener.NUM_INDEX = numIndex;
+  metDeclListener.PARAMETER_INDEX = parameterIndex;
 
-const tree = parser.program();
-antlr4.tree.ParseTreeWalker.DEFAULT.walk(metDeclVisitor, tree);
+  const tree = parser.program();
+  antlr4.tree.ParseTreeWalker.DEFAULT.walk(metDeclListener, tree);
 
-const mainMethod = metDeclVisitor.methods.find((m) => m.name == 'main');
-const symbols = metDeclVisitor.symbols;
+  const mainMethod = metDeclListener.methods.find((m) => m.name == 'main');
+  const symbols = metDeclListener.symbols;
 
-console.table(metDeclVisitor.methods);
-console.table(symbols);
+  console.table(metDeclListener.methods);
+  console.table(symbols);
 
-if (!mainMethod)
-  errors.push(new MainNotDefined());
+  if (!mainMethod)
+    errors.push(new MainNotDefined());
 
-if (mainMethod && mainMethod.args.length)
-  errors.push(new MainHasArgs());
+  if (mainMethod && mainMethod.args.length)
+    errors.push(new MainHasArgs());
 
-// agregamos los errores al arreglo de errores
-symbols.forEach((s) => s.error ? errors.push(s.error) : '');
+  // agregamos los errores al arreglo de errores
+  symbols.forEach((s) => s.error ? errors.push(s.error) : '');
 
-console.log(errors.length ? ('ERRORS: ', errors) : 'No errors');
+  console.log(errors.length ? ('ERRORS: ', errors) : 'No errors');
+}
+else
+{
+  const tree = parser.program();
+  tree.accept(new DecafVisitor());
+}
+
 // tree.accept(methods);
 
 
