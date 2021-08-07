@@ -1,8 +1,10 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src/index.js',
+  context: path.resolve(__dirname, 'src'),
+  entry: './index.js',
   resolve: { fallback: { fs: false } },
+  mode: 'development',
   output: {
     filename: 'bundle.js',
     path: path.resolve(__dirname, 'dist'),
@@ -14,5 +16,5 @@ module.exports = {
         use: ['style-loader', 'css-loader']
       }
     ]
-  }
+  },
 };
