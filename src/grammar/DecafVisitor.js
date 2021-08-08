@@ -198,7 +198,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 		const statements = ctx.statement();
     let returnTypes = [];
 
-		// Execute every var declaration without waiting for a response
+		// Execute every var declaration without waiting for a response.
+		// The visitVarDecl already adds each var to its symbol table.
 		varDeclarations.forEach(varDecl => this.visit(varDecl));
 
 		// Get every statement
