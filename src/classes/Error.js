@@ -22,3 +22,15 @@ export class ArrayLengthError extends Error {
     super('ArrayLength', 'Array length can\'t be zero or lower.');
   }
 }
+
+export class ArrayLengthNotIntError extends Error {
+  constructor() {
+    super('ArrayLengthNotInt', 'Array length is not an integer value.');
+  }
+}
+
+export class MethodReturnTypeError extends Error {
+  constructor() {
+    super('MethodReturnType', 'Void method returns a data type.');
+  }
+}

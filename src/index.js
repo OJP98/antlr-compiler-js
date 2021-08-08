@@ -2,17 +2,16 @@ import antlr4 from 'antlr4';
 import { MainNotDefined, MainHasArgs } from './classes/Error.js';
 import DecafLexer from './grammar/DecafLexer.js';
 import DecafParser from './grammar/DecafParser.js';
-import { MethodDeclaration } from './declarations/declaration.js';
 import DecafVisitor from './grammar/DecafVisitor.js';
 // import DecafListener from './grammar/DecafListener.js';
 
-const customListener = false;
 var errors = [];
 
 const input = `
 class Program {
-  void main(int param1, int param2) {
-    int my_var1;
+  void main() {
+    int my_var2;
+    char my_char[2];
     return;
   }
 }
@@ -25,41 +24,27 @@ parser.buildParseTrees = true;
 
 console.log(parser.ruleNames);
 
-const numIndex = parser.ruleNames.findIndex(r => r == 'num');
-const parameterIndex = parser.ruleNames.findIndex(r => r == 'parameter');
+const tree = parser.program();
+const decafVisitor = new DecafVisitor();
+tree.accept(decafVisitor);
 
-if (customListener)
-{
-  const metDeclListener = new MethodDeclaration();
-  metDeclListener.NUM_INDEX = numIndex;
-  metDeclListener.PARAMETER_INDEX = parameterIndex;
+// Main program
+const mainMethod = decafVisitor.methods.find((m) => m.name == 'main');
 
-  const tree = parser.program();
-  antlr4.tree.ParseTreeWalker.DEFAULT.walk(metDeclListener, tree);
+if (!mainMethod)
+  errors.push(new MainNotDefined());
 
-  const mainMethod = metDeclListener.methods.find((m) => m.name == 'main');
-  const symbols = metDeclListener.symbols;
+if (mainMethod && mainMethod.args.length)
+  errors.push(new MainHasArgs());
 
-  console.table(metDeclListener.methods);
-  console.table(symbols);
+const symbols = decafVisitor.symbols;
 
-  if (!mainMethod)
-    errors.push(new MainNotDefined());
+console.table(decafVisitor.methods);
+console.table(symbols);
 
-  if (mainMethod && mainMethod.args.length)
-    errors.push(new MainHasArgs());
 
-  // agregamos los errores al arreglo de errores
-  symbols.forEach((s) => s.error ? errors.push(s.error) : '');
+// agregamos los errores al arreglo de errores
+symbols.forEach((s) => s.error ? errors.push(s.error.details) : '');
 
-  console.log(errors.length ? ('ERRORS: ', errors) : 'No errors');
-}
-else
-{
-  const tree = parser.program();
-  tree.accept(new DecafVisitor());
-}
-
-// tree.accept(methods);
-
+console.log(errors.length ? ('ERRORS: ', errors) : 'No errors');
 

@@ -1,15 +1,24 @@
+//
 // Generated from ./src/grammar/Decaf.g4 by ANTLR 4.9.2
 // jshint ignore: start
 import antlr4 from 'antlr4';
+import {Method} from '../classes/Method';
+import {Symbol} from '../classes/Symbol';
+import {Array} from '../classes/Array';
+import { ArrayLengthError } from '../classes/Error';
+import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
 export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
+  methods = [];
+  symbols = [];
+  errors = [];
+
 	// Visit a parse tree produced by DecafParser#programInit.
 	visitProgramInit(ctx) {
 		const res = this.visitChildren(ctx);
-		console.log(res);
 	  return res;
 	}
 
@@ -34,16 +43,26 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 	// Visit a parse tree produced by DecafParser#varDecl.
 	visitVarDecl(ctx) {
-		const varType = ctx.varType();
-		const varId = ctx.id();
-		// TODO: Add to symbol table
-	  return { varType, varId };
+		const varType = this.visit(ctx.varType());
+		const varId = this.visit(ctx.id());
+
+    const symbol = new Symbol(varType, varId);
+    this.symbols.push(symbol);
+
+	  return symbol;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#arrDecl.
 	visitArrDecl(ctx) {
-	  return this.visitChildren(ctx);
+		const varType = this.visit(ctx.varType());
+		const varId = this.visit(ctx.id());
+    let num = this.visit(ctx.num());
+
+    const array = new Array(varType, varId, num);
+    this.symbols.push(array);
+
+	  return array;
 	}
 
 
@@ -54,20 +73,20 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 
 	// Visit a parse tree produced by DecafParser#intVar.
-	visitIntVar(ctx) {
-		return ctx.getText();
+	visitIntVar() {
+		return DATA_TYPE.INT;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#charVar.
-	visitCharVar(ctx) {
-		return ctx.getText();
+	visitCharVar() {
+		return DATA_TYPE.CHAR;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#booleanVar.
-	visitBooleanVar(ctx) {
-		return ctx.getText();
+	visitBooleanVar() {
+		return DATA_TYPE.BOOLEAN;
 	}
 
 
@@ -84,85 +103,92 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 
 	// Visit a parse tree produced by DecafParser#voidVar.
-	visitVoidVar(ctx) {
-		return ctx.getText();
+	visitVoidVar() {
+		return DATA_TYPE.VOID;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#methodDecl.
 	visitMethodDecl(ctx) {
-		const methodType = ctx.methodType().getText();
-		const methodId = ctx.id().getText();
+		const methodType = this.visit(ctx.methodType());
+		const methodId = this.visit(ctx.id());
+    const blockReturn = this.visit(ctx.block());
 		const params = ctx.parameter();
-		let parameters = [];
 
-		params.forEach(p => parameters.push(this.visitChildren(p)));
+    const parameters = params.reduce((acc, curr) => {
+      const param = this.visit(curr);
+      acc.push(param);
+      return acc;
+    }, []);
 		
-		//TODO: add method to symbol table
+    const method = new Method(methodType, methodId, parameters, blockReturn);
+		this.methods.push(method);
 
-	  return this.visitChildren(ctx);
+	  return method;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#intMethod.
-	visitIntMethod(ctx) {
-	  return ctx.getText();
+	visitIntMethod() {
+	  return DATA_TYPE.INT;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#charMethod.
-	visitCharMethod(ctx) {
-	  return ctx.getText();
+	visitCharMethod() {
+	  return DATA_TYPE.CHAR;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#booleanMethod.
-	visitBooleanMethod(ctx) {
-	  return ctx.getText();
+	visitBooleanMethod() {
+	  return DATA_TYPE.BOOLEAN;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#voidMethod.
-	visitVoidMethod(ctx) {
-	  return ctx.getText();
+	visitVoidMethod() {
+	  return DATA_TYPE.VOID;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#idParam.
 	visitIdParam(ctx) {
-		const paramType = ctx.parameterType();
-		const paramId = ctx.id();
-	  return { paramType, paramId };
+		const type = this.visit(ctx.parameterType())
+		const name = this.visit(ctx.id())
+	  return { type, name };
 	}
 
 
 	// Visit a parse tree produced by DecafParser#idArrParam.
 	visitIdArrParam(ctx) {
-	  return this.visitChildren(ctx);
+		const type = this.visit(ctx.parameterType())
+		const name = this.visit(ctx.id())
+	  return { type, name };
 	}
 
 
 	// Visit a parse tree produced by DecafParser#voidParam.
-	visitVoidParam(ctx) {
-	  return ctx.getText();
+	visitVoidParam() {
+	  return DATA_TYPE.VOID;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#intParam.
-	visitIntParam(ctx) {
-	  return ctx.getText();
+	visitIntParam() {
+	  return DATA_TYPE.INT;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#charParam.
-	visitCharParam(ctx) {
-	  return ctx.getText();
+	visitCharParam() {
+	  return DATA_TYPE.CHAR;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#booleanParam.
-	visitBooleanParam(ctx) {
-	  return ctx.getText();
+	visitBooleanParam() {
+	  return DATA_TYPE.BOOLEAN;
 	}
 
 
@@ -170,18 +196,24 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 	visitBlockDecl(ctx) {
 		const varDeclarations = ctx.varDeclaration();
 		const statements = ctx.statement();
-		let stmts = [];
+    let returnTypes = [];
 
 		// Execute every var declaration without waiting for a response
-		varDeclarations.forEach(varDecl => this.visitChildren(varDecl));
+		varDeclarations.forEach(varDecl => this.visit(varDecl));
 
 		// Get every statement
-		statements.forEach(stmt => stmts.push(this.visitChildren(stmt)));
+    statements.forEach(stmt => {
+      const returnType = this.visit(stmt);
+      returnTypes.push(returnType);
+    });
 
-		console.log(stmts);
+    // TODO: Get the current method return type in the scope ir order to compare
+    // if every other expression returns that same return type
 
-		console.log(varDeclarations, statements);
-	  return this.visitChildren(ctx);
+    // TODO: We'll have to check each return type if theres more then one
+    console.log(returnTypes);
+
+	  return returnTypes[0];
 	}
 
 
@@ -210,8 +242,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 
 	// Visit a parse tree produced by DecafParser#returnVoidStmt.
-	visitReturnVoidStmt(ctx) {
-	  return 'void';
+	visitReturnVoidStmt() {
+	  return DATA_TYPE.VOID;
 	}
 
 
@@ -372,14 +404,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 
 	// Visit a parse tree produced by DecafParser#trueLiteral.
-	visitTrueLiteral(ctx) {
-	  return ctx.getText();
+	visitTrueLiteral() {
+	  return BOOLEAN_TYPE.TRUE;
 	}
 
 
 	// Visit a parse tree produced by DecafParser#falseLiteral.
-	visitFalseLiteral(ctx) {
-	  return ctx.getText();
+	visitFalseLiteral() {
+	  return BOOLEAN_TYPE.FALSE;
 	}
 
 
