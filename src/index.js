@@ -3,7 +3,6 @@ import { MainNotDefined, MainHasArgs } from './classes/Error.js';
 import DecafLexer from './grammar/DecafLexer.js';
 import DecafParser from './grammar/DecafParser.js';
 import DecafVisitor from './grammar/DecafVisitor.js';
-// import DecafListener from './grammar/DecafListener.js';
 
 var errors = [];
 
@@ -12,6 +11,7 @@ class Program {
   void main() {
     int my_var2;
     char my_char[2];
+    char my_second_char[4];
     return;
   }
 }
@@ -38,13 +38,14 @@ if (mainMethod && mainMethod.args.length)
   errors.push(new MainHasArgs());
 
 const symbols = decafVisitor.symbols;
+const methods = decafVisitor.methods;
 
 console.table(decafVisitor.methods);
 console.table(symbols);
 
-
 // agregamos los errores al arreglo de errores
 symbols.forEach((s) => s.error ? errors.push(s.error.details) : '');
+methods.forEach((m) => m.error ? errors.push(m.error.details) : '');
 
 console.log(errors.length ? ('ERRORS: ', errors) : 'No errors');
 

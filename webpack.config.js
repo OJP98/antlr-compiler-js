@@ -10,10 +10,10 @@ module.exports = {
     port: 5000,
     open: true
   },
-  output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
-  },
+  // output: {
+  //   filename: 'bundle.js',
+  //   path: path.resolve(__dirname, 'dist'),
+  // },
   module: {
     rules: [
       {

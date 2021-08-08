@@ -5,18 +5,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch webpack-dev-server",
+      "name": "Launch webpack",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/node_modules/webpack-dev-server/bin/webpack-dev-server.js",
+      "program": "${workspaceFolder}/node_modules/webpack/bin/webpack.js",
       "args": [
-        "--progress", "--inline", "--config", "webpack.config.js"
+        "serve",
+        "--progress",
+        "--config",
+        "./webpack.config.js"
       ],
       "autoAttachChildProcesses": true,
-      "stopOnEntry": true,
       "url": "http://localhost:5000/",
       "webRoot": "${workspaceRoot}/src",
-      "sourceMaps": true,
     }
   ]
 }
