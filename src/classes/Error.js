@@ -3,15 +3,19 @@ export class Error {
     this.name = name;
     this.details = details;
   }
+
+  get ErrorLog () {
+    return `${this.name}: ${this.details}`;
+  }
 }
 
-export class MainNotDefined extends Error {
+export class MainNotDefinedError extends Error {
   constructor() {
     super('MainMethodNotDefined', 'Main method has not been defined.');
   }
 }
 
-export class MainHasArgs extends Error {
+export class MainHasArgsError extends Error {
   constructor() {
     super('MainMethodArgs', 'Main method contains one or more args.');
   }

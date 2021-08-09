@@ -1,8 +1,8 @@
 import { Data } from "./Data";
 
 export class Struct extends Data {
-  constructor(type, name, properties = [], signature, error) {
-    super(type, name, signature, error);
+  constructor(type, name, line, column, properties = [], signature) {
+    super(type, name, signature, line, column);
     this.properties = properties;
   }
 }

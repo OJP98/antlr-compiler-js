@@ -1,5 +1,5 @@
 import antlr4 from 'antlr4';
-import { MainNotDefined, MainHasArgs } from './classes/Error.js';
+import { MainNotDefinedError } from './classes/Error.js';
 import DecafLexer from './grammar/DecafLexer.js';
 import DecafParser from './grammar/DecafParser.js';
 import DecafVisitor from './grammar/DecafVisitor.js';
@@ -10,8 +10,8 @@ const input = `
 class Program {
   void main() {
     int my_var2;
-    char my_char[2];
-    char my_second_char[4];
+    char my_char[4];
+    char my_second_char[6];
     return;
   }
 }
@@ -32,20 +32,20 @@ tree.accept(decafVisitor);
 const mainMethod = decafVisitor.methods.find((m) => m.name == 'main');
 
 if (!mainMethod)
-  errors.push(new MainNotDefined());
-
-if (mainMethod && mainMethod.args.length)
-  errors.push(new MainHasArgs());
+  errors.push(new MainNotDefinedError().ErrorLog);
 
 const symbols = decafVisitor.symbols;
 const methods = decafVisitor.methods;
 
-console.table(decafVisitor.methods);
+console.table(methods);
 console.table(symbols);
 
 // agregamos los errores al arreglo de errores
-symbols.forEach((s) => s.error ? errors.push(s.error.details) : '');
-methods.forEach((m) => m.error ? errors.push(m.error.details) : '');
+methods.forEach((m) => m.error ? errors.push(m.Error) : '');
+symbols.forEach((s) => s.error ? errors.push(s.Error) : '');
 
-console.log(errors.length ? ('ERRORS: ', errors) : 'No errors');
+if (errors.length)
+  errors.forEach((err) => console.error(err));
+else
+  console.info('No errors found!');
 

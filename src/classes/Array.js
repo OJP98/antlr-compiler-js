@@ -2,8 +2,8 @@ import { Data } from "./Data";
 import {ArrayLengthError, ArrayLengthNotIntError} from "./Error";
 
 export class Array extends Data {
-  constructor(type, name, length, value, signature) {
-    super(type, name, signature);
+  constructor(type, name, length, line, column, value, signature) {
+    super(type, name, signature, line, column);
     this.value = value;
     this.length = +length;
     this.error = this.checkForErrors();

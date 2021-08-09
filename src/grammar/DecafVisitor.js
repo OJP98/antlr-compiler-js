@@ -45,7 +45,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const varType = this.visit(ctx.varType());
     const varId = this.visit(ctx.id());
 
-    const symbol = new Symbol(varType, varId);
+    const symbol = new Symbol(varType, varId, ctx.start.line, ctx.start.column);
     this.symbols.push(symbol);
 
     return symbol;
@@ -56,9 +56,15 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitArrDecl(ctx) {
     const varType = this.visit(ctx.varType());
     const varId = this.visit(ctx.id());
-    let num = this.visit(ctx.num());
+    const num = this.visit(ctx.num());
 
-    const array = new Array(varType, varId, num);
+    const array = new Array(
+      varType,
+      varId,
+      num,
+      ctx.start.line,
+      ctx.start.column
+    );
     this.symbols.push(array);
 
     return array;
@@ -120,7 +126,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return acc;
     }, []);
     
-    const method = new Method(methodType, methodId, parameters, blockReturn);
+    const method = new Method(
+      methodType, 
+      methodId, 
+      parameters, 
+      blockReturn,
+      ctx.start.line,
+      ctx.start.column,
+      );
     this.methods.push(method);
 
     return method;
@@ -211,7 +224,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // if every other expression returns that same return type
 
     // TODO: We'll have to check each return type if theres more then one
-    console.log(returnTypes);
+    // console.log(returnTypes);
 
     return returnTypes[0];
   }
