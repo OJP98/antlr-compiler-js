@@ -45,7 +45,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const varType = this.visit(ctx.varType());
     const varId = this.visit(ctx.id());
 
-    const symbol = new Symbol(varType, varId, ctx.start.line, ctx.start.column);
+    const symbol = new Symbol(
+      varType, varId, ctx.start.line, ctx.start.column
+    );
     this.symbols.push(symbol);
 
     return symbol;
@@ -59,11 +61,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const num = this.visit(ctx.num());
 
     const array = new Array(
-      varType,
-      varId,
-      num,
-      ctx.start.line,
-      ctx.start.column
+      varType, varId, num,
+      ctx.start.line, ctx.start.column
     );
     this.symbols.push(array);
 
@@ -127,13 +126,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     }, []);
     
     const method = new Method(
-      methodType, 
-      methodId, 
-      parameters, 
-      blockReturn,
-      ctx.start.line,
-      ctx.start.column,
-      );
+      methodType,  methodId, parameters, blockReturn,
+      ctx.start.line, ctx.start.column,
+    );
     this.methods.push(method);
 
     return method;
