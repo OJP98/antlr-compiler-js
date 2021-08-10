@@ -1,0 +1,6 @@
+.app_editor {
+		width: 700px; height: 900px;
+		resize: both;
+		overflow: hidden;
+		border: solid 1px lightgray;
+}
