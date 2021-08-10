@@ -163,7 +163,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitIdParam(ctx) {
     const type = this.visit(ctx.parameterType())
     const name = this.visit(ctx.id())
-    return { type, name };
+    return new Symbol(type, name, ctx.start.line, ctx.start.column);
   }
 
 
@@ -171,7 +171,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitIdArrParam(ctx) {
     const type = this.visit(ctx.parameterType())
     const name = this.visit(ctx.id())
-    return { type, name };
+    return new Symbol(type, name, ctx.start.line, ctx.start.colum);
   }
 
 

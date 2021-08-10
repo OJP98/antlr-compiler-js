@@ -12,10 +12,10 @@ export class Method extends Data {
   }
 
   checkForErrors() {
-    if (this.type === DATA_TYPE.VOID &&  this.returnType !== DATA_TYPE.VOID)
+    if (this.type === DATA_TYPE.VOID && this.returnType !== DATA_TYPE.VOID)
       return new MethodReturnTypeError();
 
-    if (this.name == 'main' && this.args.length)
+    if (this.name === 'main' && this.args.length)
       return new MainHasArgsError();
 
 

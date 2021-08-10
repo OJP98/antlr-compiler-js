@@ -1,21 +1,22 @@
 import antlr4 from 'antlr4';
+import 'ace-builds';
+import 'ace-builds/webpack-resolver';
 import { MainNotDefinedError } from './classes/Error.js';
 import DecafLexer from './grammar/DecafLexer.js';
 import DecafParser from './grammar/DecafParser.js';
 import DecafVisitor from './grammar/DecafVisitor.js';
 
+var editor = ace.edit("editor");
+editor.setTheme("ace/theme/monokai");
+editor.session.setMode("ace/mode/c_cpp");
+editor.setKeyboardHandler("ace/keyboard/vim");
+
+console.log(editor.getValue());
+
 var errors = [];
 
-const input = `
-class Program {
-  void main() {
-    int my_var2;
-    char my_char[4];
-    char my_second_char[6];
-    return;
-  }
-}
-`
+const input = editor.getValue();
+
 const chars = new antlr4.InputStream(input);
 const lexer = new DecafLexer(chars);
 const tokens = new antlr4.CommonTokenStream(lexer);
