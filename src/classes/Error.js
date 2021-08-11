@@ -38,3 +38,9 @@ export class MethodReturnTypeError extends Error {
     super('MethodReturnType', 'Void method returns a data type.');
   }
 }
+
+export class IdAlreadyDeclaredError extends Error {
+  constructor() {
+    super('IdAlreadyDeclaredError', 'Id has been already declared in the current scope.');
+  }
+}

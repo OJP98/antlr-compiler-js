@@ -5,11 +5,14 @@ import antlr4 from 'antlr4';
 import {Method} from '../classes/Method';
 import {Symbol} from '../classes/Symbol';
 import {Array} from '../classes/Array';
+import {SymbolTable} from '../classes/SymbolTable';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
 export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
+
+  symbolTable = new SymbolTable();
 
   methods = [];
   symbols = [];
@@ -48,7 +51,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const symbol = new Symbol(
       varType, varId, ctx.start.line, ctx.start.column
     );
-    this.symbols.push(symbol);
+    this.symbolTable.bind(symbol);
 
     return symbol;
   }
@@ -64,7 +67,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       varType, varId, num,
       ctx.start.line, ctx.start.column
     );
-    this.symbols.push(array);
+    this.symbolTable.bind(array);
 
     return array;
   }
@@ -114,22 +117,34 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#methodDecl.
   visitMethodDecl(ctx) {
+    // Create a new symbol table entry
+    this.symbolTable.enter();
+
+    // Get the method type and id
     const methodType = this.visit(ctx.methodType());
     const methodId = this.visit(ctx.id());
-    const blockReturn = this.visit(ctx.block());
-    const params = ctx.parameter();
 
+    // Get and push the parameters to the symbol table
+    const params = ctx.parameter();
     const parameters = params.reduce((acc, curr) => {
       const param = this.visit(curr);
+      this.symbolTable.bind(param);
       acc.push(param);
       return acc;
     }, []);
     
+    // Create a new method and bind it as well
     const method = new Method(
-      methodType,  methodId, parameters, blockReturn,
+      methodType,  methodId, parameters,
       ctx.start.line, ctx.start.column,
     );
+
+    this.symbolTable.bind(method);
+
+    const blockReturn = this.visit(ctx.block());
+    method.ReturnType = blockReturn;
     this.methods.push(method);
+    this.symbolTable.exit();
 
     return method;
   }

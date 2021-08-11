@@ -1,3 +1,5 @@
+import { Method } from "./Method";
+
 export class Data
 {
   constructor(type, name, signature, line = null, column = null) {
@@ -14,5 +16,9 @@ export class Data
       return;
 
     return `${this.error.name}: ${this.error.details}\nAt line ${this.line}`;
+  }
+
+  isMethod() {
+    return this instanceof Method;
   }
 }

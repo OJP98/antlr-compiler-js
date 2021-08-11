@@ -59,14 +59,10 @@ function main() {
   if (!mainMethod)
     errors.push(new MainNotDefinedError().ErrorLog);
 
-  const symbols = decafVisitor.symbols;
-  const methods = decafVisitor.methods;
+  const symbols = decafVisitor.symbolTable.allRegisters;
 
-  console.table(methods);
   console.table(symbols);
 
-  // agregamos los errores al arreglo de errores
-  methods.forEach((m) => m.error ? errors.push(m.Error) : '');
   symbols.forEach((s) => s.error ? errors.push(s.Error) : '');
 
   if (errors.length)
