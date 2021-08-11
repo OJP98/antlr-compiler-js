@@ -1,28 +1,43 @@
 import antlr4 from 'antlr4';
 import 'ace-builds';
 import 'ace-builds/webpack-resolver';
+import './style.css';
 import { MainNotDefinedError } from './classes/Error.js';
 import DecafLexer from './grammar/DecafLexer.js';
 import DecafParser from './grammar/DecafParser.js';
 import DecafVisitor from './grammar/DecafVisitor.js';
+
+const details = document.getElementById("details");
+const returnTag = document.createElement('h2');
+returnTag.innerHTML = 'output';
+document.getElementById("parseButton").addEventListener("click", main);
 
 var editor = ace.edit("editor");
 editor.setTheme("ace/theme/monokai");
 editor.session.setMode("ace/mode/c_cpp");
 editor.setKeyboardHandler("ace/keyboard/vim");
 editor.setAutoScrollEditorIntoView(true);
+editor.setShowPrintMargin(false);
 editor.commands.addCommand({
   name: "parseFile",
   bindKey: {win: "Shift-enter", mac: "Shift-enter"},
   exec: () => main()
 });
+editor.setFontSize(20);
 editor.execCommand("showKeyboardShortcuts")
 
-
-document.getElementById("parseButton").addEventListener("click", main);
+function removeAllChildNodes(parent) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+}
 
 function main() {
+
   console.clear();
+  removeAllChildNodes(details);
+  details.appendChild(returnTag)
+
   var errors = [];
   const input = editor.getValue();
 
@@ -55,8 +70,28 @@ function main() {
   symbols.forEach((s) => s.error ? errors.push(s.Error) : '');
 
   if (errors.length)
-    errors.forEach((err) => console.error(err));
+  {
+    const error_msg = document.createElement('p');
+    error_msg.style = 'color: var(--red);'
+    error_msg.innerHTML = 'Errors:';
+    details.appendChild(error_msg);
+    let counter = 1;
+    errors.forEach((err) => {
+      console.error(err);
+      const p = document.createElement('p');
+      p.innerHTML = `${counter}. ${err}`;
+      p.style = 'color: white;'
+      details.appendChild(p)
+      counter++;
+    });
+  }
   else
+  {
+    const p = document.createElement('p');
+    p.className = 'no-errors';
+    p.innerHTML = 'No errors!';
+    details.appendChild(p);
     console.info('No errors found!');
+  }
 
 }

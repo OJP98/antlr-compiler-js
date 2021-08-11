@@ -2,21 +2,18 @@
 <html lang="en">
   <head>
     <title>Decaf ANTLR</title>
-    <link rel="stylesheet" href="style.css">
-    <style type="text/css" media="screen">
-    #editor { 
-        width: 80%; height: 700px;
-        resize: both;
-        overflow: hidden;
-        border: solid 1px lightgray;
-    }
-  </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Open+Sans&display=swap" rel="stylesheet">
   </head>
   <body>
-
-    <h1>js-antlr</h1>
-
-    <div id="editor" class="app_editor">class Program {
+    <div class="header">
+      <h1>js-antlr</h1>
+      <p>A simple decaf semantic check using JS. Drag and drop a file or write one to start.</p>
+    </div>
+    <div class="container">
+      <div id="editor" class="app_editor">class Program {
     void main() {
         int my_var2;
         char my_char[2];
@@ -27,7 +24,13 @@
     int my_func(int var1, int var2) {
         return var1 + var2;
     }
-}</div>
+}
+      </div>
+      <div id="details" class="details">
+        <h2>output</h2>
+        <p class="no-errors">No errors!</p>
+      </div>
+    </div>
   <button id="parseButton">Go</button>
   </body>
 </html>

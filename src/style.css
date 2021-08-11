@@ -1,6 +1,65 @@
+:root {
+	  --blue : hsl(190, 81%, 67%);
+		--black: #272822;
+		--grey : hsl(55, 8%, 26%);
+		--red : hsl(0, 93%, 59%);
+		--red2 : #F92672;
+		--yellow : #E6DB74;
+		--purple: #AE81FF;
+}
+
+html {
+	margin: 0;
+	padding: 0;
+	font-family: 'Open Sans', sans-serif;
+}
+
+.header {
+	/* background-color: #202020; */
+	margin: 0;
+	padding: 0;
+	color: white;
+}
+
+body {
+	background-color: #2F3129;
+}
+
+p {
+	font-family: 'Montserrat', sans-serif;
+}
+
+h2 {
+	color: var(--blue);
+	align-self: center;
+}
+
+.no-errors {
+	color: var(--yellow);
+}
+
+.container {
+	display: flex;
+	flex-wrap: nowrap;
+	align-content: space-between;
+	align-items: stretch;
+	height: 720px;
+}
+
+.details {
+	padding: 1rem;
+	margin: 0.3rem;
+	width: 50vw;
+	display: flex;
+	flex-direction: column;
+	background-color: var(--black);
+	border: solid 1px black;
+}
+
 .app_editor {
-		width: 700px; height: 900px;
-		resize: both;
-		overflow: hidden;
-		border: solid 1px lightgray;
+	width: 50vw;
+	margin: 0.3rem;
+	resize: both;
+	overflow: hidden;
+	border: solid 1px black;
 }

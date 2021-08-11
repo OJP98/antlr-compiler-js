@@ -13,6 +13,6 @@ export class Data
     if (!this.error)
       return;
 
-    return `${this.error.name}: ${this.error.details}\nAt ${this.line}:${this.column + 1}`;
+    return `${this.error.name}: ${this.error.details}\nAt line ${this.line}`;
   }
 }
