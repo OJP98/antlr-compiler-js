@@ -5,4 +5,8 @@ export default class Struct extends Data {
     super(type, name, signature, line, column);
     this.properties = properties;
   }
+
+  set Properties(props) {
+    this.properties = props;
+  }
 }

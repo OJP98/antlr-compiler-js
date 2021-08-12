@@ -11,10 +11,10 @@ export default class Array extends Data {
 
   checkForErrors() {
     if (!Number.isInteger(this.length))
-      return new ArrayLengthNotIntError();
+      return new ArrayLengthNotIntError(this.name);
 
     if (this.length <= 0)
-      return new ArrayLengthError();
+      return new ArrayLengthError(this.name);
 
     return null;
   }

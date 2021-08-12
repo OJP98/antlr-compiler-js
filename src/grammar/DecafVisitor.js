@@ -1,11 +1,12 @@
 //
 // Generated from ./src/grammar/Decaf.g4 by ANTLR 4.9.2
 // jshint ignore: start
+import Array from '../classes/Array';
+import Method from '../classes/Method';
+import Struct from '../classes/Struct';
+import Symbol from '../classes/Symbol';
+import SymbolTable from '../classes/SymbolTable';
 import antlr4 from 'antlr4';
-import {Method} from '../classes/Method';
-import {Symbol} from '../classes/Symbol';
-import {Array} from '../classes/Array';
-import {SymbolTable} from '../classes/SymbolTable';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
@@ -75,7 +76,25 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#structDecl.
   visitStructDecl(ctx) {
-    return this.visitChildren(ctx);
+    const type = DATA_TYPE.STRUCT;
+    const id = this.visit(ctx.id());
+    const properties = ctx.varDeclaration();
+
+    const struct = new Struct(
+      type, id, ctx.start.line, ctx.start.column
+    );
+
+    this.symbolTable.bind(struct);
+    this.symbolTable.enter();
+
+    // Go through each var declaration, don't forget visitVarDecl
+    // Already adds the variables to the symbols table
+    properties.forEach(varDecl => this.visit(varDecl));
+    struct.Properties = properties;
+
+    this.symbolTable.exit();
+
+    return struct;
   }
 
 
@@ -296,7 +315,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#idLocation.
   visitIdLocation(ctx) {
-    return this.visitChildren(ctx);
+    const id = this.visit(ctx.id());
+    return this.symbolTable.lookup(id);
   }
 
 

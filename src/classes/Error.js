@@ -23,14 +23,14 @@ export class MainHasArgsError extends Error {
 }
 
 export class ArrayLengthError extends Error {
-  constructor() {
-    super('ArrayLength', 'Array length can\'t be zero or lower.');
+  constructor(id) {
+    super('ArrayLength', `Array "${id}" length can't be zero or lower.`);
   }
 }
 
 export class ArrayLengthNotIntError extends Error {
-  constructor() {
-    super('ArrayLengthNotInt', 'Array length is not an integer value.');
+  constructor(id) {
+    super('ArrayLengthNotInt', `Array length ${id} is not an integer value.`);
   }
 }
 
@@ -41,7 +41,13 @@ export class MethodReturnTypeError extends Error {
 }
 
 export class IdAlreadyDeclaredError extends Error {
-  constructor() {
-    super('IdAlreadyDeclaredError', 'Id has been already declared in the current scope.');
+  constructor(id) {
+    super('Id Already Declared', `"${id}" has been already declared in the current scope.`);
+  }
+}
+
+export class InvalidConversion extends Error {
+  constructor(type1, type2) {
+    super('Invalid Conversion', `Invalid conversion from ${type1} to ${type2}`);
   }
 }

@@ -11,7 +11,7 @@ export default class SymbolTable {
     this.allRegisters.push(entry);
 
     if (table.find((s) => s.name === entry.name)) {
-      entry.Error = new IdAlreadyDeclaredError();
+      entry.Error = new IdAlreadyDeclaredError(entry.name);
       return;
     }
 
@@ -30,9 +30,11 @@ export default class SymbolTable {
     this.symbolTable = [];
   }
 
-  // lookup(symbol) {
-  //   // return the symbol if exists
-  // }
+  lookup(symbolId) {
+    const allSymbols = this.symbolTable.flat();
+    const symbol = allSymbols.find((s) => s.name === symbolId);
+    return symbol || undefined;
+  }
 
   exit() {
     console.log('Exit');
