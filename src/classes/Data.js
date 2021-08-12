@@ -1,7 +1,7 @@
-import { Method } from "./Method";
+// eslint-disable-next-line import/no-cycle
+import Method from './Method';
 
-export class Data
-{
+export default class Data {
   constructor(type, name, signature, line = null, column = null) {
     this.type = type;
     this.name = name;
@@ -12,10 +12,11 @@ export class Data
   }
 
   get Error() {
-    if (!this.error)
-      return;
+    return this.error ? `${this.error.name}: ${this.error.details}\nAt line ${this.line}` : null;
+  }
 
-    return `${this.error.name}: ${this.error.details}\nAt line ${this.line}`;
+  set Error(error) {
+    this.error = error;
   }
 
   isMethod() {

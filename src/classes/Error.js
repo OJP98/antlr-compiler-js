@@ -1,10 +1,11 @@
-export class Error {
+/* eslint-disable max-classes-per-file */
+export default class Error {
   constructor(name, details) {
     this.name = name;
     this.details = details;
   }
 
-  get ErrorLog () {
+  get ErrorLog() {
     return `${this.name}: ${this.details}`;
   }
 }

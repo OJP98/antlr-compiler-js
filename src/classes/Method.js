@@ -1,9 +1,9 @@
-import { Data } from "./Data";
+// eslint-disable-next-line import/no-cycle
+import Data from './Data';
 import { MethodReturnTypeError, MainHasArgsError } from './Error';
-import { DATA_TYPE } from "../enums/dataTypes";
+import { DATA_TYPE } from '../enums/dataTypes';
 
-
-export class Method extends Data {
+export default class Method extends Data {
   constructor(type, name, args, line, column, signature) {
     super(type, name, signature, line, column);
     this.args = args;
@@ -21,7 +21,6 @@ export class Method extends Data {
 
     if (this.name === 'main' && this.args.length)
       return new MainHasArgsError();
-
 
     return null;
   }

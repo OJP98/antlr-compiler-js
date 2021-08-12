@@ -1,6 +1,6 @@
-import { IdAlreadyDeclaredError } from "./Error";
+import { IdAlreadyDeclaredError } from './Error';
 
-export class SymbolTable {
+export default class SymbolTable {
   constructor() {
     this.symbolTable = [[]];
     this.allRegisters = [];
@@ -11,7 +11,7 @@ export class SymbolTable {
     this.allRegisters.push(entry);
 
     if (table.find((s) => s.name === entry.name)) {
-      entry.error = new IdAlreadyDeclaredError()
+      entry.Error = new IdAlreadyDeclaredError();
       return;
     }
 
@@ -27,16 +27,15 @@ export class SymbolTable {
   }
 
   empty() {
-    this.symbolTable = new Array();
+    this.symbolTable = [];
   }
 
-  lookup(symbol) {
-    // return the symbol if exists
-  }
+  // lookup(symbol) {
+  //   // return the symbol if exists
+  // }
 
   exit() {
     console.log('Exit');
     this.symbolTable.pop();
   }
-
 }

@@ -8,7 +8,7 @@ module.exports = {
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
     port: 5000,
-    open: true
+    open: true,
   },
   output: {
     filename: 'bundle.js',
@@ -18,7 +18,7 @@ module.exports = {
     rules: [
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
@@ -30,7 +30,7 @@ module.exports = {
             },
           },
         ],
-      }
+      },
     ],
   },
   plugins: [
