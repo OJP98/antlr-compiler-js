@@ -49,11 +49,16 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitVarDecl(ctx) {
     const varType = this.visit(ctx.varType());
     const varId = this.visit(ctx.id());
+    console.log(ctx);
 
     const symbol = new Symbol(
       varType, varId, ctx.start.line, ctx.start.column
     );
+
     this.symbolTable.bind(symbol);
+
+    if (symbol.error)
+      this.errors.push(symbol.error);
 
     return symbol;
   }
@@ -69,7 +74,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       varType, varId, num,
       ctx.start.line, ctx.start.column
     );
+
     this.symbolTable.bind(array);
+
+    if (array.error)
+      this.errors.push(array.error);
 
     return array;
   }
@@ -83,7 +92,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const props = [];
 
     const struct = new Struct(
-      type, id, ctx.start.line, ctx.start.column
+      type, id
     );
 
     // Add the struct to the current scope and create a new one
@@ -142,35 +151,38 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#methodDecl.
   visitMethodDecl(ctx) {
-    // Create a new symbol table entry
-    this.symbolTable.enter();
-
     // Get the method type and id
     const methodType = this.visit(ctx.methodType());
     const methodId = this.visit(ctx.id());
+    const params = ctx.parameter();
+
+    const method = new Method(
+      methodType, methodId, ctx.start.line, ctx.start.column
+    );
+    this.symbolTable.bind(method);
+
+    // Create a new symbol table entry
+    this.symbolTable.enter();
 
     // Get and push the parameters to the symbol table
-    const params = ctx.parameter();
     const parameters = params.reduce((acc, curr) => {
       const param = this.visit(curr);
-      this.symbolTable.bind(param);
       acc.push(param);
       return acc;
     }, []);
-    
-    // Create a new method and bind it as well
-    const method = new Method(
-      methodType,  methodId, parameters,
-      ctx.start.line, ctx.start.column,
-    );
+    // Assign the parameters to the created method
+    method.args = parameters;
 
-    this.symbolTable.bind(method);
-
+    // Visit block and assign it's return type to the method
     const blockReturn = this.visit(ctx.block());
     method.ReturnType = blockReturn;
-    this.methods.push(method);
-    this.symbolTable.exit();
 
+    // Finally, check for any errors and push them if exist
+    if (method.error)
+      this.errors.push(method.error)
+
+    // Exit the newly created symbol table
+    this.symbolTable.exit();
     return method;
   }
 
@@ -203,15 +215,21 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitIdParam(ctx) {
     const type = this.visit(ctx.parameterType())
     const name = this.visit(ctx.id())
-    return new Symbol(type, name, ctx.start.line, ctx.start.column);
+    const symbol = new Symbol(
+      type, name, ctx.start.line, ctx.start.column
+    );
+
+    const bindError = this.symbolTable.bind(symbol);
+    if (bindError)
+      this.errors.push(bindError);
+
+    return symbol
   }
 
 
   // Visit a parse tree produced by DecafParser#idArrParam.
   visitIdArrParam(ctx) {
-    const type = this.visit(ctx.parameterType())
-    const name = this.visit(ctx.id())
-    return new Symbol(type, name, ctx.start.line, ctx.start.colum);
+    this.visitIdParam(ctx);
   }
 
 
@@ -314,10 +332,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     if (invalidProperty) 
       this.errors.push(
-        new invalidPropertyError(id, invalidProperty, ctx.start.line).ErrorLog
+        new invalidPropertyError(id, invalidProperty, ctx.start.line)
       );
     else if (!exists)
-      this.errors.push(new UndeclaredIdError(id, ctx.start.line).ErrorLog);
+      this.errors.push(new UndeclaredIdError(id, ctx.start.line));
     
     return this.visitChildren(ctx);
   }
@@ -435,10 +453,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     if (invalidProperty) 
       this.errors.push(
-        new invalidPropertyError(id, invalidProperty, ctx.start.line).ErrorLog
+        new invalidPropertyError(id, invalidProperty, ctx.start.line)
       );
     else if (!exists)
-      this.errors.push(new UndeclaredIdError(id, ctx.start.line).ErrorLog);
+      this.errors.push(new UndeclaredIdError(id, ctx.start.line));
     
     return this.visitChildren(ctx);
   }

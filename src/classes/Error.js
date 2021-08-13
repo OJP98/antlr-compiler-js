@@ -1,12 +1,14 @@
 /* eslint-disable max-classes-per-file */
 export default class Error {
-  constructor(name, details) {
+  constructor(name, details, line = null, column = null) {
     this.name = name;
     this.details = details;
+    this.line = line;
+    this.column = column;
   }
 
   get ErrorLog() {
-    return `${this.details}`;
+    return this.line ? `${this.details} At line ${this.line}` : this.details;
   }
 }
 
@@ -29,20 +31,20 @@ export class ArrayLengthError extends Error {
 }
 
 export class ArrayLengthNotIntError extends Error {
-  constructor(id) {
-    super('ArrayLengthNotInt', `Array length ${id} is not an integer value.`);
+  constructor(id, line, column) {
+    super('ArrayLengthNotInt', `Array length ${id} is not an integer value.`, line, column);
   }
 }
 
 export class MethodReturnTypeError extends Error {
-  constructor() {
-    super('MethodReturnType', 'Void method returns a data type.');
+  constructor(line, column) {
+    super('MethodReturnType', 'Void method returns a data type.', line, column);
   }
 }
 
 export class IdAlreadyDeclaredError extends Error {
-  constructor(id) {
-    super('Id Already Declared', `"${id}" has been already declared in the current scope.`);
+  constructor(id, line, column) {
+    super('Id Already Declared', `"${id}" has been already declared in the current scope.`, line, column);
   }
 }
 

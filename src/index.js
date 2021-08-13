@@ -37,6 +37,7 @@ function removeAllChildNodes(parent) {
 }
 
 function main() {
+  const errors = [];
   console.clear();
   removeAllChildNodes(details);
   details.appendChild(returnTag);
@@ -56,7 +57,7 @@ function main() {
   tree.accept(decafVisitor);
 
   const symbols = decafVisitor.symbolTable.allRegisters;
-  const { errors } = decafVisitor;
+  const visitorErrors = decafVisitor.errors;
 
   // Main program
   const mainMethod = symbols.find((m) => m.name === 'main');
@@ -66,7 +67,7 @@ function main() {
 
   console.table(symbols);
 
-  symbols.forEach((s) => (s.error ? errors.push(s.Error) : ''));
+  visitorErrors.forEach((e) => errors.push(e.ErrorLog));
   errors.concat(decafVisitor.errors);
 
   if (errors.length) {

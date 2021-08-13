@@ -5,7 +5,7 @@ import { DATA_TYPE } from '../enums/dataTypes';
 
 export default class Method extends Data {
   constructor(type, name, args, line, column, signature) {
-    super(type, name, signature, line, column);
+    super(type, name, line, column, signature);
     this.args = args;
     this.returnType = null;
   }
@@ -16,8 +16,11 @@ export default class Method extends Data {
   }
 
   checkForErrors() {
+    if (this.error)
+      return this.error;
+
     if (this.returnType && this.type === DATA_TYPE.VOID && this.returnType !== DATA_TYPE.VOID)
-      return new MethodReturnTypeError();
+      return new MethodReturnTypeError(this.line, this.column);
 
     if (this.name === 'main' && this.args.length)
       return new MainHasArgsError();

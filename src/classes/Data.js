@@ -1,11 +1,11 @@
 export default class Data {
-  constructor(type, name, signature, line = null, column = null) {
+  constructor(type, name, line, column, signature = null) {
     this.type = type;
     this.name = name;
-    this.signature = signature || null;
-    this.error = null;
     this.line = line;
     this.column = column;
+    this.signature = signature;
+    this.error = null;
   }
 
   get Error() {
@@ -14,5 +14,9 @@ export default class Data {
 
   set Error(error) {
     this.error = error;
+  }
+
+  checkForErrors() {
+    return this.error || null;
   }
 }

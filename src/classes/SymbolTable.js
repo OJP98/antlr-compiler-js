@@ -11,14 +11,18 @@ export default class SymbolTable {
     this.allRegisters.push(entry);
 
     if (table.find((s) => s.name === entry.name)) {
-      entry.Error = new IdAlreadyDeclaredError(entry.name);
-      return;
+      const error = new IdAlreadyDeclaredError(entry.name, entry.line, entry.column);
+      entry.Error = error;
+      table.push(entry);
+      this.symbolTable.push(table);
+      return error;
     }
 
     table.push(entry);
     this.symbolTable.push(table);
     console.log('Bind', entry);
     console.table(this.symbolTable);
+    return null;
   }
 
   enter() {
