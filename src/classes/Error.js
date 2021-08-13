@@ -57,3 +57,9 @@ export class InvalidConversion extends Error {
     super('Invalid Conversion', `Invalid conversion from ${type1} to ${type2}`);
   }
 }
+
+export class invalidPropertyError extends Error {
+  constructor(struct, property, line) {
+    super('Invalid Property', `"${property}" is not a property of "${struct}". At line ${line}`);
+  }
+}

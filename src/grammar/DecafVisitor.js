@@ -8,7 +8,7 @@ import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
-import { UndeclaredIdError } from '../classes/Error';
+import { invalidPropertyError, UndeclaredIdError } from '../classes/Error';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
@@ -122,7 +122,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#structVar.
   visitStructVar(ctx) {
-    return this.visitChildren(ctx);
+    // TODO: Structs data type are DIFFERENT than strcuts variables...
+    const structId = this.visit(ctx.id());
+    return DATA_TYPE.STRUCT;
   }
 
 
@@ -307,6 +309,16 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#assignmentStmt.
   visitAssignmentStmt(ctx) {
+    const location = this.visit(ctx.location());
+    const { id, exists, invalidProperty } = location;
+
+    if (invalidProperty) 
+      this.errors.push(
+        new invalidPropertyError(id, invalidProperty, ctx.start.line).ErrorLog
+      );
+    else if (!exists)
+      this.errors.push(new UndeclaredIdError(id, ctx.start.line).ErrorLog);
+    
     return this.visitChildren(ctx);
   }
 
@@ -343,7 +355,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Does the specified id exists?
     if (!struct)
-      return { id: `${id}.${location}`, exists: false };
+      return { id: `${id}.${location.id}`, exists: false };
 
     // Is it a struct data type?
     if (struct.type !== DATA_TYPE.STRUCT)
@@ -351,16 +363,38 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // If everything else passes, then get the object
     const prop = struct.getProperty(location.id);
-    if (!prop)
+    if (!prop) {
       console.error(`"${id}" doesn't contain the property "${location.id}"`);
+      return { id: id, exists: prop, invalidProperty: location.id };
+    }
 
-    return { id: id, exists: prop };
+    return { id: `${id}.${location.id}`, exists: prop };
   }
 
 
   // Visit a parse tree produced by DecafParser#idArrDotLocation.
   visitIdArrDotLocation(ctx) {
-    return this.visitChildren(ctx);
+    const id = this.visit(ctx.id());
+    const struct = this.symbolTable.lookup(id);
+    // TODO: check ir expr return type is an integer value
+    const expr = this.visit(ctx.expression());
+
+    // Does the specified id exists?
+    if (!struct)
+      return { id: id, exists: false };
+    
+    // Is it a struct data type?
+    if (struct.type !== DATA_TYPE.STRUCT)
+      console.error('Data type is not struct!');
+    
+    // If everything else passes, then get the object
+    const prop = struct.getProperty(location.id);
+    if (!prop) {
+      console.error(`"${id}" doesn't contain the property "${location.id}"`);
+      return { id: id, exists: prop, invalidProperty: location.id };
+    }
+
+    return { id: `${id}[${expr}].${location.id}`, exists: prop };
   }
 
 
@@ -396,9 +430,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#locationExpr.
   visitLocationExpr(ctx) {
-    const res = this.visit(ctx.location());
-    const { id, exists } = res;
-    if (!exists)
+    const location = this.visit(ctx.location());
+    const { id, exists, invalidProperty } = location;
+
+    if (invalidProperty) 
+      this.errors.push(
+        new invalidPropertyError(id, invalidProperty, ctx.start.line).ErrorLog
+      );
+    else if (!exists)
       this.errors.push(new UndeclaredIdError(id, ctx.start.line).ErrorLog);
     
     return this.visitChildren(ctx);
