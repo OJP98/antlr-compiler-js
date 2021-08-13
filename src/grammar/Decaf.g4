@@ -48,7 +48,7 @@ statement : 'if' '(' expression ')' block                 # ifStmt
           | 'return' ';'                                  # returnVoidStmt 
           | methodCall ';'                                # methodStmt
           | block                                         # blockStmt
-          | location '=' expression                       # assignmentStmt
+          | location '=' expression ';'                   # assignmentStmt
           | expression ';'                                # expressionStmt
           ;
 
