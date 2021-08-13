@@ -41,7 +41,6 @@ function main() {
   removeAllChildNodes(details);
   details.appendChild(returnTag);
 
-  const errors = [];
   const input = editor.getValue();
 
   const chars = new antlr4.InputStream(input);
@@ -57,15 +56,18 @@ function main() {
   tree.accept(decafVisitor);
 
   const symbols = decafVisitor.symbolTable.allRegisters;
+  const { errors } = decafVisitor;
 
   // Main program
   const mainMethod = symbols.find((m) => m.name === 'main');
 
-  if (!mainMethod) { errors.push(new MainNotDefinedError().ErrorLog); }
+  if (!mainMethod)
+    errors.push(new MainNotDefinedError().ErrorLog);
 
   console.table(symbols);
 
   symbols.forEach((s) => (s.error ? errors.push(s.Error) : ''));
+  errors.concat(decafVisitor.errors);
 
   if (errors.length) {
     const errorMsg = document.createElement('p');

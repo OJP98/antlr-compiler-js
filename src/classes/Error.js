@@ -6,7 +6,7 @@ export default class Error {
   }
 
   get ErrorLog() {
-    return `${this.name}: ${this.details}`;
+    return `${this.details}`;
   }
 }
 
@@ -43,6 +43,12 @@ export class MethodReturnTypeError extends Error {
 export class IdAlreadyDeclaredError extends Error {
   constructor(id) {
     super('Id Already Declared', `"${id}" has been already declared in the current scope.`);
+  }
+}
+
+export class UndeclaredIdError extends Error {
+  constructor(id, line) {
+    super('UndeclaredIdError', `"${id}" was not declared in this scope. At line ${line}`);
   }
 }
 

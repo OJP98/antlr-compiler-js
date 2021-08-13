@@ -8,6 +8,7 @@ import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
+import { UndeclaredIdError } from '../classes/Error';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
@@ -85,6 +86,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       type, id, ctx.start.line, ctx.start.column
     );
 
+    // Add the struct to the current scope and create a new one
     this.symbolTable.bind(struct);
     this.symbolTable.enter();
 
@@ -318,19 +320,41 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#idLocation.
   visitIdLocation(ctx) {
     const id = this.visit(ctx.id());
-    return this.symbolTable.lookup(id);
+    return { id: id, exists: this.symbolTable.lookup(id) };
   }
 
 
   // Visit a parse tree produced by DecafParser#arrLocation.
   visitArrLocation(ctx) {
-    return this.visitChildren(ctx);
+    const id = this.visit(ctx.id());
+    // TODO: check ir expr return type is an integer value
+    const expr = this.visit(ctx.expression());
+
+    return { id: id, exists: this.symbolTable.lookup(id) };
   }
 
 
   // Visit a parse tree produced by DecafParser#idDotLocation.
   visitIdDotLocation(ctx) {
-    return this.visitChildren(ctx);
+    const id = this.visit(ctx.id());
+    const struct = this.symbolTable.lookup(id);
+    // Does the struct has the specified property?
+    const location = this.visit(ctx.location());
+
+    // Does the specified id exists?
+    if (!struct)
+      return { id: `${id}.${location}`, exists: false };
+
+    // Is it a struct data type?
+    if (struct.type !== DATA_TYPE.STRUCT)
+      console.error('Data type is not struct!');
+
+    // If everything else passes, then get the object
+    const prop = struct.getProperty(location.id);
+    if (!prop)
+      console.error(`"${id}" doesn't contain the property "${location.id}"`);
+
+    return { id: id, exists: prop };
   }
 
 
@@ -372,6 +396,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#locationExpr.
   visitLocationExpr(ctx) {
+    const res = this.visit(ctx.location());
+    const { id, exists } = res;
+    if (!exists)
+      this.errors.push(new UndeclaredIdError(id, ctx.start.line).ErrorLog);
+    
     return this.visitChildren(ctx);
   }
 

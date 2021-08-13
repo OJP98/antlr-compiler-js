@@ -9,4 +9,8 @@ export default class Struct extends Data {
   set Properties(props) {
     this.properties = props;
   }
+
+  getProperty(prop) {
+    return this.properties.find((p) => p.name === prop);
+  }
 }
