@@ -20,14 +20,14 @@ export default class SymbolTable {
 
     table.push(entry);
     this.symbolTable.push(table);
-    console.log('Bind', entry);
-    console.table(this.symbolTable);
+    // console.log(this.symbolTable);
+    // console.log('Bind', entry);
     return null;
   }
 
   enter() {
     this.symbolTable.push([]);
-    console.log('New entry');
+    // console.log('New entry');
   }
 
   empty() {
@@ -35,13 +35,19 @@ export default class SymbolTable {
   }
 
   lookup(symbolId) {
-    const allSymbols = this.symbolTable.flat();
-    const symbol = allSymbols.find((s) => s.name === symbolId);
-    return symbol || undefined;
+    const symbolTableCopy = this.symbolTable.slice();
+
+    while (symbolTableCopy.length) {
+      const table = symbolTableCopy.pop();
+      const found = table.find((symbol) => symbol.name === symbolId);
+      if (found)
+        return found;
+    }
+    return undefined;
   }
 
   exit() {
-    console.log('Exit');
+    // console.log('Exit');
     this.symbolTable.pop();
   }
 }

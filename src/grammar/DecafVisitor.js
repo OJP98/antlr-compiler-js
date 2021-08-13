@@ -49,7 +49,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitVarDecl(ctx) {
     const varType = this.visit(ctx.varType());
     const varId = this.visit(ctx.id());
-    console.log(ctx);
 
     const symbol = new Symbol(
       varType, varId, ctx.start.line, ctx.start.column
@@ -223,7 +222,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (bindError)
       this.errors.push(bindError);
 
-    return symbol
+    return symbol;
   }
 
 
@@ -458,7 +457,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     else if (!exists)
       this.errors.push(new UndeclaredIdError(id, ctx.start.line));
     
-    return this.visitChildren(ctx);
+    return location;
   }
 
 
