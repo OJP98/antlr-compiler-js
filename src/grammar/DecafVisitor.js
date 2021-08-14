@@ -4,6 +4,7 @@
 import Array from '../classes/Array';
 import Method from '../classes/Method';
 import Struct from '../classes/Struct';
+import StructDeclaration from '../classes/StructDeclaration';
 import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
 import antlr4 from 'antlr4';
@@ -49,10 +50,21 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitVarDecl(ctx) {
     const varType = this.visit(ctx.varType());
     const varId = this.visit(ctx.id());
-
-    const symbol = new Symbol(
-      varType, varId, ctx.start.line, ctx.start.column
-    );
+    const startLine = ctx.start.line;
+    const startCol = ctx.start.column;
+    const { structId, type } = varType;
+    let symbol = null;
+    
+    if (structId) {
+       const struct = this.symbolTable.lookup(structId);
+       symbol = new Struct(
+         type, varId, startLine, startCol, struct, structId
+       );
+    } else {
+      symbol = new Symbol(
+        type, varId, ctx.start.line, ctx.start.column
+      );
+    }
 
     this.symbolTable.bind(symbol);
 
@@ -85,13 +97,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#structDecl.
   visitStructDecl(ctx) {
-    const type = DATA_TYPE.STRUCT;
+    const type = DATA_TYPE.STRUCT_DECL;
     const id = this.visit(ctx.id());
     const properties = ctx.varDeclaration();
     const props = [];
 
-    const struct = new Struct(
-      type, id
+    const struct = new StructDeclaration(
+      type, id, ctx.start.line, ctx.start.column
     );
 
     // Add the struct to the current scope and create a new one
@@ -103,48 +115,50 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     properties.forEach(varDecl => props.push(
       this.visit(varDecl))
     );
-    struct.Properties = props;
-    this.symbolTable.exit();
+    struct.properties = props;
 
+    if (struct.error)
+      this.errors.push(struct.error)
+
+    this.symbolTable.exit();
     return struct;
   }
 
 
   // Visit a parse tree produced by DecafParser#intVar.
   visitIntVar() {
-    return DATA_TYPE.INT;
+    return { structId: null, type: DATA_TYPE.INT };
   }
 
 
   // Visit a parse tree produced by DecafParser#charVar.
   visitCharVar() {
-    return DATA_TYPE.CHAR;
+    return { structId: null, type: DATA_TYPE.CHAR };
   }
 
 
   // Visit a parse tree produced by DecafParser#booleanVar.
   visitBooleanVar() {
-    return DATA_TYPE.BOOLEAN;
+    return { structId: null, type: DATA_TYPE.BOOLEAN };
   }
 
 
   // Visit a parse tree produced by DecafParser#structVar.
   visitStructVar(ctx) {
-    // TODO: Structs data type are DIFFERENT than strcuts variables...
     const structId = this.visit(ctx.id());
-    return DATA_TYPE.STRUCT;
+    return { structId, type: DATA_TYPE.STRUCT };
   }
 
 
   // Visit a parse tree produced by DecafParser#structDeclarationVar.
   visitStructDeclarationVar(ctx) {
-    return this.visitChildren(ctx);
+    return { structId: null, type: this.visitChildren(ctx) };
   }
 
 
   // Visit a parse tree produced by DecafParser#voidVar.
   visitVoidVar() {
-    return DATA_TYPE.VOID;
+    return { structId: null, type: DATA_TYPE.VOID };
   }
 
 

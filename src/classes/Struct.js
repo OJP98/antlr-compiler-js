@@ -1,21 +1,29 @@
 import Data from './Data';
+import { UndeclaredStructError } from './Error';
 
 export default class Struct extends Data {
-  constructor(type, name, structId = null, properties = [], signature) {
-    super(type, name, signature);
-    this.properties = properties;
+  constructor(type, name, line, column, structDecl = null, structId, signature) {
+    super(type, name, line, column, signature);
+    this.structDecl = structDecl;
     this.structId = structId;
+    this.error = this.checkForErrors();
   }
 
-  set Properties(props) {
-    this.properties = props;
+  set StructId(structDecl) {
+    this.structDecl = structDecl;
   }
 
-  set StructId(structId) {
-    this.structId = structId;
+  checkForErrors() {
+    if (this.error)
+      return this.error;
+
+    if (!this.structDecl)
+      return new UndeclaredStructError(this.structId, this.line);
+
+    return null;
   }
 
   getProperty(prop) {
-    return this.properties.find((p) => p.name === prop);
+    return this.structDecl.properties.find((p) => p.name === prop);
   }
 }

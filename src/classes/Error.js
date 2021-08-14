@@ -50,7 +50,7 @@ export class IdAlreadyDeclaredError extends Error {
 
 export class UndeclaredIdError extends Error {
   constructor(id, line) {
-    super('UndeclaredIdError', `"${id}" was not declared in this scope. At line ${line}`);
+    super('UndeclaredIdError', `"${id}" doesn't exist in the current scope. At line ${line}`);
   }
 }
 
@@ -63,5 +63,11 @@ export class InvalidConversion extends Error {
 export class invalidPropertyError extends Error {
   constructor(struct, property, line) {
     super('Invalid Property', `"${property}" is not a property of "${struct}". At line ${line}`);
+  }
+}
+
+export class UndeclaredStructError extends Error {
+  constructor(structId, line) {
+    super('Undeclared Struct', `struct "${structId}" doesn't exist in the current scope. At line ${line}`);
   }
 }
