@@ -1,11 +1,12 @@
 import Data from './Data';
-import { UndeclaredStructError } from './Error';
+import { ArrayLengthError, UndeclaredStructError } from './Error';
 
 export default class Struct extends Data {
-  constructor(type, name, line, column, structDecl = null, structId, signature) {
-    super(type, name, line, column, signature);
+  constructor(type, name, line, column, structDecl = null, structId, length = null) {
+    super(type, name, line, column);
     this.structDecl = structDecl;
     this.structId = structId;
+    this.length = length;
     this.error = this.checkForErrors();
   }
 
@@ -16,6 +17,9 @@ export default class Struct extends Data {
   checkForErrors() {
     if (this.error)
       return this.error;
+
+    if (this.length !== null && this.length <= 0)
+      return new ArrayLengthError(this.name, this.line);
 
     if (!this.structDecl)
       return new UndeclaredStructError(this.structId, this.line);

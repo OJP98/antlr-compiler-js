@@ -25,8 +25,8 @@ export class MainHasArgsError extends Error {
 }
 
 export class ArrayLengthError extends Error {
-  constructor(id) {
-    super('ArrayLength', `Array "${id}" length can't be zero or lower.`);
+  constructor(id, line) {
+    super('ArrayLength', `Array "${id}" length can't be zero or lower.`, line);
   }
 }
 
@@ -50,7 +50,7 @@ export class IdAlreadyDeclaredError extends Error {
 
 export class UndeclaredIdError extends Error {
   constructor(id, line) {
-    super('UndeclaredIdError', `"${id}" doesn't exist in the current scope. At line ${line}`);
+    super('UndeclaredIdError', `"${id}" doesn't exist in the current scope.`, line);
   }
 }
 
@@ -62,12 +62,12 @@ export class InvalidConversion extends Error {
 
 export class invalidPropertyError extends Error {
   constructor(struct, property, line) {
-    super('Invalid Property', `"${property}" is not a property of "${struct}". At line ${line}`);
+    super('Invalid Property', `"${property}" is not a property of "${struct}"`, line);
   }
 }
 
 export class UndeclaredStructError extends Error {
   constructor(structId, line) {
-    super('Undeclared Struct', `struct "${structId}" doesn't exist in the current scope. At line ${line}`);
+    super('Undeclared Struct', `struct "${structId}" doesn't exist in the current scope.`, line);
   }
 }

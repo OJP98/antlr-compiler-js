@@ -4,8 +4,8 @@ import { MethodReturnTypeError, MainHasArgsError } from './Error';
 import { DATA_TYPE } from '../enums/dataTypes';
 
 export default class Method extends Data {
-  constructor(type, name, line, column, signature) {
-    super(type, name, line, column, signature);
+  constructor(type, name, line, column) {
+    super(type, name, line, column);
     this.args = [];
     this.returnType = null;
   }

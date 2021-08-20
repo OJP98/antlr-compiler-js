@@ -9,6 +9,7 @@ declaration : structDeclaration                          # declarationStruct
 
 varDeclaration : varType id ';'                          # varDecl
                | varType id '[' num ']' ';'              # arrDecl
+               | structDeclaration                       # structOfStruct
                ;
 
 structDeclaration : 'struct' id '{' varDeclaration* '}' ';'?  # structDecl ;

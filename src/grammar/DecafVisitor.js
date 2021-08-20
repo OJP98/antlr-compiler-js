@@ -80,18 +80,28 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const varType = this.visit(ctx.varType());
     const varId = this.visit(ctx.id());
     const num = this.visit(ctx.num());
+    const startLine = ctx.start.line;
+    const startCol = ctx.start.column;
+    const { structId, type } = varType;
+    let symbol = null;
+    
+    if (structId) {
+       const struct = this.symbolTable.lookup(structId);
+       symbol = new Struct(
+         type, varId, startLine, startCol, struct, structId, num
+       );
+    } else {
+      symbol = new Array(
+        varType, varId, num, startLine, startCol
+      );
+    }
 
-    const array = new Array(
-      varType, varId, num,
-      ctx.start.line, ctx.start.column
-    );
+    this.symbolTable.bind(symbol);
 
-    this.symbolTable.bind(array);
+    if (symbol.error)
+      this.errors.push(symbol.error);
 
-    if (array.error)
-      this.errors.push(array.error);
-
-    return array;
+    return symbol;
   }
 
 
@@ -340,7 +350,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#assignmentStmt.
   visitAssignmentStmt(ctx) {
+    // TODO: Revisar que el tipo de dato de location y de la expresión, sea el mismo
     const location = this.visit(ctx.location());
+    const expr = this.visit(ctx.expression());
     const { id, exists, invalidProperty } = location;
 
     if (invalidProperty) 

@@ -1,10 +1,9 @@
 export default class Data {
-  constructor(type, name, line, column, signature = null) {
+  constructor(type, name, line, column) {
     this.type = type;
     this.name = name;
     this.line = line;
     this.column = column;
-    this.signature = signature;
     this.error = null;
   }
 
