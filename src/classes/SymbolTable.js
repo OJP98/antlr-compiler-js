@@ -38,12 +38,12 @@ export default class SymbolTable {
     const symbolTableCopy = this.symbolTable.slice();
 
     while (symbolTableCopy.length) {
-      const table = symbolTableCopy.pop();
-      const found = table.find((symbol) => symbol.name === symbolId);
+      const currTable = symbolTableCopy.pop();
+      const found = currTable.find((symbol) => symbol.name === symbolId);
       if (found)
         return found;
     }
-    return undefined;
+    return null;
   }
 
   exit() {

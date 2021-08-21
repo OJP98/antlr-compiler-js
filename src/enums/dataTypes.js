@@ -6,6 +6,7 @@ export const DATA_TYPE = Object.freeze({
   VOID: 'void',
   STRUCT: 'struct',
   STRUCT_DECL: 'struct_decl',
+  ERROR: 'error',
 });
 
 export const BOOLEAN_TYPE = Object.freeze({

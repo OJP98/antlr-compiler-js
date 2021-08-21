@@ -1,5 +1,11 @@
 import Data from './Data';
-import { ArrayLengthError, UndeclaredStructError } from './Error';
+import Symbol from './Symbol';
+import {
+  ArrayLengthError,
+  UndeclaredStructError,
+  InvalidPropertyError,
+} from './Error';
+import { DATA_TYPE } from '../enums/dataTypes';
 
 export default class Struct extends Data {
   constructor(type, name, line, column, structDecl = null, structId, length = null) {
@@ -27,7 +33,15 @@ export default class Struct extends Data {
     return null;
   }
 
-  getProperty(prop) {
-    return this.structDecl.properties.find((p) => p.name === prop);
+  getProperty(prop, line) {
+    const structProp = this.structDecl.properties.find((p) => p.name === prop);
+
+    if (!structProp) {
+      const errorProp = new Symbol(DATA_TYPE.ERROR, prop);
+      errorProp.error = new InvalidPropertyError(this.name, prop, line);
+      return errorProp;
+    }
+
+    return structProp;
   }
 }

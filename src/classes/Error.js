@@ -60,7 +60,7 @@ export class InvalidConversion extends Error {
   }
 }
 
-export class invalidPropertyError extends Error {
+export class InvalidPropertyError extends Error {
   constructor(struct, property, line) {
     super('Invalid Property', `"${property}" is not a property of "${struct}"`, line);
   }
