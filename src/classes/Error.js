@@ -8,7 +8,7 @@ export default class Error {
   }
 
   get ErrorLog() {
-    return this.line ? `${this.details} At line ${this.line}` : this.details;
+    return this.line ? `${this.details}  At line ${this.line}` : this.details;
   }
 }
 
@@ -68,6 +68,15 @@ export class InvalidPropertyError extends Error {
 
 export class UndeclaredStructError extends Error {
   constructor(structId, line) {
-    super('Undeclared Struct', `struct "${structId}" doesn't exist in the current scope.`, line);
+    super('Undeclared Struct', `Struct "${structId}" doesn't exist in the current scope.`, line);
+  }
+}
+
+export class InvalidAssignmentError extends Error {
+  constructor(id, symbolType, assignmentType, line) {
+    super(
+      'Invalid Assignment',
+      `Invalid assignment of type "${assignmentType}" to ${symbolType} "${id}".`, line,
+    );
   }
 }
