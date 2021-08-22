@@ -9,7 +9,14 @@ import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
-import { InvalidAssignmentError, InvalidExpressionTypeError, InvalidOperationType, UndeclaredIdError, UndeclaredStructError } from '../classes/Error';
+import {
+  InvalidAssignmentError,
+  InvalidExpressionTypeError,
+  InvalidMethodCallError,
+  UndeclaredIdError,
+  UndeclaredMethodError,
+  UndeclaredStructError
+} from '../classes/Error';
 import getOperationResult from '../js/operations';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
@@ -499,7 +506,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#methodCallExpr.
   visitMethodCallExpr(ctx) {
-    return this.visitChildren(ctx);
+    return this.visit(ctx.methodCall());
   }
 
 
@@ -573,13 +580,45 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#methodCallDecl.
   visitMethodCallDecl(ctx) {
-    return this.visitChildren(ctx);
+    const methodId = this.visit(ctx.id());
+    const args = this.visit(ctx.arg());
+    const method = this.symbolTable.lookup(methodId);
+    const errorSymbol = new Symbol(DATA_TYPE.ERROR, methodId);
+
+    // Does the specified method exists?
+    if (!method) {
+      const notFoundError = new UndeclaredMethodError(methodId, ctx.start.line);
+      errorSymbol.error = notFoundError;
+      this.errors.push(notFoundError);
+      return errorSymbol;
+    }
+
+    // Is the method call and the arguments the same length?
+    if (method.args.length !== args.length) {
+      const argsAmountError = new InvalidMethodCallError(methodId, ctx.start.line);
+      errorSymbol.error = argsAmountError;
+      this.errors.push(argsAmountError);
+      return errorSymbol;
+    }
+
+    const methodTypes = method.args.map((arg) => arg.type);
+    const argTypes = args.map((arg) => arg.type);
+
+    // TODO: Check if arrays are the same
+    if (!argTypes.equals(methodTypes)) {
+      const argsTypeError = new InvalidMethodCallError(methodId, ctx.start.line);
+      errorSymbol.error = argsTypeError;
+      this.errors.push(argsTypeError);
+      return errorSymbol;
+    }
+
+    return method;
   }
 
 
   // Visit a parse tree produced by DecafParser#argDecl.
   visitArgDecl(ctx) {
-    return this.visitChildren(ctx);
+    return this.visit(ctx.expression());
   }
 
 

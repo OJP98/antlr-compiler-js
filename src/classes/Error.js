@@ -101,3 +101,23 @@ export class InvalidExpressionTypeError extends Error {
     );
   }
 }
+
+// Undeclared Method
+export class UndeclaredMethodError extends Error {
+  constructor(methodId, line) {
+    super(
+      'Undeclared Method',
+      `Method "${methodId}" doesn't exist in the current scope.`, line,
+    );
+  }
+}
+
+// Method call arguments are not the same as the declared method
+export class InvalidMethodCallError extends Error {
+  constructor(methodId, line) {
+    super(
+      'Invalid Method Call',
+      `Invalid amount or argument types to method "${methodId}".`, line,
+    );
+  }
+}
