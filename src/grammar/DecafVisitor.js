@@ -9,7 +9,7 @@ import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
-import { InvalidAssignmentError, InvalidOperationType, UndeclaredIdError, UndeclaredStructError } from '../classes/Error';
+import { InvalidAssignmentError, InvalidExpressionTypeError, InvalidOperationType, UndeclaredIdError, UndeclaredStructError } from '../classes/Error';
 import getOperationResult from '../js/operations';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
@@ -309,27 +309,57 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#ifStmt.
   visitIfStmt(ctx) {
-    // const expression = this.visit(ctx.expression());
-    // const block = this.visit(ctx.block());
-    return this.visitChildren(ctx);
+    const expression = this.visit(ctx.expression());
+    const block = this.visit(ctx.block());
+
+    if (expression.type !== DATA_TYPE.BOOLEAN) {
+      const expressionError = new InvalidExpressionTypeError('if', ctx.start.line);
+      this.errors.push(expressionError);
+      return DATA_TYPE.ERROR;
+    }
+
+    return DATA_TYPE.VOID;
   }
 
 
   // Visit a parse tree produced by DecafParser#ifElseStmt.
   visitIfElseStmt(ctx) {
-    return this.visitChildren(ctx);
+    const expression = this.visit(ctx.expression());
+    const [block1, block2] = this.visit(ctx.block());
+
+    if (expression.type !== DATA_TYPE.BOOLEAN) {
+      const expressionError = new InvalidExpressionTypeError('if', ctx.start.line);
+      this.errors.push(expressionError);
+      return DATA_TYPE.ERROR;
+    }
+
+    return DATA_TYPE.VOID;
   }
 
 
   // Visit a parse tree produced by DecafParser#whileStmt.
   visitWhileStmt(ctx) {
-    return this.visitChildren(ctx);
+    const expression = this.visit(ctx.expression());
+    const block = this.visit(ctx.block());
+
+    if (expression.type !== DATA_TYPE.BOOLEAN) {
+      const expressionError = new InvalidExpressionTypeError('while', ctx.start.line);
+      this.errors.push(expressionError);
+      return DATA_TYPE.ERROR;
+    }
+
+    return DATA_TYPE.VOID;
   }
 
 
   // Visit a parse tree produced by DecafParser#returnExprStmt.
   visitReturnExprStmt(ctx) {
-    return this.visitChildren(ctx);
+    const expression = this.visit(ctx.expression());
+
+    if (expression.type === DATA_TYPE.ERROR)
+      this.errors.push(expression.error);
+
+    return expression;
   }
 
 
@@ -561,13 +591,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#charLiteral.
   visitCharLiteral(ctx) {
-    return this.visitChildren(ctx);
+    return this.visit(ctx.char_literal());
   }
 
 
   // Visit a parse tree produced by DecafParser#boolLiteral.
   visitBoolLiteral(ctx) {
-    return this.visitChildren(ctx);
+    return this.visit(ctx.bool_literal());
   }
 
 
@@ -588,14 +618,18 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 
   // Visit a parse tree produced by DecafParser#trueLiteral.
-  visitTrueLiteral() {
-    return BOOLEAN_TYPE.TRUE;
+  visitTrueLiteral(ctx) {
+    return new Symbol(
+      DATA_TYPE.BOOLEAN, 'boolLiteral', ctx.start.line, null, BOOLEAN_TYPE.TRUE
+    );    
   }
 
 
   // Visit a parse tree produced by DecafParser#falseLiteral.
-  visitFalseLiteral() {
-    return BOOLEAN_TYPE.FALSE;
+  visitFalseLiteral(ctx) {
+    return new Symbol(
+      DATA_TYPE.BOOLEAN, 'boolLiteral', ctx.start.line, null, BOOLEAN_TYPE.FALSE
+    );    
   }
 
 

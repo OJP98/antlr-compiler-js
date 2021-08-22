@@ -91,3 +91,13 @@ export class InvalidOperationType extends Error {
     );
   }
 }
+
+// if or while expression is not void
+export class InvalidExpressionTypeError extends Error {
+  constructor(type, line) {
+    super(
+      'Invalid Expression Type',
+      `"${type}" expression is not of type void.`, line,
+    );
+  }
+}
