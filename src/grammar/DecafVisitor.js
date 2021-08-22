@@ -9,7 +9,8 @@ import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
-import { InvalidAssignmentError, UndeclaredIdError, UndeclaredStructError } from '../classes/Error';
+import { InvalidAssignmentError, InvalidOperationType, UndeclaredIdError, UndeclaredStructError } from '../classes/Error';
+import getOperationResult from '../js/operations';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
@@ -308,6 +309,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#ifStmt.
   visitIfStmt(ctx) {
+    // const expression = this.visit(ctx.expression());
+    // const block = this.visit(ctx.block());
     return this.visitChildren(ctx);
   }
 
@@ -353,7 +356,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const symbol = this.visit(ctx.location());
     const expr = this.visit(ctx.expression());
 
-    if (symbol.error)
+    if (symbol.error || expr.error)
       return DATA_TYPE.ERROR;
     
 
@@ -490,7 +493,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#relOpExpr.
   visitRelOpExpr(ctx) {
-    return this.visitChildren(ctx);
+    return this.visitFirstArithOpExpr(ctx);
   }
 
 
@@ -521,18 +524,20 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#secondArithOpExpr.
   visitSecondArithOpExpr(ctx) {
-    const [expr1, expr2] = this.visit(ctx.expression());
-    if (expr1.type !== expr2.type) {
-      // TODO: return new error
-    }
-
-    return expr1;
+    return this.visitFirstArithOpExpr(ctx);
   }
 
 
   // Visit a parse tree produced by DecafParser#firstArithOpExpr.
   visitFirstArithOpExpr(ctx) {
-    return this.visitChildren(ctx);
+    const [expr1, expr2] = this.visit(ctx.expression());
+    const operator = ctx.op.text;
+    const result = getOperationResult(expr1, expr2, operator, ctx.start.line);
+
+    if (result.type === DATA_TYPE.ERROR)
+      this.errors.push(result.error);
+
+    return result;
   }
 
 
@@ -576,7 +581,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitNumLiteral(ctx) {
     const num = this.visit(ctx.num());
     const intLiteral = new Symbol(
-      DATA_TYPE.INT, 'intLiteral', null, null, num
+      DATA_TYPE.INT, 'intLiteral', ctx.start.line, null, num
     );
     return intLiteral;
   }

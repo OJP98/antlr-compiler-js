@@ -72,11 +72,22 @@ export class UndeclaredStructError extends Error {
   }
 }
 
+// location = expression don't have the same types
 export class InvalidAssignmentError extends Error {
   constructor(id, symbolType, assignmentType, line) {
     super(
       'Invalid Assignment',
       `Invalid assignment of type "${assignmentType}" to ${symbolType} "${id}".`, line,
+    );
+  }
+}
+
+// operand types are not int.
+export class InvalidOperationType extends Error {
+  constructor(line) {
+    super(
+      'Invalid Operation Type',
+      'Invalid data type for operation.', line,
     );
   }
 }
