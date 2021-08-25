@@ -117,7 +117,7 @@ export class InvalidMethodCallError extends Error {
   constructor(methodId, line) {
     super(
       'Invalid Method Call',
-      `Invalid amount or argument types to method "${methodId}".`, line,
+      `Invalid amount or argument types passed to method "${methodId}".`, line,
     );
   }
 }

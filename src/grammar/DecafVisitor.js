@@ -18,6 +18,7 @@ import {
   UndeclaredStructError
 } from '../classes/Error';
 import getOperationResult from '../js/operations';
+import compareArrays from '../js/utils';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
@@ -206,7 +207,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Visit block and assign it's return type to the method
     const blockReturn = this.visit(ctx.block());
-    method.ReturnType = blockReturn;
+    method.ReturnType = blockReturn.type;
+    console.log(method);
 
     // Finally, check for any errors and push them if exist
     if (method.error)
@@ -372,7 +374,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#returnVoidStmt.
   visitReturnVoidStmt() {
-    return DATA_TYPE.VOID;
+    return new Symbol(DATA_TYPE.VOID, 'voidReturn');
   }
 
 
@@ -593,19 +595,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return errorSymbol;
     }
 
-    // Is the method call and the arguments the same length?
-    if (method.args.length !== args.length) {
-      const argsAmountError = new InvalidMethodCallError(methodId, ctx.start.line);
-      errorSymbol.error = argsAmountError;
-      this.errors.push(argsAmountError);
-      return errorSymbol;
-    }
-
     const methodTypes = method.args.map((arg) => arg.type);
     const argTypes = args.map((arg) => arg.type);
 
-    // TODO: Check if arrays are the same
-    if (!argTypes.equals(methodTypes)) {
+    // Are the signatures the same? (length and types)
+    if (!compareArrays(methodTypes, argTypes)) {
       const argsTypeError = new InvalidMethodCallError(methodId, ctx.start.line);
       errorSymbol.error = argsTypeError;
       this.errors.push(argsTypeError);
