@@ -14,12 +14,16 @@ import {
   InvalidAssignmentError,
   InvalidExpressionTypeError,
   InvalidMethodCallError,
+  InvalidOperationType,
   SymbolNotArrayError,
   UndeclaredIdError,
   UndeclaredMethodError,
   UndeclaredStructError
 } from '../classes/Error';
-import getOperationResult from '../js/operations';
+import {
+  getOperationResult,
+  operationError
+} from '../js/operations';
 import compareArrays from '../js/utils';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
@@ -322,6 +326,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const expression = this.visit(ctx.expression());
     const block = this.visit(ctx.block());
 
+    if (expression.error)
+      return expression;
+
     if (expression.type !== DATA_TYPE.BOOLEAN) {
       const expressionError = new InvalidExpressionTypeError('if', ctx.start.line);
       this.errors.push(expressionError);
@@ -336,6 +343,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitIfElseStmt(ctx) {
     const expression = this.visit(ctx.expression());
     const [block1, block2] = this.visit(ctx.block());
+
+    if (expression.error)
+      return expression;
 
     if (expression.type !== DATA_TYPE.BOOLEAN) {
       const expressionError = new InvalidExpressionTypeError('if', ctx.start.line);
@@ -352,6 +362,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const expression = this.visit(ctx.expression());
     const block = this.visit(ctx.block());
 
+    if (expression.error)
+      return expression;
+
     if (expression.type !== DATA_TYPE.BOOLEAN) {
       const expressionError = new InvalidExpressionTypeError('while', ctx.start.line);
       this.errors.push(expressionError);
@@ -366,6 +379,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitReturnExprStmt(ctx) {
     const expression = this.visit(ctx.expression());
 
+    // TODO: Should this actually be happening?
     if (expression.type === DATA_TYPE.ERROR)
       this.errors.push(expression.error);
 
@@ -438,9 +452,12 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitArrLocation(ctx) {
     let symbol = this.visitIdLocation(ctx);
 
-    // Does the symbol contain an error?
-    if (symbol.type === DATA_TYPE.ERROR)
+    // TODO: FIX THIS NOW!!!!!!
+    // Does the symbol id exists?
+    if (symbol.type === DATA_TYPE.ERROR) {
+      this.errors.push(symbol.error);
       return symbol;
+    }
     
     // Is the symbol an error?
     if (!(symbol instanceof Array)) {
@@ -540,7 +557,17 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#notExpr.
   visitNotExpr(ctx) {
-    return this.visitChildren(ctx);
+    const expr = this.visit(ctx.expression());
+
+    // Is the expression of the boolean type?
+    if (expr.type !== DATA_TYPE.BOOLEAN) {
+      const typeError = new InvalidOperationType(ctx.start.line);
+      const symbolError = new Symbol(DATA_TYPE.ERROR, 'negativeExpr');
+      this.errors.push(typeError);
+      symbolError.error = typeError;
+    }
+
+    return expr;
   }
 
 
@@ -565,7 +592,16 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#condOpExpr.
   visitCondOpExpr(ctx) {
-    return this.visitChildren(ctx);
+    const [expr1, expr2] = this.visit(ctx.expression());
+
+    // Are both boolean expressions?
+    if (expr1.type !== DATA_TYPE.BOOLEAN || expr2.type !== DATA_TYPE.BOOLEAN) {
+      const error = operationError(ctx.start.line);
+      this.errors.push(error.error);
+      return error;
+    }
+
+    return new Symbol(DATA_TYPE.BOOLEAN, 'condOpExpr');
   }
 
 

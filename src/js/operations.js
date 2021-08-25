@@ -44,14 +44,22 @@ function performOperation(symbol1, symbol2, operator) {
   return resultSymbol;
 }
 
-export default function getOperationResult(symbol1, symbol2, operator, line) {
-  if (symbol1.type !== DATA_TYPE.INT || symbol2.type !== DATA_TYPE.INT) {
-    const operationError = new InvalidOperationType(line);
-    const errorSymbol = new Symbol(DATA_TYPE.ERROR, 'arithExpr');
-    errorSymbol.error = operationError;
-    return errorSymbol;
-  }
+export const operationError = (line) => {
+  const error = new InvalidOperationType(line);
+  const errorSymbol = new Symbol(DATA_TYPE.ERROR, 'arithExpr');
+  errorSymbol.error = error;
+  return errorSymbol;
+};
 
-  const operationResult = performOperation(symbol1, symbol2, operator);
-  return operationResult;
+export function getOperationResult(symbol1, symbol2, operator, line) {
+  if (symbol1.type !== DATA_TYPE.INT || symbol2.type !== DATA_TYPE.INT) {
+    return operationError(line);
+  }
+  return performOperation(symbol1, symbol2, operator);
 }
+
+// export function getCondOperation(symbol1, symbol2, operator, line) {
+//   if (symbol1.type !== DATA_TYPE.BOOLEAN || symbol2.type !== DATA_TYPE.BOOLEAN) {
+//     return operationError(line);
+//   }
+// }
