@@ -121,3 +121,22 @@ export class InvalidMethodCallError extends Error {
     );
   }
 }
+
+// Method call arguments are not the same as the declared method
+export class ArraySubscriptError extends Error {
+  constructor(line) {
+    super(
+      'Array Subscript',
+      'Array subscript is not an integer.', line,
+    );
+  }
+}
+
+export class SymbolNotArrayError extends Error {
+  constructor(symbolId, line) {
+    super(
+      'Symbol Not Array',
+      `subscripted value "${symbolId}" is not an array.`, line,
+    );
+  }
+}

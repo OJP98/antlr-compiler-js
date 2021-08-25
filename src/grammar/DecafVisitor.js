@@ -10,9 +10,11 @@ import SymbolTable from '../classes/SymbolTable';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
 import {
+  ArraySubscriptError,
   InvalidAssignmentError,
   InvalidExpressionTypeError,
   InvalidMethodCallError,
+  SymbolNotArrayError,
   UndeclaredIdError,
   UndeclaredMethodError,
   UndeclaredStructError
@@ -93,7 +95,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const startCol = ctx.start.column;
     const { structId, type } = varType;
     let symbol = null;
-    
+
     if (structId) {
        const structDecl = this.symbolTable.lookup(structId);
        symbol = new Struct(
@@ -101,7 +103,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
        );
     } else {
       symbol = new Array(
-        varType, varId, num, startLine, startCol
+        type, varId, num, startLine, startCol
       );
     }
 
@@ -208,7 +210,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // Visit block and assign it's return type to the method
     const blockReturn = this.visit(ctx.block());
     method.ReturnType = blockReturn.type;
-    console.log(method);
 
     // Finally, check for any errors and push them if exist
     if (method.error)
@@ -435,14 +436,33 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#arrLocation.
   visitArrLocation(ctx) {
-    const symbol = this.visitIdLocation(ctx);
+    let symbol = this.visitIdLocation(ctx);
 
     // Does the symbol contain an error?
     if (symbol.type === DATA_TYPE.ERROR)
       return symbol;
     
-    // TODO: check ir expr return type is an integer value
+    // Is the symbol an error?
+    if (!(symbol instanceof Array)) {
+      const notArrayError = new SymbolNotArrayError(
+        symbol.name, ctx.start.line
+      );
+      this.errors.push(notArrayError);
+      symbol.error = notArrayError;
+    }
+      
     const expr = this.visit(ctx.expression());
+
+    // Does the expression contains an error?
+    if (expr.type === DATA_TYPE.ERROR)
+      return expr;
+
+    // Is the [<expr>] an INT type?
+    if (expr.type !== DATA_TYPE.INT) {
+      const arrayError = new ArraySubscriptError(ctx.start.line);
+      this.errors.push(arrayError);
+      symbol.error = arrayError;
+    }
 
     return symbol;
   }
