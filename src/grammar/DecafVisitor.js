@@ -105,7 +105,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (structId) {
        const structDecl = this.symbolTable.lookup(structId);
        symbol = new Struct(
-         type, varId, startLine, startCol, structDecl, structId, num
+         type, varId, startLine, startCol, structDecl, structId, +num
        );
     } else {
       symbol = new Array(
@@ -215,6 +215,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Visit block and assign it's return type to the method
     const blockReturn = this.visit(ctx.block());
+
+    if (blockReturn.type === DATA_TYPE.ERROR)
+      return blockReturn;
+
     method.ReturnType = blockReturn.type;
 
     // Finally, check for any errors and push them if exist
@@ -412,8 +416,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const symbol = this.visit(ctx.location());
     const expr = this.visit(ctx.expression());
 
-    if (symbol.error || expr.error)
+    if (symbol.error || expr.error) {
+      this.errors.push(symbol.error || expr.error);
       return DATA_TYPE.ERROR;
+    }
 
     // Are both sides of the assignment of the same type?
     if (symbol.type !== expr.type) {
@@ -453,20 +459,28 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitArrLocation(ctx) {
     let symbol = this.visitIdLocation(ctx);
 
-    // TODO: FIX THIS NOW!!!!!!
     // Does the symbol id exists?
-    if (symbol.type === DATA_TYPE.ERROR) {
-      this.errors.push(symbol.error);
+    if (symbol.type === DATA_TYPE.ERROR)
       return symbol;
-    }
-    
-    // Is the symbol an error?
-    if (!(symbol instanceof Array)) {
+
+    // Is it a struct with no length?
+    if (symbol instanceof Struct && !symbol.length) {
       const notArrayError = new SymbolNotArrayError(
         symbol.name, ctx.start.line
       );
-      this.errors.push(notArrayError);
       symbol.error = notArrayError;
+      symbol.type = DATA_TYPE.ERROR;
+      return symbol;
+    }
+    
+    // Is it an array?
+    if ( !(symbol instanceof Struct) && !(symbol instanceof Array)) {
+      const notArrayError = new SymbolNotArrayError(
+        symbol.name, ctx.start.line
+      );
+      symbol.error = notArrayError;
+      symbol.type = DATA_TYPE.ERROR;
+      return symbol;
     }
       
     const expr = this.visit(ctx.expression());
@@ -492,25 +506,18 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const location = this.visit(ctx.location());
 
     // Does the struct id exists?
-    if (struct.type === DATA_TYPE.ERROR) {
-      this.errors.push(struct.error);
+    if (struct.type === DATA_TYPE.ERROR)
       return struct;
-    }
 
     // Is the symbol a struct?
     if (struct.type !== DATA_TYPE.STRUCT) {
       const structError = new UndeclaredStructError(struct.name, ctx.parentCtx.start.line);
       struct.error = structError;
-      this.errors.push(structError);
       return struct;
     }
 
     // Get the struct property
     const structProp = struct.getProperty(location.name, ctx.parentCtx.start.line);
-    // Does the struct property exists?
-    if (structProp.type === DATA_TYPE.ERROR)
-      this.errors.push(structProp.error);
-    
     return structProp;
   }
 
@@ -521,24 +528,26 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const location = this.visit(ctx.location());
 
     // Does the struct id exists?
-    if (struct.type === DATA_TYPE.ERROR) {
-      this.errors.push(struct.error);
+    if (struct.type === DATA_TYPE.ERROR)
       return struct;
-    }
 
     // Is the symbol a struct?
     if (struct.type !== DATA_TYPE.STRUCT) {
       const struct = new UndeclaredStructError(symbol.name, ctx.parentCtx.start.line);
       struct.error = struct;
-      this.errors.push(struct);
       return struct;
     }
 
     // Get the struct property
     const structProp = struct.getProperty(location.name, ctx.parentCtx.start.line);
-    // Does the struct property exists?
-    if (structProp.type === DATA_TYPE.ERROR)
-      this.errors.push(structProp.error);
+
+    if (!(structProp instanceof Array)) {
+      const propNotArray = new SymbolNotArrayError(
+        structProp.name, ctx.parentCtx.start.line
+      );
+      structProp.error = propNotArray;
+    }
+
     
     return structProp;
   }
@@ -593,6 +602,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#locationExpr.
   visitLocationExpr(ctx) {
     const location = this.visit(ctx.location());
+    if (location.type === DATA_TYPE.ERROR)
+      this.errors.push(location.error);
     return location;
   }
 
@@ -601,8 +612,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitCondOpExpr(ctx) {
     const [expr1, expr2] = this.visit(ctx.expression());
     const result = condOperation(expr1, expr2, ctx.start.line);
-
-    console.log(result);
 
     if (result.type === DATA_TYPE.ERROR)
       this.errors.push(result.error);
@@ -613,7 +622,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#literalExpr.
   visitLiteralExpr(ctx) {
-    return this.visit(ctx.literal());
+    const literal = this.visit(ctx.literal());
+    if (literal.type === DATA_TYPE.ERROR)
+      this.errors.push(literal.error);
+    return literal;
   }
 
 
