@@ -317,7 +317,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // TODO: We'll have to check each return type if theres more then one
     // console.log(returnTypes);
 
-    return returnTypes[0];
+    return returnTypes.pop();
   }
 
 
@@ -401,7 +401,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#blockStmt.
   visitBlockStmt(ctx) {
-    return this.visitChildren(ctx);
+    return this.visit(ctx.block());
   }
 
 
@@ -412,7 +412,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     if (symbol.error || expr.error)
       return DATA_TYPE.ERROR;
-    
 
     // Are both sides of the assignment of the same type?
     if (symbol.type !== expr.type) {
@@ -423,7 +422,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(assignmentError);
     }
 
-    return symbol;
+    return new Symbol(DATA_TYPE.VOID, 'assignmentStmt');
   }
 
 

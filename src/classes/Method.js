@@ -1,6 +1,9 @@
 // eslint-disable-next-line import/no-cycle
 import Data from './Data';
-import { MethodReturnTypeError, MainHasArgsError } from './Error';
+import {
+  MethodReturnTypeError,
+  MainHasArgsError,
+} from './Error';
 import { DATA_TYPE } from '../enums/dataTypes';
 
 export default class Method extends Data {
@@ -20,7 +23,10 @@ export default class Method extends Data {
       return this.error;
 
     if (this.returnType && this.type === DATA_TYPE.VOID && this.returnType !== DATA_TYPE.VOID)
-      return new MethodReturnTypeError(this.line, this.column);
+      return new MethodReturnTypeError(this.name, this.type, this.returnType, this.line);
+
+    if (this.returnType && this.type !== this.returnType)
+      return new MethodReturnTypeError(this.name, this.type, this.returnType, this.line);
 
     if (this.name === 'main' && this.args.length)
       return new MainHasArgsError();

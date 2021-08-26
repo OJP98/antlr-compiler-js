@@ -37,8 +37,11 @@ export class ArrayLengthNotIntError extends Error {
 }
 
 export class MethodReturnTypeError extends Error {
-  constructor(line, column) {
-    super('MethodReturnType', 'Void method returns a data type.', line, column);
+  constructor(methodId, methodType, returnType, line) {
+    super(
+      'Method Return Type',
+      `${methodType} method "${methodId}" returns ${returnType} data type.`, line,
+    );
   }
 }
 
