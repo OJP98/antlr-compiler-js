@@ -21,6 +21,8 @@ import {
   UndeclaredStructError
 } from '../classes/Error';
 import {
+  condOperation,
+  equalsOperation,
   getOperationResult,
   operationError
 } from '../js/operations';
@@ -572,7 +574,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#eqOpExpr.
   visitEqOpExpr(ctx) {
-    return this.visitChildren(ctx);
+    const [expr1, expr2] = this.visit(ctx.expression());
+    const result =  equalsOperation(expr1, expr2, ctx.start.line);
+
+    if (result.type === DATA_TYPE.ERROR)
+      this.errors.push(result.error);
+    
+    return result;
   }
 
 
@@ -592,15 +600,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#condOpExpr.
   visitCondOpExpr(ctx) {
     const [expr1, expr2] = this.visit(ctx.expression());
+    const result = condOperation(expr1, expr2, ctx.start.line);
 
-    // Are both boolean expressions?
-    if (expr1.type !== DATA_TYPE.BOOLEAN || expr2.type !== DATA_TYPE.BOOLEAN) {
-      const error = operationError(ctx.start.line);
-      this.errors.push(error.error);
-      return error;
-    }
+    console.log(result);
 
-    return new Symbol(DATA_TYPE.BOOLEAN, 'condOpExpr');
+    if (result.type === DATA_TYPE.ERROR)
+      this.errors.push(result.error);
+
+    return result;
   }
 
 

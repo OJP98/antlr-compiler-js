@@ -46,7 +46,7 @@ function performOperation(symbol1, symbol2, operator) {
 
 export const operationError = (line) => {
   const error = new InvalidOperationType(line);
-  const errorSymbol = new Symbol(DATA_TYPE.ERROR, 'arithExpr');
+  const errorSymbol = new Symbol(DATA_TYPE.ERROR, 'operationError');
   errorSymbol.error = error;
   return errorSymbol;
 };
@@ -58,8 +58,26 @@ export function getOperationResult(symbol1, symbol2, operator, line) {
   return performOperation(symbol1, symbol2, operator);
 }
 
-// export function getCondOperation(symbol1, symbol2, operator, line) {
-//   if (symbol1.type !== DATA_TYPE.BOOLEAN || symbol2.type !== DATA_TYPE.BOOLEAN) {
-//     return operationError(line);
-//   }
-// }
+export function equalsOperation(symbol1, symbol2, line) {
+  // Are the symbols the same type?
+  if (symbol1.type !== symbol2.type)
+    return operationError(line);
+
+  // Next, check if the all the symbol types are allowed.
+  const allowedDataTypes = [DATA_TYPE.INT, DATA_TYPE.BOOLEAN, DATA_TYPE.CHAR];
+  if (!allowedDataTypes.includes(symbol1.type))
+    return operationError(line);
+
+  if (!allowedDataTypes.includes(symbol2.type))
+    return operationError(line);
+
+  return new Symbol(DATA_TYPE.BOOLEAN, 'eqExpr');
+}
+
+export function condOperation(symbol1, symbol2, line) {
+  // Are both boolean expressions?
+  if (symbol1.type !== DATA_TYPE.BOOLEAN || symbol2.type !== DATA_TYPE.BOOLEAN)
+    return operationError(line);
+
+  return new Symbol(DATA_TYPE.BOOLEAN, 'condExpr');
+}
