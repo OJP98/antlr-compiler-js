@@ -44,4 +44,23 @@ export default class Struct extends Data {
 
     return structProp;
   }
+
+  getArrayOfProperties() {
+    return this.structDecl.properties ?? null;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  searchPropertyRecursively(propertyId) {
+    let searchResult;
+
+    this.structDecl.properties.forEach((property) => {
+      if (property.name === propertyId)
+        return property;
+
+      if (property.type === DATA_TYPE.STRUCT)
+        searchResult = this.searchPropertyRecursively(propertyId);
+
+      return searchResult ?? null;
+    });
+  }
 }

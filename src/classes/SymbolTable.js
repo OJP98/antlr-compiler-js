@@ -18,6 +18,7 @@ export default class SymbolTable {
       return error;
     }
 
+    entry.scope = this.symbolTable.length;
     table.push(entry);
     this.symbolTable.push(table);
     // console.log(this.symbolTable);

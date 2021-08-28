@@ -492,7 +492,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // Is the [<expr>] an INT type?
     if (expr.type !== DATA_TYPE.INT) {
       const arrayError = new ArraySubscriptError(ctx.start.line);
-      this.errors.push(arrayError);
       symbol.error = arrayError;
     }
 
@@ -503,11 +502,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#idDotLocation.
   visitIdDotLocation(ctx) {
     const struct = this.visitIdLocation(ctx);
-    const location = this.visit(ctx.location());
-
-    // Does the struct id exists?
-    if (struct.type === DATA_TYPE.ERROR)
-      return struct;
 
     // Is the symbol a struct?
     if (struct.type !== DATA_TYPE.STRUCT) {
@@ -516,20 +510,22 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return struct;
     }
 
+    this.symbolTable.enter();
+    const structProperties = struct.getArrayOfProperties();
+    structProperties.forEach((p) => this.symbolTable.bind(p));
+
+    const location = this.visit(ctx.location());
+    console.log(location);
+    this.symbolTable.exit();
+
     // Get the struct property
-    const structProp = struct.getProperty(location.name, ctx.parentCtx.start.line);
-    return structProp;
+    return location;
   }
 
 
   // Visit a parse tree produced by DecafParser#idArrDotLocation.
   visitIdArrDotLocation(ctx) {
     const struct = this.visitArrLocation(ctx);
-    const location = this.visit(ctx.location());
-
-    // Does the struct id exists?
-    if (struct.type === DATA_TYPE.ERROR)
-      return struct;
 
     // Is the symbol a struct?
     if (struct.type !== DATA_TYPE.STRUCT) {
@@ -538,18 +534,16 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return struct;
     }
 
-    // Get the struct property
-    const structProp = struct.getProperty(location.name, ctx.parentCtx.start.line);
+    // Start a new entry of the symbol table and bind the struct props
+    this.symbolTable.enter();
+    const structProperties = struct.getArrayOfProperties();
+    structProperties.forEach((p) => this.symbolTable.bind(p));
 
-    if (!(structProp instanceof Array)) {
-      const propNotArray = new SymbolNotArrayError(
-        structProp.name, ctx.parentCtx.start.line
-      );
-      structProp.error = propNotArray;
-    }
+    // Now, get the location (struct property)
+    const location = this.visit(ctx.location());
+    this.symbolTable.exit();
 
-    
-    return structProp;
+    return location;
   }
 
 
