@@ -38,7 +38,7 @@ export default class Struct extends Data {
 
     if (!structProp) {
       const errorProp = new Symbol(DATA_TYPE.ERROR, prop);
-      errorProp.error = new InvalidPropertyError(this.name, prop, line);
+      errorProp.Error = new InvalidPropertyError(this.name, prop, line);
       return errorProp;
     }
 
@@ -49,18 +49,21 @@ export default class Struct extends Data {
     return this.structDecl.properties ?? null;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   searchPropertyRecursively(propertyId) {
     let searchResult;
 
-    this.structDecl.properties.forEach((property) => {
-      if (property.name === propertyId)
-        return property;
+    this.structDecl.properties.some((property) => {
+      if (property.name === propertyId) {
+        searchResult = this;
+        return searchResult;
+      }
 
       if (property.type === DATA_TYPE.STRUCT)
-        searchResult = this.searchPropertyRecursively(propertyId);
+        searchResult = property.searchPropertyRecursively(propertyId);
 
-      return searchResult ?? null;
+      return searchResult;
     });
+
+    return searchResult;
   }
 }

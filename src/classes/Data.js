@@ -1,3 +1,5 @@
+import { DATA_TYPE } from "../enums/dataTypes";
+
 export default class Data {
   constructor(type, name, line, column) {
     this.type = type;
@@ -13,6 +15,7 @@ export default class Data {
 
   set Error(error) {
     this.error = error;
+    this.type = DATA_TYPE.ERROR;
   }
 
   checkForErrors() {

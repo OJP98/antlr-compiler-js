@@ -15,6 +15,7 @@ import {
   InvalidExpressionTypeError,
   InvalidMethodCallError,
   InvalidOperationType,
+  InvalidPropertyError,
   SymbolNotArrayError,
   UndeclaredIdError,
   UndeclaredMethodError,
@@ -503,10 +504,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitIdDotLocation(ctx) {
     const struct = this.visitIdLocation(ctx);
 
+    console.log(struct);
+
     // Is the symbol a struct?
     if (struct.type !== DATA_TYPE.STRUCT) {
-      const structError = new UndeclaredStructError(struct.name, ctx.parentCtx.start.line);
-      struct.error = structError;
+      struct.Error = new UndeclaredStructError(struct.name, ctx.parentCtx.start.line);
       return struct;
     }
 
@@ -515,8 +517,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     structProperties.forEach((p) => this.symbolTable.bind(p));
 
     const location = this.visit(ctx.location());
-    console.log(location);
     this.symbolTable.exit();
+
+    const locationStruct = struct.searchPropertyRecursively(location.name);
+    if (!locationStruct)
+      location.error = new InvalidPropertyError(
+        struct.name, location.name, ctx.parentCtx.start.line
+      );
 
     // Get the struct property
     return location;
@@ -529,8 +536,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Is the symbol a struct?
     if (struct.type !== DATA_TYPE.STRUCT) {
-      const struct = new UndeclaredStructError(symbol.name, ctx.parentCtx.start.line);
-      struct.error = struct;
+      struct.Error = new UndeclaredStructError(symbol.name, ctx.parentCtx.start.line);
       return struct;
     }
 
@@ -542,6 +548,12 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // Now, get the location (struct property)
     const location = this.visit(ctx.location());
     this.symbolTable.exit();
+
+    const locationStruct = struct.searchPropertyRecursively(location.name);
+      if (!locationStruct)
+        location.error = new InvalidPropertyError(
+          struct.name, location.name, ctx.parentCtx.start.line
+        );
 
     return location;
   }
@@ -568,7 +580,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       const typeError = new InvalidOperationType(ctx.start.line);
       const symbolError = new Symbol(DATA_TYPE.ERROR, 'negativeExpr');
       this.errors.push(typeError);
-      symbolError.error = typeError;
+      symbolError.Error = typeError;
     }
 
     return expr;
@@ -596,8 +608,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#locationExpr.
   visitLocationExpr(ctx) {
     const location = this.visit(ctx.location());
-    if (location.type === DATA_TYPE.ERROR)
-      this.errors.push(location.error);
     return location;
   }
 
@@ -606,10 +616,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitCondOpExpr(ctx) {
     const [expr1, expr2] = this.visit(ctx.expression());
     const result = condOperation(expr1, expr2, ctx.start.line);
-
-    if (result.type === DATA_TYPE.ERROR)
-      this.errors.push(result.error);
-
     return result;
   }
 
@@ -617,8 +623,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#literalExpr.
   visitLiteralExpr(ctx) {
     const literal = this.visit(ctx.literal());
-    if (literal.type === DATA_TYPE.ERROR)
-      this.errors.push(literal.error);
     return literal;
   }
 
@@ -640,10 +644,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const [expr1, expr2] = this.visit(ctx.expression());
     const operator = ctx.op.text;
     const result = getOperationResult(expr1, expr2, operator, ctx.start.line);
-
-    if (result.type === DATA_TYPE.ERROR)
-      this.errors.push(result.error);
-
     return result;
   }
 
@@ -659,7 +659,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (!method) {
       const notFoundError = new UndeclaredMethodError(methodId, ctx.start.line);
       errorSymbol.error = notFoundError;
-      this.errors.push(notFoundError);
       return errorSymbol;
     }
 
@@ -670,7 +669,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (!compareArrays(methodTypes, argTypes)) {
       const argsTypeError = new InvalidMethodCallError(methodId, ctx.start.line);
       errorSymbol.error = argsTypeError;
-      this.errors.push(argsTypeError);
       return errorSymbol;
     }
 
