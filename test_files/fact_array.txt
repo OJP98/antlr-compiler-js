@@ -1,3 +1,5 @@
+//TODO: make sure any method without returns, actually returns something
+
 class Program
 { 
 int factorial(int n)

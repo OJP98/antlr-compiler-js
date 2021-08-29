@@ -215,13 +215,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Visit block and assign it's return type to the method
     const blockReturn = this.visit(ctx.block());
-
+    console.log(blockReturn);
     if (blockReturn.type === DATA_TYPE.ERROR)
       return blockReturn;
 
     method.ReturnType = blockReturn.type;
 
-		console.log(method);
+		// console.log(method);
     // Finally, check for any errors and push them if exist
     if (method.error)
       this.errors.push(method.error)
@@ -353,18 +353,25 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const expression = this.visit(ctx.expression());
     const [block1, block2] = this.visit(ctx.block());
 
+    // TODO: Both block types are int, should we return an int?
+    console.log(block1, block2);
+
     if (expression.type === DATA_TYPE.ERROR) {
       this.errors.push(expression.error);
       return expression;
     }
 
+    // The expression should be of boolean type
     if (expression.type !== DATA_TYPE.BOOLEAN) {
-      const expressionError = new InvalidExpressionTypeError('if', ctx.start.line);
+      const expressionError = new InvalidExpressionTypeError('ifelse', ctx.start.line);
       expression.Error = expressionError;
       this.errors.push(expressionError);
+      return expression;
     }
 
-    return expression;
+    //TODO: Up (in method decl) we shall check for problems
+    return [block1, block2];
+
   }
 
 

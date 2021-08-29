@@ -14,12 +14,13 @@ struct OtherTest
 };
 
 
-void main(void)
+void main()
 {
 	struct OtherTest M[5];
 	int i;
 	i = 1;	
 	M[i].T[1].n = 2;
+	return;
 	
 }
 
