@@ -408,7 +408,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#methodStmt.
   visitMethodStmt(ctx) {
-    return this.visit(ctx.methodCall());
+    const methodCall = this.visit(ctx.methodCall());
+    if (methodCall.type === DATA_TYPE.ERROR)
+      this.errors.push(methodCall.error);
+    
+    return methodCall;
   }
 
 
@@ -674,9 +678,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // Does the specified method exists?
     if (!method) {
       const notFoundError = new UndeclaredMethodError(methodId, ctx.start.line);
-      errorSymbol.error = notFoundError;
+      errorSymbol.Error = notFoundError;
       return errorSymbol;
     }
+
+    const argError = args.find((arg) => (arg.type === DATA_TYPE.ERROR));
+  
+    if (argError)
+      return argError;
 
     const methodTypes = method.args.map((arg) => arg.type);
     const argTypes = args.map((arg) => arg.type);
@@ -684,7 +693,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // Are the signatures the same? (length and types)
     if (!compareArrays(methodTypes, argTypes)) {
       const argsTypeError = new InvalidMethodCallError(methodId, ctx.start.line);
-      errorSymbol.error = argsTypeError;
+      errorSymbol.Error = argsTypeError;
       return errorSymbol;
     }
 
