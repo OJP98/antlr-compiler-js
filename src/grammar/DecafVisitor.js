@@ -1,4 +1,3 @@
-//
 // Generated from ./src/grammar/Decaf.g4 by ANTLR 4.9.2
 // jshint ignore: start
 import Array from '../classes/Array';
@@ -222,6 +221,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     method.ReturnType = blockReturn.type;
 
+		console.log(method);
     // Finally, check for any errors and push them if exist
     if (method.error)
       this.errors.push(method.error)
@@ -706,7 +706,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#charLiteral.
   visitCharLiteral(ctx) {
-    return this.visit(ctx.char_literal());
+		let char = ctx.getText();
+		char = char.replace(/\"/g, '');
+    return new Symbol(
+      DATA_TYPE.CHAR, 'charLiteral', ctx.start.line, null, char
+    );
   }
 
 
@@ -714,13 +718,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitBoolLiteral(ctx) {
     return this.visit(ctx.bool_literal());
   }
-
-
-  // Visit a parse tree produced by DecafParser#charLiteralDecl.
-  visitCharLiteralDecl(ctx) {
-    return this.visitChildren(ctx);
-  }
-
 
   // Visit a parse tree produced by DecafParser#numLiteral.
   visitNumLiteral(ctx) {
@@ -758,7 +755,4 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitNumDecl(ctx) {
     return ctx.getText();
   }
-
-
-
 }

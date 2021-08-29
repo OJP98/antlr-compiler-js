@@ -77,11 +77,10 @@ methodCall : id '(' (arg (',' arg)*)* ')'                 # methodCallDecl ;
 arg : expression                                          # argDecl ;
 
 literal : int_literal                                     # intLiteral
-        | char_literal                                    # charLiteral
         | bool_literal                                    # boolLiteral
+        | CHAR_LITERAL                                    # charLiteral
         ;
 
-char_literal : '\'' LETTER '\''                           # charLiteralDecl ;
 
 int_literal : num                                         # numLiteral ;
 
@@ -92,6 +91,8 @@ bool_literal : 'true'                                     # trueLiteral
 id : ID                                                   # idDecl ;
 
 num : DIGIT+                                              # numDecl ;
+
+CHAR_LITERAL : '"' LETTER '"';
 
 ID : LETTER ALPHA_NUM* ;
 

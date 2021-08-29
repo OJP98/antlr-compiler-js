@@ -15,7 +15,9 @@ export default class Method extends Data {
 
   set ReturnType(returnType) {
     this.returnType = returnType;
-    this.Error = this.checkForErrors();
+    const error = this.checkForErrors();
+    if (error)
+      this.Error = error;
   }
 
   checkForErrors() {

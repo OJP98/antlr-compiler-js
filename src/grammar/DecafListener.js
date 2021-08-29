@@ -1,4 +1,4 @@
-// Generated from .\src\grammar\Decaf.g4 by ANTLR 4.9.2
+// Generated from ./src/grammar/Decaf.g4 by ANTLR 4.9.2
 // jshint ignore: start
 import antlr4 from 'antlr4';
 
@@ -56,6 +56,15 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 
 	// Exit a parse tree produced by DecafParser#arrDecl.
 	exitArrDecl(ctx) {
+	}
+
+
+	// Enter a parse tree produced by DecafParser#structOfStruct.
+	enterStructOfStruct(ctx) {
+	}
+
+	// Exit a parse tree produced by DecafParser#structOfStruct.
+	exitStructOfStruct(ctx) {
 	}
 
 
@@ -473,15 +482,6 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#charLiteral.
-	enterCharLiteral(ctx) {
-	}
-
-	// Exit a parse tree produced by DecafParser#charLiteral.
-	exitCharLiteral(ctx) {
-	}
-
-
 	// Enter a parse tree produced by DecafParser#boolLiteral.
 	enterBoolLiteral(ctx) {
 	}
@@ -491,12 +491,12 @@ export default class DecafListener extends antlr4.tree.ParseTreeListener {
 	}
 
 
-	// Enter a parse tree produced by DecafParser#charLiteralDecl.
-	enterCharLiteralDecl(ctx) {
+	// Enter a parse tree produced by DecafParser#charLiteral.
+	enterCharLiteral(ctx) {
 	}
 
-	// Exit a parse tree produced by DecafParser#charLiteralDecl.
-	exitCharLiteralDecl(ctx) {
+	// Exit a parse tree produced by DecafParser#charLiteral.
+	exitCharLiteral(ctx) {
 	}
 
 

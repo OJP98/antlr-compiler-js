@@ -9,7 +9,8 @@
     "start": "npx webpack serve",
     "watch": "webpack --watch",
     "lint": "eslint src/**/*.js",
-    "lint-fix": "eslint src/**/*.js --fix"
+    "lint-fix": "eslint src/**/*.js --fix",
+    "grammar": "antlr4 -Dlanguage=JavaScript -visitor -listener ./src/grammar/Decaf.g4 -o ./src/grammar/"
   },
   "keywords": [
     "antlr",
