@@ -21,14 +21,11 @@ export default class SymbolTable {
     entry.scope = this.symbolTable.length;
     table.push(entry);
     this.symbolTable.push(table);
-    // console.log(this.symbolTable);
-    // console.log('Bind', entry);
     return null;
   }
 
   enter() {
     this.symbolTable.push([]);
-    // console.log('New entry');
   }
 
   empty() {
@@ -48,7 +45,6 @@ export default class SymbolTable {
   }
 
   exit() {
-    // console.log('Exit');
     this.symbolTable.pop();
   }
 }

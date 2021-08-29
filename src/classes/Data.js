@@ -1,4 +1,4 @@
-import { DATA_TYPE } from "../enums/dataTypes";
+import { DATA_TYPE } from '../enums/dataTypes';
 
 export default class Data {
   constructor(type, name, line, column) {

@@ -47,7 +47,7 @@ function performOperation(symbol1, symbol2, operator) {
 export const operationError = (line) => {
   const error = new InvalidOperationType(line);
   const errorSymbol = new Symbol(DATA_TYPE.ERROR, 'operationError');
-  errorSymbol.error = error;
+  errorSymbol.Error = error;
   return errorSymbol;
 };
 

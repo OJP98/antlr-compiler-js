@@ -50,20 +50,15 @@ export default class Struct extends Data {
   }
 
   searchPropertyRecursively(propertyId) {
-    let searchResult;
-
-    this.structDecl.properties.some((property) => {
+    return this.structDecl.properties.some((property) => {
       if (property.name === propertyId) {
-        searchResult = this;
-        return searchResult;
+        return this;
       }
 
       if (property.type === DATA_TYPE.STRUCT)
-        searchResult = property.searchPropertyRecursively(propertyId);
+        return property.searchPropertyRecursively(propertyId);
 
-      return searchResult;
+      return null;
     });
-
-    return searchResult;
   }
 }
