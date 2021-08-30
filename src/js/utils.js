@@ -1,4 +1,3 @@
-import { MethodReturnTypeError } from '../classes/Error';
 import Symbol from '../classes/Symbol';
 import { DATA_TYPE } from '../enums/dataTypes';
 
@@ -6,7 +5,7 @@ export function compareArrays(arr1, arr2) {
   return JSON.stringify(arr1) === JSON.stringify(arr2);
 }
 
-export function getErrorFromArray(symbolArray) {
+function getErrorFromArray(symbolArray) {
   return symbolArray.find((symbol) => symbol.type === DATA_TYPE.ERROR);
 }
 
@@ -14,28 +13,27 @@ function isNotEquals(symbol, returnType) {
   return symbol.type !== DATA_TYPE.NONE && symbol.type !== returnType;
 }
 
-export function getReturnTypeFromArray(returnTypesArray, expectedReturnType) {
-  const error = this.getErrorFromArray(returnTypesArray);
+function filterNoneType(symbolArray) {
+  return symbolArray.filter((symbol) => symbol.type !== DATA_TYPE.NONE);
+}
 
-  if (error)
-    return error;
+export function getReturnTypeFromArray(returnTypesArray) {
+  const typeError = getErrorFromArray(returnTypesArray);
+  if (typeError)
+    return typeError;
 
-  const differentReturnType = this.returnTypesArray.find(
-    (symbol) => isNotEquals(symbol, expectedReturnType),
+  const notNoneDataTypes = filterNoneType(returnTypesArray);
+
+  if (!notNoneDataTypes)
+    return new Symbol(DATA_TYPE.NONE, 'returnTypeFromArray');
+
+  const expectedDataType = notNoneDataTypes[0].type;
+  const notEqual = notNoneDataTypes.find(
+    (symbol) => isNotEquals(symbol, expectedDataType),
   );
 
-  if (differentReturnType) {
-    differentReturnType.Error = new MethodReturnTypeError(
-      '', expectedReturnType, differentReturnType.type,
-    );
-    return differentReturnType;
-  }
+  if (notEqual)
+    return new Symbol(DATA_TYPE.ERROR, 'multipleReturnTypes', notEqual.line);
 
-  const everyReturnIsNone = this.returnTypesArray.every((symbol) => symbol.type === DATA_TYPE.NONE);
-
-  if (everyReturnIsNone)
-    return new Symbol(DATA_TYPE.VOID, 'returnType');
-
-  const returnType = this.returnTypesArray.find((symbol) => symbol.type === expectedReturnType);
-  return returnType;
+  return new Symbol(expectedDataType, 'returnTypeFromArray');
 }

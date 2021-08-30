@@ -15,6 +15,7 @@ import {
   InvalidMethodCallError,
   InvalidOperationType,
   InvalidPropertyError,
+  MultipleReturnTypesError,
   SymbolNotArrayError,
   UndeclaredIdError,
   UndeclaredMethodError,
@@ -26,7 +27,7 @@ import {
   getOperationResult,
   operationError
 } from '../js/operations';
-import compareArrays from '../js/utils';
+import { compareArrays, getReturnTypeFromArray } from '../js/utils';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
@@ -214,15 +215,15 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     method.args = parameters;
 
     // Visit block and assign it's return type to the method
-    const blockReturn = this.visit(ctx.block());
-    if (blockReturn.type === DATA_TYPE.ERROR)
-      return blockReturn;
+    const block = this.visit(ctx.block());
 
-    method.ReturnType = blockReturn.type;
+    if (block.type === DATA_TYPE.ERROR)
+      return block;
 
-		// console.log(method);
+    method.ReturnType = block.type;
+
     // Finally, check for any errors and push them if exist
-    if (method.error)
+    if (method.type === DATA_TYPE.ERROR)
       this.errors.push(method.error)
 
     // Exit the newly created symbol table
@@ -257,7 +258,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#idParam.
   visitIdParam(ctx) {
-    const type = this.visit(ctx.parameterType())
+    const type = this.visit(ctx.parameterType());
     const name = this.visit(ctx.id())
     const symbol = new Symbol(
       type, name, ctx.start.line, ctx.start.column
@@ -273,7 +274,17 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#idArrParam.
   visitIdArrParam(ctx) {
-    this.visitIdParam(ctx);
+    const type = this.visit(ctx.parameterType());
+    const name = this.visit(ctx.id())
+    const symbol = new Array(
+      type, name, 1, ctx.start.line, ctx.start.column
+    );
+
+    const bindError = this.symbolTable.bind(symbol);
+    if (bindError)
+      this.errors.push(bindError);
+
+    return symbol;
   }
 
 
@@ -313,24 +324,33 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Get every statement
     statements.forEach(stmt => {
-      const returnType = this.visit(stmt);
-      returnTypes.push(returnType);
+      const returnSymbol = this.visit(stmt);
+      returnTypes = returnTypes.concat(returnSymbol);
     });
 
-    // TODO: Get the current method return type in the scope ir order to compare
-    // if every other expression returns that same return type
+    // If we don't have stmts, then return NONE
+    if (!returnTypes.length)
+      return new Symbol(DATA_TYPE.NONE, 'BlockDecl');
 
-    // TODO: We'll have to check each return type if theres more then one
-    // console.log(returnTypes);
+    // If it's just one, return it
+    if (returnTypes.length === 1)
+      return returnTypes.pop();
+    
+    // Make sure all tye return types are the same
+    const returnSymbol = getReturnTypeFromArray(returnTypes);
+    if (returnSymbol.type === DATA_TYPE.ERROR) {
+      const returnError = new MultipleReturnTypesError(returnSymbol.line);
+      returnSymbol.Error = returnError;
+      this.errors.push(returnError);
+    }
 
-    return returnTypes.pop();
+    return returnSymbol;
   }
 
 
   // Visit a parse tree produced by DecafParser#ifStmt.
   visitIfStmt(ctx) {
     const expression = this.visit(ctx.expression());
-    const block = this.visit(ctx.block());
 
     if (expression.type === DATA_TYPE.ERROR) {
       this.errors.push(expression.error);
@@ -343,7 +363,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(expressionError);
     }
 
-    return expression;
+    const block = this.visit(ctx.block());
+
+    return block;
   }
 
 
@@ -357,7 +379,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return expression;
     }
 
-    // The expression should be of boolean type
+    // The expression should be of boolean/ type
     if (expression.type !== DATA_TYPE.BOOLEAN) {
       const expressionError = new InvalidExpressionTypeError('if - else', ctx.start.line);
       expression.Error = expressionError;
@@ -372,7 +394,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(block1.error || block2.error);
 
     //TODO: Up (in method decl) we shall check for problems
-    return [block1, block2, expression];
+    return [block1, block2];
 
   }
 
@@ -380,7 +402,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#whileStmt.
   visitWhileStmt(ctx) {
     const expression = this.visit(ctx.expression());
-    const block = this.visit(ctx.block());
 
     if (expression.type === DATA_TYPE.ERROR) {
       this.errors.push(expression.error);
@@ -393,7 +414,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(expressionError);
     }
 
-    return expression;
+    const block = this.visit(ctx.block());
+
+    return block;
   }
 
 
@@ -401,7 +424,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitReturnExprStmt(ctx) {
     const expression = this.visit(ctx.expression());
 
-    // TODO: Should this actually be happening?
     if (expression.type === DATA_TYPE.ERROR)
       this.errors.push(expression.error);
 
@@ -410,18 +432,19 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
 
   // Visit a parse tree produced by DecafParser#returnVoidStmt.
-  visitReturnVoidStmt() {
-    return new Symbol(DATA_TYPE.VOID, 'voidReturn');
+  visitReturnVoidStmt(ctx) {
+    return new Symbol(DATA_TYPE.VOID, 'voidReturn', ctx.start.line);
   }
 
 
   // Visit a parse tree produced by DecafParser#methodStmt.
   visitMethodStmt(ctx) {
     const methodCall = this.visit(ctx.methodCall());
+
     if (methodCall.type === DATA_TYPE.ERROR)
       this.errors.push(methodCall.error);
 
-    return methodCall;
+    return new Symbol(DATA_TYPE.NONE, 'methodStmt', ctx.start.line);
   }
 
 
@@ -450,7 +473,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(assignmentError);
     }
 
-    return new Symbol(DATA_TYPE.VOID, 'assignmentStmt');
+    return new Symbol(DATA_TYPE.NONE, 'assignmentStmt');
   }
 
 
@@ -459,6 +482,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const expr = this.visit(ctx.expression());
     if (expr.type === DATA_TYPE.ERROR)
       this.errors.push(expr.error);
+    expr.type = DATA_TYPE.NONE;
     return expr;
   }
 

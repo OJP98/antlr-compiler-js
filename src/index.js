@@ -68,6 +68,7 @@ function main() {
   console.table(symbols);
 
   visitorErrors.forEach((e) => errors.push(e.ErrorLog));
+  // visitorErrors.forEach((e) => console.log(e));
   errors.concat(decafVisitor.errors);
 
   if (errors.length) {

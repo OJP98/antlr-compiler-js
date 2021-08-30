@@ -14,7 +14,7 @@ export default class Method extends Data {
   }
 
   set ReturnType(returnType) {
-    this.returnType = returnType;
+    this.returnType = returnType === DATA_TYPE.NONE ? DATA_TYPE.VOID : returnType;
     const error = this.checkForErrors();
     if (error)
       this.Error = error;
@@ -23,9 +23,6 @@ export default class Method extends Data {
   checkForErrors() {
     if (this.error)
       return this.error;
-
-    if (this.returnType && this.type === DATA_TYPE.VOID && this.returnType !== DATA_TYPE.VOID)
-      return new MethodReturnTypeError(this.name, this.type, this.returnType, this.line);
 
     if (this.returnType && this.type !== this.returnType)
       return new MethodReturnTypeError(this.name, this.type, this.returnType, this.line);

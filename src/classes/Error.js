@@ -45,6 +45,15 @@ export class MethodReturnTypeError extends Error {
   }
 }
 
+export class MultipleReturnTypesError extends Error {
+  constructor(line) {
+    super(
+      'Multiple Return Types',
+      'Multiple return data types in a single block.', line,
+    );
+  }
+}
+
 export class IdAlreadyDeclaredError extends Error {
   constructor(id, line, column) {
     super('Id Already Declared', `"${id}" has been already declared in the current scope.`, line, column);
