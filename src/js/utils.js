@@ -1,3 +1,4 @@
+import { MultipleReturnTypesError } from '../classes/Error';
 import Symbol from '../classes/Symbol';
 import { DATA_TYPE } from '../enums/dataTypes';
 
@@ -19,12 +20,13 @@ function filterNoneType(symbolArray) {
 
 export function getReturnTypeFromArray(returnTypesArray) {
   const typeError = getErrorFromArray(returnTypesArray);
+
   if (typeError)
     return typeError;
 
   const notNoneDataTypes = filterNoneType(returnTypesArray);
 
-  if (!notNoneDataTypes)
+  if (!notNoneDataTypes.length)
     return new Symbol(DATA_TYPE.NONE, 'returnTypeFromArray');
 
   const expectedDataType = notNoneDataTypes[0].type;
@@ -32,8 +34,12 @@ export function getReturnTypeFromArray(returnTypesArray) {
     (symbol) => isNotEquals(symbol, expectedDataType),
   );
 
-  if (notEqual)
-    return new Symbol(DATA_TYPE.ERROR, 'multipleReturnTypes', notEqual.line);
+  if (notEqual) {
+    const returnSymbol = new Symbol(DATA_TYPE.ERROR, 'multipleReturnTypes');
+    const returnError = new MultipleReturnTypesError(returnSymbol.line);
+    returnSymbol.Error = returnError;
+    return returnSymbol;
+  }
 
   return new Symbol(expectedDataType, 'returnTypeFromArray');
 }

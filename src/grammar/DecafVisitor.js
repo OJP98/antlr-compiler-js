@@ -60,7 +60,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#declarationMethod.
   visitDeclarationMethod(ctx) {
-    return this.visitChildren(ctx);
+    return this.visit(ctx.methodDeclaration());
   }
 
 
@@ -223,7 +223,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     method.ReturnType = block.type;
 
     // Finally, check for any errors and push them if exist
-    if (method.type === DATA_TYPE.ERROR)
+    if (method.error)
       this.errors.push(method.error)
 
     // Exit the newly created symbol table
@@ -338,10 +338,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     
     // Make sure all tye return types are the same
     const returnSymbol = getReturnTypeFromArray(returnTypes);
-    if (returnSymbol.type === DATA_TYPE.ERROR) {
-      const returnError = new MultipleReturnTypesError(returnSymbol.line);
-      returnSymbol.Error = returnError;
-      this.errors.push(returnError);
+    if (returnSymbol.type === DATA_TYPE.ERROR && returnSymbol.name === 'multipleReturnTypes') {
+      this.errors.push(returnSymbol.error);
     }
 
     return returnSymbol;
@@ -389,11 +387,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Get both blocks (if - else)
     const [block1, block2] = this.visit(ctx.block());
-
-    if (block1.type === DATA_TYPE.ERROR || block2.type === DATA_TYPE.error)
-      this.errors.push(block1.error || block2.error);
-
-    //TODO: Up (in method decl) we shall check for problems
     return [block1, block2];
 
   }
@@ -415,7 +408,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     }
 
     const block = this.visit(ctx.block());
-
     return block;
   }
 
@@ -457,11 +449,15 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#assignmentStmt.
   visitAssignmentStmt(ctx) {
     const symbol = this.visit(ctx.location());
-    const expr = this.visit(ctx.expression());
+    if (symbol.type === DATA_TYPE.ERROR) {
+      this.errors.push(symbol.error);
+      return symbol;
+    }
 
-    if (symbol.error || expr.error) {
-      this.errors.push(symbol.error || expr.error);
-      return symbol.error ? symbol : expr;
+    const expr = this.visit(ctx.expression());
+    if (expr.type === DATA_TYPE.ERROR) {
+      this.errors.push(expr.error);
+      return expr;
     }
 
     // Are both sides of the assignment of the same type?
@@ -480,8 +476,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#expressionStmt.
   visitExpressionStmt(ctx) {
     const expr = this.visit(ctx.expression());
-    if (expr.type === DATA_TYPE.ERROR)
+    if (expr.type === DATA_TYPE.ERROR) {
       this.errors.push(expr.error);
+      return expr;
+    }
     expr.type = DATA_TYPE.NONE;
     return expr;
   }

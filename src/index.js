@@ -50,14 +50,15 @@ function main() {
   const parser = new DecafParser(tokens);
   parser.buildParseTrees = true;
 
-  console.log(parser.ruleNames);
+  // console.log(parser.ruleNames);
 
   const tree = parser.program();
   const decafVisitor = new DecafVisitor();
   tree.accept(decafVisitor);
 
   const symbols = decafVisitor.symbolTable.allRegisters;
-  const visitorErrors = decafVisitor.errors;
+  let visitorErrors = decafVisitor.errors;
+  console.log(visitorErrors);
 
   // Main program
   const mainMethod = symbols.find((m) => m.name === 'main');
@@ -68,8 +69,7 @@ function main() {
   console.table(symbols);
 
   visitorErrors.forEach((e) => errors.push(e.ErrorLog));
-  // visitorErrors.forEach((e) => console.log(e));
-  errors.concat(decafVisitor.errors);
+  visitorErrors = [...new Set(visitorErrors)];
 
   if (errors.length) {
     const errorMsg = document.createElement('p');
