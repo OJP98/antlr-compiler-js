@@ -510,22 +510,20 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Is it a struct with no length?
     if (symbol instanceof Struct && !symbol.length) {
-      const notArrayError = new SymbolNotArrayError(
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR, symbol.name);
+      errorSymbol.Error = new SymbolNotArrayError(
         symbol.name, ctx.start.line
       );
-      symbol.error = notArrayError;
-      symbol.type = DATA_TYPE.ERROR;
-      return symbol;
+      return errorSymbol;
     }
 
     // Is it an array?
     if (!(symbol instanceof Struct) && !(symbol instanceof Array)) {
-      const notArrayError = new SymbolNotArrayError(
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR, symbol.name);
+      errorSymbol.Error = new SymbolNotArrayError(
         symbol.name, ctx.start.line
       );
-      symbol.error = notArrayError;
-      symbol.type = DATA_TYPE.ERROR;
-      return symbol;
+      return errorSymbol;
     }
 
     const expr = this.visit(ctx.expression());
@@ -536,8 +534,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Is the [<expr>] an INT type?
     if (expr.type !== DATA_TYPE.INT) {
-      const arrayError = new ArraySubscriptError(ctx.start.line);
-      symbol.error = arrayError;
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR);
+      errorSymbol.Error = new ArraySubscriptError(ctx.start.line);
+      return errorSymbol;
     }
 
     return symbol;
@@ -553,8 +552,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Is the symbol a struct?
     if (struct.type !== DATA_TYPE.STRUCT) {
-      struct.Error = new UndeclaredStructError(struct.name, ctx.parentCtx.start.line);
-      return struct;
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR, struct.name);
+      errorSymbol.Error = new UndeclaredStructError(struct.name, ctx.parentCtx.start.line);
+      return errorSymbol;
     }
 
     this.symbolTable.enter();
@@ -565,11 +565,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     this.symbolTable.exit();
 
     const locationStruct = struct.searchPropertyRecursively(location.name);
-    if (!locationStruct)
-      location.Error = new InvalidPropertyError(
-        struct.name, location.name, ctx.parentCtx.start.line
-      );
-
+    if (!locationStruct) {
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR, location.name);
+      errorSymbol.Error = new InvalidPropertyError(struct.name, location.name, ctx.parentCtx.start.line);
+      return errorSymbol;
+    }
     // Get the struct property
     return location;
   }
@@ -584,8 +584,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Is the symbol a struct?
     if (struct.type !== DATA_TYPE.STRUCT) {
-      struct.Error = new UndeclaredStructError(struct.name, ctx.parentCtx.start.line);
-      return struct;
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR, struct.name);
+      errorSymbol.Error = new UndeclaredStructError(struct.name, ctx.parentCtx.start.line);
+      return errorSymbol;
     }
 
     // Start a new entry of the symbol table and bind the struct props
@@ -598,11 +599,12 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     this.symbolTable.exit();
 
     const locationStruct = struct.searchPropertyRecursively(location.name);
-      if (!locationStruct)
-        location.Error = new InvalidPropertyError(
-          struct.name, location.name, ctx.parentCtx.start.line
-        );
 
+    if (!locationStruct) {
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR, location.name);
+      errorSymbol.Error = new InvalidPropertyError(struct.name, location.name, ctx.parentCtx.start.line);
+      return errorSymbol;
+    }
     return location;
   }
 

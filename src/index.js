@@ -10,9 +10,12 @@ import { MainNotDefinedError } from './classes/Error';
 import DecafLexer from './grammar/DecafLexer';
 import DecafParser from './grammar/DecafParser';
 import DecafVisitor from './grammar/DecafVisitor';
+import ConsoleErrorListener from './grammar/ErrorListener';
 
 const details = document.getElementById('details');
 const returnTag = document.createElement('h2');
+const errorListener = new ConsoleErrorListener();
+let errors = [];
 returnTag.innerHTML = 'output';
 document.getElementById('parseButton').addEventListener('click', main);
 
@@ -24,7 +27,7 @@ editor.setAutoScrollEditorIntoView(true);
 editor.setShowPrintMargin(false);
 editor.commands.addCommand({
   name: 'parseFile',
-  bindKey: { win: 'Shift-enter', mac: 'Shift-enter' },
+  bindKey: { win: 'Ctrl-enter', mac: 'Command-enter' },
   exec: () => main(),
 });
 editor.setFontSize(20);
@@ -36,41 +39,7 @@ function removeAllChildNodes(parent) {
   }
 }
 
-function main() {
-  const errors = [];
-  console.clear();
-  removeAllChildNodes(details);
-  details.appendChild(returnTag);
-
-  const input = editor.getValue();
-
-  const chars = new antlr4.InputStream(input);
-  const lexer = new DecafLexer(chars);
-  const tokens = new antlr4.CommonTokenStream(lexer);
-  const parser = new DecafParser(tokens);
-  parser.buildParseTrees = true;
-
-  // console.log(parser.ruleNames);
-
-  const tree = parser.program();
-  const decafVisitor = new DecafVisitor();
-  tree.accept(decafVisitor);
-
-  const symbols = decafVisitor.symbolTable.allRegisters;
-  let visitorErrors = decafVisitor.errors;
-  console.log(visitorErrors);
-
-  // Main program
-  const mainMethod = symbols.find((m) => m.name === 'main');
-
-  if (!mainMethod)
-    errors.push(new MainNotDefinedError().ErrorLog);
-
-  console.table(symbols);
-
-  visitorErrors.forEach((e) => errors.push(e.ErrorLog));
-  visitorErrors = [...new Set(visitorErrors)];
-
+function renderErrors() {
   if (errors.length) {
     const errorMsg = document.createElement('p');
     errorMsg.style = 'color: var(--red);';
@@ -92,4 +61,46 @@ function main() {
     details.appendChild(p);
     console.info('No errors found!');
   }
+}
+
+function main() {
+  errors = [];
+  errorListener.clearSyntaxErrors();
+  console.clear();
+  removeAllChildNodes(details);
+  details.appendChild(returnTag);
+
+  const input = editor.getValue();
+
+  const chars = new antlr4.InputStream(input);
+  const lexer = new DecafLexer(chars);
+  const tokens = new antlr4.CommonTokenStream(lexer);
+  const parser = new DecafParser(tokens);
+  parser.buildParseTrees = true;
+  parser.removeErrorListeners();
+  parser.addErrorListener(errorListener);
+
+  const tree = parser.program();
+
+  if (errorListener.syntaxErrors.length) {
+    errorListener.syntaxErrors.forEach((e) => errors.push(e));
+  } else {
+    const decafVisitor = new DecafVisitor();
+    tree.accept(decafVisitor);
+
+    const symbols = decafVisitor.symbolTable.allRegisters;
+    const visitorErrors = decafVisitor.errors;
+    console.log(visitorErrors);
+
+    // Main program
+    const mainMethod = symbols.find((m) => m.name === 'main');
+
+    if (!mainMethod)
+      errors.push(new MainNotDefinedError().ErrorLog);
+
+    console.table(symbols);
+
+    visitorErrors.forEach((e) => errors.push(e.ErrorLog));
+  }
+  renderErrors();
 }
