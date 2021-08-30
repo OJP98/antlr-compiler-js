@@ -14,31 +14,15 @@
     </div>
     <div class="container">
       <div id="editor" class="app_editor">class Program {
-      
-    struct st {
-        int x;
-        int y;
-    }
     
-    struct Nuevo {
-        int a;
-        int b;
-        struct st c;
-    };
-
-    struct Nuevo n[5];
-
     int method1(int param1) {
-        n[1].c = 5;
-        return param1;
+        if (param1 == 0) {
+          return 1;
+        } else {
+          return 0;
+        }
     }
 
-    int method2(int param1) {
-        int result[5];
-        result[1] = 5;
-        return result[1];
-    }
-    
     void main() {
         int my_var2;
         return;
