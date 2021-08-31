@@ -1,6 +1,8 @@
 # js-antlr
 
-A decaf parser implementation using JavaScript and ANTLR4 Visitor generated file. It's created on a [specified grammar](src/grammar/Decaf.g4). You may test out files from the browser, wether you want to upload a .decaf file and/or write your own in the integrated editor. 
+A decaf parser implementation using JavaScript and ANTLR4 Visitor generated file. It's created on a [specified grammar](src/grammar/Decaf.g4). You may test out files from the browser, wether you want to upload a .decaf file and/or write your own in the integrated editor. Use it online in this [netlify link](https://decafparser.netlify.app/).
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/f3b596e5-d5f3-4c06-acf5-b79dec62fd27/deploy-status)](https://app.netlify.com/sites/decafparser/deploys)
 
 ## Requirements
 
