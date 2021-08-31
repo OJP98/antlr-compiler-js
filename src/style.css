@@ -63,3 +63,21 @@ h2 {
 	overflow: hidden;
 	border: solid 1px black;
 }
+
+.droparea {
+	margin: 1rem auto;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 384px;
+	max-width: 100%;
+	height: 160px;
+	border: 4px dashed var(--grey);
+	border-radius: 15px;
+	color: white;
+}
+
+.blue-border {
+	border-color: var(--blue);
+}

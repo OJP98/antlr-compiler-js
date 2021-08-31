@@ -3,14 +3,23 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-undef */
 import antlr4 from 'antlr4';
-import 'ace-builds';
-import 'ace-builds/webpack-resolver';
 import './style.css';
 import { MainNotDefinedError } from './classes/Error';
 import DecafLexer from './grammar/DecafLexer';
 import DecafParser from './grammar/DecafParser';
 import DecafVisitor from './grammar/DecafVisitor';
 import ConsoleErrorListener from './grammar/ErrorListener';
+import 'ace-builds';
+import 'ace-builds/webpack-resolver';
+import dragDrop from './js/dragDrop';
+import editor from './js/aceConfig';
+
+dragDrop();
+editor.commands.addCommand({
+  name: 'parseFile',
+  bindKey: { win: 'Ctrl-enter', mac: 'Command-enter' },
+  exec: () => main(),
+});
 
 const details = document.getElementById('details');
 const returnTag = document.createElement('h2');
@@ -18,20 +27,6 @@ const errorListener = new ConsoleErrorListener();
 let errors = [];
 returnTag.innerHTML = 'output';
 document.getElementById('parseButton').addEventListener('click', main);
-
-const editor = ace.edit('editor');
-editor.setTheme('ace/theme/monokai');
-editor.session.setMode('ace/mode/c_cpp');
-editor.setKeyboardHandler('ace/keyboard/vim');
-editor.setAutoScrollEditorIntoView(true);
-editor.setShowPrintMargin(false);
-editor.commands.addCommand({
-  name: 'parseFile',
-  bindKey: { win: 'Ctrl-enter', mac: 'Command-enter' },
-  exec: () => main(),
-});
-editor.setFontSize(20);
-editor.execCommand('showKeyboardShortcuts');
 
 function removeAllChildNodes(parent) {
   while (parent.firstChild) {
