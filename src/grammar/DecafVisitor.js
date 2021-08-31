@@ -16,6 +16,7 @@ import {
   InvalidOperationType,
   InvalidPropertyError,
   MultipleReturnTypesError,
+  NegativeArraySubscriptError,
   SymbolNotArrayError,
   UndeclaredIdError,
   UndeclaredMethodError,
@@ -539,6 +540,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return errorSymbol;
     }
 
+    // Is the <expr> lower than 0?
+    if (expr.value && expr.value < 0) {
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR);
+      errorSymbol.Error = new NegativeArraySubscriptError(symbol.name, ctx.start.line);
+      return errorSymbol;
+    }
+
     return symbol;
   }
 
@@ -563,6 +571,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     const location = this.visit(ctx.location());
     this.symbolTable.exit();
+
+    if (location.type === DATA_TYPE.ERROR)
+      return location;
 
     const locationStruct = struct.searchPropertyRecursively(location.name);
     if (!locationStruct) {
@@ -597,6 +608,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // Now, get the location (struct property)
     const location = this.visit(ctx.location());
     this.symbolTable.exit();
+
+    if (location.type === DATA_TYPE.ERROR)
+      return location;
 
     const locationStruct = struct.searchPropertyRecursively(location.name);
 
@@ -689,6 +703,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     if (expr.type !== DATA_TYPE.INT)
       expr.Error = new InvalidOperationType(ctx.start.line);
+
+    expr.value = -(expr.value);
 
     return expr;
   }

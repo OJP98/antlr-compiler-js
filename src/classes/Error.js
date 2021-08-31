@@ -144,11 +144,20 @@ export class ArraySubscriptError extends Error {
   }
 }
 
+export class NegativeArraySubscriptError extends Error {
+  constructor(arrayId, line) {
+    super(
+      'Negative Array Subscript',
+      `Array "${arrayId}" subscript is lower than zero.`, line,
+    );
+  }
+}
+
 export class SymbolNotArrayError extends Error {
   constructor(symbolId, line) {
     super(
       'Symbol Not Array',
-      `subscripted value "${symbolId}" is not an array.`, line,
+      `Subscripted value "${symbolId}" is not an array.`, line,
     );
   }
 }
