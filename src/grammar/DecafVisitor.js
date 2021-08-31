@@ -357,9 +357,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     }
 
     if (expression.type !== DATA_TYPE.BOOLEAN) {
-      const expressionError = new InvalidExpressionTypeError('if', ctx.start.line);
-      expression.Error = expressionError;
+      const symbolError = new symbol(DATA_TYPE.ERROR, 'ifExprEror');
+      symbolError.Error =  new InvalidExpressionTypeError('if', ctx.start.line);
       this.errors.push(expressionError);
+      return symbolError;
     }
 
     const block = this.visit(ctx.block());
@@ -380,11 +381,12 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // The expression should be of boolean/ type
     if (expression.type !== DATA_TYPE.BOOLEAN) {
-      const expressionError = new InvalidExpressionTypeError('if - else', ctx.start.line);
-      expression.Error = expressionError;
+      const symbolError = new symbol(DATA_TYPE.ERROR, 'ifExprEror');
+      symbolError.Error =  new InvalidExpressionTypeError('if - else', ctx.start.line);
       this.errors.push(expressionError);
-      return expression;
+      return symbolError;
     }
+
 
     // Get both blocks (if - else)
     const [block1, block2] = this.visit(ctx.block());
@@ -402,10 +404,12 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return expression;
     }
 
+    // The expression should be of boolean/ type
     if (expression.type !== DATA_TYPE.BOOLEAN) {
-      const expressionError = new InvalidExpressionTypeError('while', ctx.start.line);
-      expression.Error = expressionError;
+      const symbolError = new symbol(DATA_TYPE.ERROR, 'ifExprEror');
+      symbolError.Error =  new InvalidExpressionTypeError('while', ctx.start.line);
       this.errors.push(expressionError);
+      return symbolError;
     }
 
     const block = this.visit(ctx.block());

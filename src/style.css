@@ -81,3 +81,9 @@ h2 {
 .blue-border {
 	border-color: var(--blue);
 }
+
+.error
+{
+    background: var(--red);
+    position: absolute;
+}
