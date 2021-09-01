@@ -124,6 +124,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   }
 
 
+  visitStructOfStruct(ctx) {
+    return this.visit(ctx.structDeclaration());
+  }
+
+
   // Visit a parse tree produced by DecafParser#structDecl.
   visitStructDecl(ctx) {
     const type = DATA_TYPE.STRUCT_DECL;
