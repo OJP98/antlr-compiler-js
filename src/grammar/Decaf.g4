@@ -103,3 +103,5 @@ LETTER : [a-zA-Z] | '_' ;
 ALPHA_NUM : LETTER | DIGIT;
 
 WS : [ \t\n\r] + -> skip ;
+
+COMMENTS: '//' ~('\r' | '\n' )*  -> channel(HIDDEN) ;
