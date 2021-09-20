@@ -1,8 +1,8 @@
 import Data from './Data';
 
 export default class StrcutDeclaration extends Data {
-  constructor(type, name, line, column, properties = []) {
-    super(type, name, line, column);
+  constructor(type, name, line, properties = []) {
+    super(type, name, line);
     this.properties = properties;
   }
 

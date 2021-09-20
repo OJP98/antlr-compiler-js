@@ -70,19 +70,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const varType = this.visit(ctx.varType());
     const varId = this.visit(ctx.id());
     const startLine = ctx.start.line;
-    const startCol = ctx.start.column;
-    const { structId, type } = varType;
-    let symbol = null;
+    const { type, structId } = varType;
+    let symbol;
 
     if (structId) {
-       const structDecl = this.symbolTable.lookup(structId);
-       symbol = new Struct(
-         type, varId, startLine, startCol, structDecl, structId
-       );
+      const structDecl = this.symbolTable.lookup(structId);
+      symbol = new Struct(type, varId, startLine, structDecl, structId);
     } else {
-      symbol = new Symbol(
-        type, varId, ctx.start.line, ctx.start.column
-      );
+      symbol = new Symbol(type, varId, startLine);
     }
 
     this.symbolTable.bind(symbol);
@@ -100,19 +95,16 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const varId = this.visit(ctx.id());
     const num = this.visit(ctx.num());
     const startLine = ctx.start.line;
-    const startCol = ctx.start.column;
     const { structId, type } = varType;
     let symbol = null;
 
     if (structId) {
        const structDecl = this.symbolTable.lookup(structId);
        symbol = new Struct(
-         type, varId, startLine, startCol, structDecl, structId, +num
+         type, varId, startLine, structDecl, structId, +num
        );
     } else {
-      symbol = new Array(
-        type, varId, num, startLine, startCol
-      );
+      symbol = new Array(type, varId, num, startLine);
     }
 
     this.symbolTable.bind(symbol);
@@ -137,7 +129,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const props = [];
 
     const struct = new StructDeclaration(
-      type, id, ctx.start.line, ctx.start.column
+      type, id, ctx.start.line
     );
 
     // Add the struct to the current scope and create a new one
@@ -161,19 +153,19 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#intVar.
   visitIntVar() {
-    return { structId: null, type: DATA_TYPE.INT };
+    return { type: DATA_TYPE.INT };
   }
 
 
   // Visit a parse tree produced by DecafParser#charVar.
   visitCharVar() {
-    return { structId: null, type: DATA_TYPE.CHAR };
+    return { type: DATA_TYPE.CHAR };
   }
 
 
   // Visit a parse tree produced by DecafParser#booleanVar.
   visitBooleanVar() {
-    return { structId: null, type: DATA_TYPE.BOOLEAN };
+    return { type: DATA_TYPE.BOOLEAN };
   }
 
 
@@ -186,13 +178,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#structDeclarationVar.
   visitStructDeclarationVar(ctx) {
-    return { structId: null, type: this.visitChildren(ctx) };
+    return { type: this.visitChildren(ctx) };
   }
 
 
   // Visit a parse tree produced by DecafParser#voidVar.
   visitVoidVar() {
-    return { structId: null, type: DATA_TYPE.VOID };
+    return { type: DATA_TYPE.VOID };
   }
 
 
@@ -204,7 +196,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const params = ctx.parameter();
 
     const method = new Method(
-      methodType, methodId, ctx.start.line, ctx.start.column
+      methodType, methodId, ctx.start.line
     );
     this.symbolTable.bind(method);
 
@@ -267,7 +259,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const type = this.visit(ctx.parameterType());
     const name = this.visit(ctx.id())
     const symbol = new Symbol(
-      type, name, ctx.start.line, ctx.start.column
+      type, name, ctx.start.line
     );
 
     const bindError = this.symbolTable.bind(symbol);
@@ -283,7 +275,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const type = this.visit(ctx.parameterType());
     const name = this.visit(ctx.id())
     const symbol = new Array(
-      type, name, 1, ctx.start.line, ctx.start.column
+      type, name, 1, ctx.start.line
     );
 
     const bindError = this.symbolTable.bind(symbol);

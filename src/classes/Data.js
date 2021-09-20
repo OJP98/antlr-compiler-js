@@ -1,11 +1,10 @@
 import { DATA_TYPE } from '../enums/dataTypes';
 
 export default class Data {
-  constructor(type, name, line, column) {
+  constructor(type, name, line) {
     this.type = type;
     this.name = name;
     this.line = line;
-    this.column = column;
     this.error = null;
   }
 

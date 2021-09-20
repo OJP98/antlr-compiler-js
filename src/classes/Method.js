@@ -7,8 +7,8 @@ import {
 import { DATA_TYPE } from '../enums/dataTypes';
 
 export default class Method extends Data {
-  constructor(type, name, line, column) {
-    super(type, name, line, column);
+  constructor(type, name, line) {
+    super(type, name, line);
     this.args = [];
     this.returnType = null;
   }

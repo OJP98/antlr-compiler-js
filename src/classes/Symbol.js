@@ -1,8 +1,8 @@
 import Data from './Data';
 
 export default class Symbol extends Data {
-  constructor(type, name, line, column, value) {
-    super(type, name, line, column);
+  constructor(type, name, line, value) {
+    super(type, name, line);
     this.value = value;
   }
 }
