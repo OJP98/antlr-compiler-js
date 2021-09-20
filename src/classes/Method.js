@@ -11,6 +11,7 @@ export default class Method extends Data {
     super(type, name, line);
     this.args = [];
     this.returnType = null;
+    this.width = 0;
   }
 
   set ReturnType(returnType) {

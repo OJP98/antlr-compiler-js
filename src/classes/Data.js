@@ -6,6 +6,7 @@ export default class Data {
     this.name = name;
     this.line = line;
     this.error = null;
+    this.setWidth();
   }
 
   get Error() {
@@ -19,5 +20,21 @@ export default class Data {
 
   checkForErrors() {
     return this.error || null;
+  }
+
+  setWidth() {
+    this.width = 0;
+    if (this.type === DATA_TYPE.INT)
+      this.width = 4;
+
+    else if (this.type === DATA_TYPE.BOOLEAN)
+      this.width = 2;
+
+    else if (this.type === DATA_TYPE.CHAR)
+      this.width = 4;
+  }
+
+  get Width() {
+    return this.width;
   }
 }

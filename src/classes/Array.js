@@ -7,6 +7,7 @@ export default class Array extends Data {
     this.value = value;
     this.length = +length;
     this.error = this.checkForErrors();
+    this.width *= this.length;
   }
 
   checkForErrors() {
