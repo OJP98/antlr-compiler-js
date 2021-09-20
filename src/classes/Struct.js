@@ -14,10 +14,15 @@ export default class Struct extends Data {
     this.structId = structId;
     this.length = length;
     this.error = this.checkForErrors();
+    this.assignWidthFromStructDecl();
   }
 
   set StructId(structDecl) {
     this.structDecl = structDecl;
+  }
+
+  assignWidthFromStructDecl() {
+    this.width = this.structDecl.width;
   }
 
   checkForErrors() {

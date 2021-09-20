@@ -141,7 +141,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     properties.forEach(varDecl => props.push(
       this.visit(varDecl))
     );
-    struct.properties = props;
+    struct.Properties = props;
 
     if (struct.error)
       this.errors.push(struct.error)
