@@ -21,7 +21,7 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.(png|jpe?g|gif)$/i,
+        test: /\.(png|jpe?g|gif|ico)$/i,
         use: [
           {
             loader: 'file-loader',
@@ -36,8 +36,10 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/index.html',
+      title: 'Decaf Parser',
       file: 'index.html',
       inject: 'body',
+      favicon: './src/favicon.ico',
     }),
   ],
 };
