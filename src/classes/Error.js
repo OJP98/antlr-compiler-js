@@ -1,10 +1,9 @@
 /* eslint-disable max-classes-per-file */
 export default class Error {
-  constructor(name, details, line = null, column = null) {
+  constructor(name, details, line = null) {
     this.name = name;
     this.details = details;
     this.line = line;
-    this.column = column;
   }
 
   get ErrorLog() {
@@ -31,8 +30,8 @@ export class ArrayLengthError extends Error {
 }
 
 export class ArrayLengthNotIntError extends Error {
-  constructor(id, line, column) {
-    super('ArrayLengthNotInt', `Array length ${id} is not an integer value.`, line, column);
+  constructor(id, line) {
+    super('ArrayLengthNotInt', `Array length ${id} is not an integer value.`, line);
   }
 }
 
@@ -55,8 +54,8 @@ export class MultipleReturnTypesError extends Error {
 }
 
 export class IdAlreadyDeclaredError extends Error {
-  constructor(id, line, column) {
-    super('Id Already Declared', `"${id}" has been already declared in the current scope.`, line, column);
+  constructor(id, line) {
+    super('Id Already Declared', `"${id}" has been already declared in the current scope.`, line);
   }
 }
 
@@ -158,6 +157,16 @@ export class SymbolNotArrayError extends Error {
     super(
       'Symbol Not Array',
       `Subscripted value "${symbolId}" is not an array.`, line,
+    );
+  }
+}
+
+export class MethodAlreadyDeclaredError extends Error {
+  constructor(methodId, line) {
+    super(
+      'Method Already Declared',
+      `"${methodId}" has been already declared.`,
+      line,
     );
   }
 }

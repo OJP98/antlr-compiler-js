@@ -7,19 +7,19 @@ export default class SymbolTable {
   }
 
   bind(entry) {
-    const table = this.symbolTable.pop();
+    const currentTable = this.symbolTable.pop();
     this.allRegisters.push(entry);
 
-    if (table.find((s) => s.name === entry.name)) {
-      const error = new IdAlreadyDeclaredError(entry.name, entry.line, entry.column);
+    if (currentTable.find((s) => s.name === entry.name)) {
+      const error = new IdAlreadyDeclaredError(entry.name, entry.line);
       entry.Error = error;
-      table.push(entry);
-      this.symbolTable.push(table);
+      currentTable.push(entry);
+      this.symbolTable.push(currentTable);
       return error;
     }
 
-    table.push(entry);
-    this.symbolTable.push(table);
+    currentTable.push(entry);
+    this.symbolTable.push(currentTable);
     return null;
   }
 

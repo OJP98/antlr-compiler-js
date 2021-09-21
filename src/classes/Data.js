@@ -6,6 +6,8 @@ export default class Data {
     this.name = name;
     this.line = line;
     this.error = null;
+    this.offset = null;
+    this.width = null;
     this.setWidth();
   }
 
@@ -23,7 +25,6 @@ export default class Data {
   }
 
   setWidth() {
-    this.width = 0;
     if (this.type === DATA_TYPE.INT)
       this.width = 4;
 

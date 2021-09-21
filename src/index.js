@@ -84,17 +84,18 @@ function main() {
     tree.accept(decafVisitor);
 
     const symbols = decafVisitor.symbolTable.allRegisters;
+    const methods = decafVisitor.methodTable.methodTable;
     const visitorErrors = decafVisitor.errors;
     console.log(visitorErrors);
 
     // Main program
-    const mainMethod = symbols.find((m) => m.name === 'main');
+    const mainMethod = methods.find((m) => m.name === 'main');
 
     if (!mainMethod)
       errors.push(new MainNotDefinedError().ErrorLog);
 
     console.table(symbols);
-
+    console.table(methods);
     visitorErrors.forEach((e) => errors.push(e.ErrorLog));
   }
   renderErrors();

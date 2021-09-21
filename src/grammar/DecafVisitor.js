@@ -6,6 +6,7 @@ import Struct from '../classes/Struct';
 import StructDeclaration from '../classes/StructDeclaration';
 import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
+import MethodTable from '../classes/MethodTable';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
 import {
@@ -35,6 +36,7 @@ import { compareArrays, getReturnTypeFromArray } from '../js/utils';
 export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   symbolTable = new SymbolTable();
+  methodTable = new MethodTable();
 
   methods = [];
   symbols = [];
@@ -198,7 +200,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const method = new Method(
       methodType, methodId, ctx.start.line
     );
-    this.symbolTable.bind(method);
+    this.methodTable.bind(method);
 
     // Create a new symbol table entry
     this.symbolTable.enter();
@@ -734,7 +736,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitMethodCallDecl(ctx) {
     const methodId = this.visit(ctx.id());
     const args = this.visit(ctx.arg());
-    const method = this.symbolTable.lookup(methodId);
+    const method = this.methodTable.lookup(methodId);
     const errorSymbol = new Symbol(DATA_TYPE.ERROR, methodId);
 
     // Does the specified method exists?

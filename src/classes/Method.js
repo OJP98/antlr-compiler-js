@@ -1,17 +1,16 @@
-// eslint-disable-next-line import/no-cycle
-import Data from './Data';
 import {
   MethodReturnTypeError,
   MainHasArgsError,
 } from './Error';
 import { DATA_TYPE } from '../enums/dataTypes';
 
-export default class Method extends Data {
+export default class Method {
   constructor(type, name, line) {
-    super(type, name, line);
+    this.type = type;
+    this.name = name;
+    this.line = line;
     this.args = [];
     this.returnType = null;
-    this.width = 0;
   }
 
   set ReturnType(returnType) {
