@@ -21,6 +21,11 @@ export default class Method {
       this.error = error;
   }
 
+  set Error(error) {
+    this.error = error;
+    this.type = DATA_TYPE.ERROR;
+  }
+
   checkForErrors() {
     if (this.error)
       return this.error;

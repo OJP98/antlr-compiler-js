@@ -9,10 +9,8 @@ export default class MethodTable {
     if (this.methodTable.find((m) => m.name === entry.name)) {
       const error = new MethodAlreadyDeclaredError(entry.name, entry.line);
       entry.Error = error;
-      return error;
     }
     this.methodTable.push(entry);
-    return null;
   }
 
   lookup(methodId) {

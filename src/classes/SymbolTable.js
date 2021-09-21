@@ -14,15 +14,13 @@ export default class SymbolTable {
     if (currentTable.find((s) => s.name === entry.name)) {
       const error = new IdAlreadyDeclaredError(entry.name, entry.line);
       entry.Error = error;
-      currentTable.push(entry);
-      this.symbolTable.push(currentTable);
-      return error;
     }
 
-    this.setNewOffset(entry);
+    if (!entry.isStructProp)
+      this.setNewOffset(entry);
+
     currentTable.push(entry);
     this.symbolTable.push(currentTable);
-    return null;
   }
 
   enter() {

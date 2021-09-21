@@ -36,6 +36,7 @@ import { compareArrays, getReturnTypeFromArray } from '../js/utils';
 
 export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
+  declaringStructProps = false;
   symbolTable = new SymbolTable();
   methodTable = new MethodTable();
   structTable = new StructTable();
@@ -83,7 +84,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       symbol = new Symbol(type, varId, startLine);
     }
 
-    this.symbolTable.bind(symbol);
+    if (!this.declaringStructProps)
+      this.symbolTable.bind(symbol);
+    else 
+      this.structTable.newProperty(symbol);
 
     if (symbol.error)
       this.errors.push(symbol.error);
@@ -103,14 +107,15 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     if (structId) {
        const structDecl = this.structTable.lookup(structId);
-       symbol = new Struct(
-         type, varId, startLine, structDecl, structId, +num
-       );
+       symbol = new Struct(type, varId, startLine, structDecl, structId, +num);
     } else {
       symbol = new Array(type, varId, num, startLine);
     }
 
-    this.symbolTable.bind(symbol);
+    if (!this.declaringStructProps)
+      this.symbolTable.bind(symbol);
+    else 
+      this.structTable.newProperty(symbol);
 
     if (symbol.error)
       this.errors.push(symbol.error);
@@ -128,6 +133,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitStructDecl(ctx) {
     const type = DATA_TYPE.STRUCT_DECL;
     const id = this.visit(ctx.id());
+    this.declaringStructProps = true;
     const properties = ctx.varDeclaration();
     const props = [];
 
@@ -150,6 +156,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(struct.error)
 
     this.symbolTable.exit();
+    this.declaringStructProps = false;
     return struct;
   }
 
@@ -265,9 +272,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       type, name, ctx.start.line
     );
 
-    const bindError = this.symbolTable.bind(symbol);
-    if (bindError)
-      this.errors.push(bindError);
+    this.symbolTable.bind(symbol);
+    if (symbol.error)
+      this.errors.push(symbol.error);
 
     return symbol;
   }
@@ -281,9 +288,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       type, name, 1, ctx.start.line
     );
 
-    const bindError = this.symbolTable.bind(symbol);
-    if (bindError)
-      this.errors.push(bindError);
+    this.symbolTable.bind(symbol);
+    if (symbol.error)
+      this.errors.push(symbol.error);
 
     return symbol;
   }

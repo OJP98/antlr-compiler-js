@@ -13,7 +13,7 @@ export default class Struct extends Data {
     this.structDecl = structDecl;
     this.structId = structId;
     this.length = length;
-    this.error = this.checkForErrors();
+    this.checkForErrors();
     this.assignWidthFromStructDecl();
   }
 
@@ -22,20 +22,21 @@ export default class Struct extends Data {
   }
 
   assignWidthFromStructDecl() {
-    this.width = this.structDecl.width;
+    if (this.structDecl)
+      this.width = this.structDecl.width;
+    else
+      this.width = null;
   }
 
   checkForErrors() {
     if (this.error)
-      return this.error;
+      return;
 
     if (this.length !== null && this.length <= 0)
-      return new ArrayLengthError(this.name, this.line);
+      this.Error = new ArrayLengthError(this.name, this.line);
 
     if (!this.structDecl)
-      return new UndeclaredStructError(this.structId, this.line);
-
-    return null;
+      this.Error = new UndeclaredStructError(this.structId, this.line);
   }
 
   getProperty(prop, line) {
@@ -51,7 +52,7 @@ export default class Struct extends Data {
   }
 
   getArrayOfProperties() {
-    return this.structDecl.properties ?? null;
+    return this.structDecl?.properties || null;
   }
 
   searchPropertyRecursively(propertyId) {
