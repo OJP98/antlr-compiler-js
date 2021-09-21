@@ -29,7 +29,7 @@ h2 {
 }
 
 button {
-  background-color: rgba(109, 109, 109, 0.133);
+  background-color: #373832;
 	width: 100%;
   border: none;
   outline: none;
@@ -38,15 +38,17 @@ button {
   transition: 0.3s;
 	font-size: 20px;
 	font-family: 'Ubuntu Mono', 'Montserrat', sans-serif;
-	color: #000000;
+	color: #ffffff;
 }
 
 button:hover {
   background-color: #ddd;
+	color: black;
 }
 
 button.active {
   background-color: #ccc;
+	color: black;
 }
 
 button {
@@ -58,7 +60,7 @@ button {
 .header {
 	/* background-color: #202020; */
 	margin: 0;
-	padding-left: 4rem;
+	padding-left: 1rem;
 	color: white;
 }
 
@@ -71,18 +73,19 @@ button {
 	flex-wrap: nowrap;
 	align-content: space-between;
 	align-items: stretch;
-	height: 720px;
+	height: 80vh;
 }
 
 .tab {
 	padding: 0rem;
 	margin: 0.3rem;
-	width: 50vw;
+	width: 80%;
 	background-color: var(--black);
 	border: solid 1px black;
 	display: flex;
 	flex-direction: column;
-	overflow-y: scroll;
+	overflow-y: scroll; 
+	resize: both;
 }
 
 .tab::-webkit-scrollbar {
@@ -97,10 +100,12 @@ button {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-around;
+	position: sticky;
+	top: 0;
 }
 
 .app_editor {
-	width: 50vw;
+	width: 80%;
 	margin: 0.3rem;
 	resize: both;
 	overflow: hidden;
