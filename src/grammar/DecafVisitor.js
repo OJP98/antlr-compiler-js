@@ -7,6 +7,7 @@ import StructDeclaration from '../classes/StructDeclaration';
 import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
 import MethodTable from '../classes/MethodTable';
+import StructTable from '../classes/StructTable';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
 import {
@@ -37,8 +38,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   symbolTable = new SymbolTable();
   methodTable = new MethodTable();
+  structTable = new StructTable();
 
-  methods = [];
   symbols = [];
   errors = [];
 
@@ -76,7 +77,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     let symbol;
 
     if (structId) {
-      const structDecl = this.symbolTable.lookup(structId);
+      const structDecl = this.structTable.lookup(structId);
       symbol = new Struct(type, varId, startLine, structDecl, structId);
     } else {
       symbol = new Symbol(type, varId, startLine);
@@ -101,7 +102,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     let symbol = null;
 
     if (structId) {
-       const structDecl = this.symbolTable.lookup(structId);
+       const structDecl = this.structTable.lookup(structId);
        symbol = new Struct(
          type, varId, startLine, structDecl, structId, +num
        );
@@ -135,7 +136,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     );
 
     // Add the struct to the current scope and create a new one
-    this.symbolTable.bind(struct);
+    this.structTable.bind(struct);
     this.symbolTable.enter();
 
     // Go through each var declaration, don't forget visitVarDecl

@@ -1,8 +1,8 @@
-import Data from './Data';
-
-export default class StructDeclaration extends Data {
+export default class StructDeclaration {
   constructor(type, name, line, properties = []) {
-    super(type, name, line);
+    this.type = type;
+    this.name = name;
+    this.line = line;
     this.properties = properties;
   }
 
