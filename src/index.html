@@ -6,6 +6,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Open+Sans&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap" rel="stylesheet">
   </head>
   <body>
     <div class="header">
@@ -33,13 +34,21 @@
         int my_var2;
         return;
     }
-}
-      </div>
-      <div id="details" class="details">
-        <h2>output</h2>
-        <p class="no-errors">No errors!</p>
+}</div>
+      <div class="tab">
+        <div class="tabheader">
+          <button class="tablinks active">Type Check</button>
+          <button class="tablinks">Intermediate-Code</button>
+          <button class="tablinks">MIPS</button>
+        </div>
+
+        <div id="typecheck" class="tabcontent">
+          <h2>output</h2>
+          <p class="no-errors">No errors!</p>
+        </div>
       </div>
     </div>
+
   <button id="parseButton">PARSE</button>
   </body>
 </html>

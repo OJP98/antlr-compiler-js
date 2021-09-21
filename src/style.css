@@ -11,14 +11,7 @@
 html {
 	margin: 0;
 	padding: 0;
-	font-family: 'Open Sans', sans-serif;
-}
-
-.header {
-	/* background-color: #202020; */
-	margin: 0;
-	padding-left: 4rem;
-	color: white;
+	font-family: 'Ubuntu Mono', 'Open Sans', sans-serif;
 }
 
 body {
@@ -26,12 +19,47 @@ body {
 }
 
 p {
-	font-family: 'Montserrat', sans-serif;
+	font-family: 'Ubuntu Mono', 'Montserrat', sans-serif;
+	font-size: 20px;
 }
 
 h2 {
 	color: var(--blue);
 	align-self: center;
+}
+
+button {
+  background-color: rgba(109, 109, 109, 0.133);
+	width: 100%;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+	font-size: 20px;
+	font-family: 'Ubuntu Mono', 'Montserrat', sans-serif;
+	color: #000000;
+}
+
+button:hover {
+  background-color: #ddd;
+}
+
+button.active {
+  background-color: #ccc;
+}
+
+button {
+	font-family: 'Ubuntu Mono', 'Montserrat', sans-serif;
+	font-size: 20px;
+}
+
+
+.header {
+	/* background-color: #202020; */
+	margin: 0;
+	padding-left: 4rem;
+	color: white;
 }
 
 .no-errors {
@@ -46,14 +74,29 @@ h2 {
 	height: 720px;
 }
 
-.details {
-	padding: 1rem;
+.tab {
+	padding: 0rem;
 	margin: 0.3rem;
 	width: 50vw;
-	display: flex;
-	flex-direction: column;
 	background-color: var(--black);
 	border: solid 1px black;
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+}
+
+.tab::-webkit-scrollbar {
+  display: none;
+}
+
+.tabcontent {
+	padding: 0 1rem;
+}
+
+.tabheader {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
 }
 
 .app_editor {

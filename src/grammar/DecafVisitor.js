@@ -661,7 +661,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (expr1.type === DATA_TYPE.ERROR || expr2.type === DATA_TYPE.ERROR)
       return expr1.error ? expr1 : expr2;
 
-    const result =  equalsOperation(expr1, expr2, ctx.start.line);
+    const result = equalsOperation(expr1, expr2, ctx.start.line);
     return result;
   }
 
@@ -748,7 +748,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     }
 
     const argError = args.find((arg) => (arg.type === DATA_TYPE.ERROR));
-
     if (argError)
       return argError;
 

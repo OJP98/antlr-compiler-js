@@ -21,7 +21,7 @@ editor.commands.addCommand({
   exec: () => main(),
 });
 
-const details = document.getElementById('details');
+const details = document.getElementById('typecheck');
 const returnTag = document.createElement('h2');
 const errorListener = new ConsoleErrorListener();
 let errors = [];

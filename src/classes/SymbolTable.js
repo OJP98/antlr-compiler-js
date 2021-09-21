@@ -4,6 +4,7 @@ export default class SymbolTable {
   constructor() {
     this.symbolTable = [[]];
     this.allRegisters = [];
+    this.offset = 0;
   }
 
   bind(entry) {
@@ -18,6 +19,7 @@ export default class SymbolTable {
       return error;
     }
 
+    this.setNewOffset(entry);
     currentTable.push(entry);
     this.symbolTable.push(currentTable);
     return null;
@@ -45,5 +47,10 @@ export default class SymbolTable {
 
   exit() {
     this.symbolTable.pop();
+  }
+
+  setNewOffset(entry) {
+    entry.offset = this.offset;
+    this.offset += entry.width;
   }
 }
