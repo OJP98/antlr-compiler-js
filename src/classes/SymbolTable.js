@@ -16,7 +16,7 @@ export default class SymbolTable {
       entry.Error = error;
     }
 
-    if (!entry.isStructProp)
+    if (!entry.isStructProp && !entry.isParam)
       this.setNewOffset(entry);
 
     currentTable.push(entry);

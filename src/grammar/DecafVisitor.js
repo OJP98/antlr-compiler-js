@@ -8,6 +8,7 @@ import Symbol from '../classes/Symbol';
 import SymbolTable from '../classes/SymbolTable';
 import MethodTable from '../classes/MethodTable';
 import StructTable from '../classes/StructTable';
+import Expression from '../classes/Expression';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
 import {
@@ -17,7 +18,6 @@ import {
   InvalidMethodCallError,
   InvalidOperationType,
   InvalidPropertyError,
-  MultipleReturnTypesError,
   NegativeArraySubscriptError,
   SymbolNotArrayError,
   UndeclaredIdError,
@@ -28,7 +28,6 @@ import {
   condOperation,
   equalsOperation,
   getOperationResult,
-  operationError
 } from '../js/operations';
 import { compareArrays, getReturnTypeFromArray } from '../js/utils';
 
@@ -272,6 +271,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       type, name, ctx.start.line
     );
 
+    symbol.isParam = true;
+
     this.symbolTable.bind(symbol);
     if (symbol.error)
       this.errors.push(symbol.error);
@@ -287,6 +288,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const symbol = new Array(
       type, name, 1, ctx.start.line
     );
+
+    symbol.isParam = true;
 
     this.symbolTable.bind(symbol);
     if (symbol.error)
@@ -471,6 +474,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(expr.error);
       return expr;
     }
+
+    const code = Expression.Code + expr.value;
+    console.log(code);
 
     // Are both sides of the assignment of the same type?
     if (symbol.type !== expr.type) {
@@ -787,9 +793,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#charLiteral.
   visitCharLiteral(ctx) {
 		let char = ctx.getText();
-		char = char.replace(/\"/g, '');
+		const cleanedChar = char.replace(/\"/g, '');
     return new Symbol(
-      DATA_TYPE.CHAR, 'charLiteral', ctx.start.line, null, char
+      DATA_TYPE.CHAR, 'charLiteral', ctx.start.line, cleanedChar
     );
   }
 
@@ -803,7 +809,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitNumLiteral(ctx) {
     const num = this.visit(ctx.num());
     const intLiteral = new Symbol(
-      DATA_TYPE.INT, 'intLiteral', ctx.start.line, null, +num
+      DATA_TYPE.INT, 'intLiteral', ctx.start.line, +num
     );
     return intLiteral;
   }
@@ -812,7 +818,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#trueLiteral.
   visitTrueLiteral(ctx) {
     return new Symbol(
-      DATA_TYPE.BOOLEAN, 'boolLiteral', ctx.start.line, null, BOOLEAN_TYPE.TRUE
+      DATA_TYPE.BOOLEAN, 'boolLiteral', ctx.start.line, BOOLEAN_TYPE.TRUE
     );
   }
 
@@ -820,7 +826,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#falseLiteral.
   visitFalseLiteral(ctx) {
     return new Symbol(
-      DATA_TYPE.BOOLEAN, 'boolLiteral', ctx.start.line, null, BOOLEAN_TYPE.FALSE
+      DATA_TYPE.BOOLEAN, 'boolLiteral', ctx.start.line, BOOLEAN_TYPE.FALSE
     );
   }
 
