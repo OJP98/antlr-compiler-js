@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Decaf ANTLR</title>
+    <title>Decaf Parser</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
@@ -17,17 +17,19 @@
     </div>
     <div class="container">
       <div id="editor" class="app_editor">class Program {
-      
-    int method() {
-      return 0;
+    
+    int hola;
+    
+    struct Struct {
+        int a;
+        int b;
     }
     
-    int method1(int param1) {
-        if (param1 == 0) {
-            return 1;
-        } else {
-            return 0;
-        }
+    struct Struct s;
+      
+    int method() {
+        s.a = 10;
+        return 0;
     }
 
     void main() {

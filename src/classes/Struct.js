@@ -15,17 +15,36 @@ export default class Struct extends Data {
     this.length = length;
     this.checkForErrors();
     this.assignWidthFromStructDecl();
+    this.assignPropertiesFromStructDecl();
   }
 
   set StructId(structDecl) {
     this.structDecl = structDecl;
   }
 
+  set Offset(offset) {
+    this.offset = offset;
+    this.assignOffsetToProperties();
+  }
+
   assignWidthFromStructDecl() {
-    if (this.structDecl)
+    if (this.structDecl) {
       this.width = this.structDecl.width;
-    else
+    } else
       this.width = null;
+  }
+
+  assignOffsetToProperties() {
+    // eslint-disable-next-line no-return-assign
+    this.properties = this.properties.map((prop) => ({
+      ...prop,
+      offset: prop.offset += this.offset,
+      line: this.line,
+    }));
+  }
+
+  assignPropertiesFromStructDecl() {
+    this.properties = this.structDecl?.properties || [];
   }
 
   checkForErrors() {
@@ -40,7 +59,7 @@ export default class Struct extends Data {
   }
 
   getProperty(prop, line) {
-    const structProp = this.structDecl.properties.find((p) => p.name === prop);
+    const structProp = this.properties.find((p) => p.name === prop);
 
     if (!structProp) {
       const errorProp = new Symbol(DATA_TYPE.ERROR, prop);
@@ -52,11 +71,11 @@ export default class Struct extends Data {
   }
 
   getArrayOfProperties() {
-    return this.structDecl?.properties || null;
+    return this.properties || [];
   }
 
   searchPropertyRecursively(propertyId) {
-    return this.structDecl.properties.some((property) => {
+    return this.properties.some((property) => {
       if (property.name === propertyId) {
         return this;
       }

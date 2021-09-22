@@ -20,6 +20,10 @@ export default class Data {
     this.type = DATA_TYPE.ERROR;
   }
 
+  set Offset(offset) {
+    this.offset = offset;
+  }
+
   checkForErrors() {
     return this.error || null;
   }

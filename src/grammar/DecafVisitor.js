@@ -136,12 +136,12 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const properties = ctx.varDeclaration();
     const props = [];
 
-    const struct = new StructDeclaration(
+    const structDecl = new StructDeclaration(
       type, id, ctx.start.line
     );
 
     // Add the struct to the current scope and create a new one
-    this.structTable.bind(struct);
+    this.structTable.bind(structDecl);
     this.symbolTable.enter();
 
     // Go through each var declaration, don't forget visitVarDecl
@@ -149,14 +149,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     properties.forEach(varDecl => props.push(
       this.visit(varDecl))
     );
-    struct.Properties = props;
+    structDecl.Properties = props;
 
-    if (struct.error)
-      this.errors.push(struct.error)
+    if (structDecl.error)
+      this.errors.push(structDecl.error)
 
     this.symbolTable.exit();
     this.declaringStructProps = false;
-    return struct;
+    return structDecl;
   }
 
 
