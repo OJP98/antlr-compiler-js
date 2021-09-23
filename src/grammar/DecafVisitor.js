@@ -485,7 +485,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(assignmentError);
     }
 
-    return new Symbol(DATA_TYPE.NONE, 'assignmentStmt');
+    const resultSymbol = new Symbol(DATA_TYPE.NONE, 'assignmentStmt');
+    resultSymbol.addr = symbol.addr;
+    resultSymbol.Code = `${resultSymbol.addr} = ${expr.addr}`;
+
+    return resultSymbol;
   }
 
 
@@ -693,11 +697,16 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#condOpExpr.
   visitCondOpExpr(ctx) {
     const [expr1, expr2] = this.visit(ctx.expression());
+    const operator = ctx.op.getText();
 
     if (expr1.type === DATA_TYPE.ERROR || expr2.type === DATA_TYPE.ERROR)
       return expr1.error ? expr1 : expr2;
 
     const result = condOperation(expr1, expr2, ctx.start.line);
+
+    result.addr = Temp.New();
+    result.Code = `${result.addr} = ${expr1.addr} ${operator} ${expr2.addr}`
+
     return result;
   }
 
@@ -705,6 +714,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#literalExpr.
   visitLiteralExpr(ctx) {
     const literal = this.visit(ctx.literal());
+    literal.addr = literal.value;
+    literal.code = literal.value;
     return literal;
   }
 
@@ -720,6 +731,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       expr.Error = new InvalidOperationType(ctx.start.line);
 
     expr.value = -(expr.value);
+    expr.addr = Temp.New();
+    expr.Code = `${expr.addr} = ${expr.value}`
 
     return expr;
   }
@@ -740,9 +753,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     const operator = ctx.op.text;
     const result = getResultSymbolFromOp(expr1, expr2, operator, ctx.start.line);
+
     result.addr = Temp.New();
-    result.code = `${result.addr} = ${expr1.code} ${operator} ${expr2.code}`;
-    console.log(result);
+    result.Code = `${result.addr} = ${expr1.addr} ${operator} ${expr2.addr}`;
+
     return result;
   }
 

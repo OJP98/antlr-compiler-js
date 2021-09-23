@@ -14,6 +14,7 @@ import 'ace-builds/webpack-resolver';
 import dragDrop from './js/dragDrop';
 import editor from './js/aceConfig';
 import Temp from './classes/Temp';
+import IntermediateCode from './classes/IntermediateCode';
 
 dragDrop();
 editor.commands.addCommand({
@@ -62,6 +63,7 @@ function renderErrors() {
 function main() {
   errors = [];
   Temp.Reset();
+  IntermediateCode.Initialize();
   errorListener.clearSyntaxErrors();
   console.clear();
   removeAllChildNodes(details);

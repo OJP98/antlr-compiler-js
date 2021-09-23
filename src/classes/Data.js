@@ -1,4 +1,5 @@
 import { DATA_TYPE } from '../enums/dataTypes';
+import IntermediateCode from './IntermediateCode';
 
 export default class Data {
   constructor(type, name, line) {
@@ -24,6 +25,11 @@ export default class Data {
 
   set Offset(offset) {
     this.offset = offset;
+  }
+
+  set Code(code) {
+    this.code = code;
+    IntermediateCode.pushCodeLine(code);
   }
 
   checkForErrors() {

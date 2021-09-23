@@ -1,5 +1,7 @@
 export default class Temp {
-  static totalTemps = 0;
+  static set TotalTemps(totalTemps) {
+    this.totalTemps = totalTemps;
+  }
 
   static New() {
     this.totalTemps += 1;
@@ -7,6 +9,6 @@ export default class Temp {
   }
 
   static Reset() {
-    this.totalTemps = 0;
+    this.TotalTemps = 0;
   }
 }
