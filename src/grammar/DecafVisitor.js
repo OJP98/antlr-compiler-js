@@ -5,10 +5,11 @@ import Method from '../classes/Method';
 import Struct from '../classes/Struct';
 import StructDeclaration from '../classes/StructDeclaration';
 import Symbol from '../classes/Symbol';
-import SymbolTable from '../classes/SymbolTable';
-import MethodTable from '../classes/MethodTable';
-import StructTable from '../classes/StructTable';
+import SymbolTable from '../scripts/SymbolTable';
+import MethodTable from '../scripts/MethodTable';
+import StructTable from '../scripts/StructTable';
 import Expression from '../classes/Expression';
+import Temp from '../classes/Temp';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
 import {
@@ -27,7 +28,7 @@ import {
 import {
   condOperation,
   equalsOperation,
-  getOperationResult,
+  getResultSymbolFromOp,
 } from '../js/operations';
 import { compareArrays, getReturnTypeFromArray } from '../js/utils';
 
@@ -475,9 +476,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return expr;
     }
 
-    const code = Expression.Code + expr.value;
-    console.log(code);
-
     // Are both sides of the assignment of the same type?
     if (symbol.type !== expr.type) {
       const assignmentError = new InvalidAssignmentError(
@@ -741,7 +739,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return expr1.error ? expr1 : expr2;
 
     const operator = ctx.op.text;
-    const result = getOperationResult(expr1, expr2, operator, ctx.start.line);
+    const result = getResultSymbolFromOp(expr1, expr2, operator, ctx.start.line);
+    result.addr = Temp.New();
+    result.code = `${result.addr} = ${expr1.code} ${operator} ${expr2.code}`;
+    console.log(result);
     return result;
   }
 

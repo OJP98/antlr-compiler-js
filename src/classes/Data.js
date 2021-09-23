@@ -8,6 +8,8 @@ export default class Data {
     this.error = null;
     this.offset = null;
     this.width = null;
+    this.code = null;
+    this.addr = null;
     this.setWidth();
   }
 

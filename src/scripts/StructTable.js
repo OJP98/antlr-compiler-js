@@ -1,4 +1,4 @@
-import { IdAlreadyDeclaredError } from './Error';
+import { IdAlreadyDeclaredError } from '../classes/Error';
 
 export default class MethodTable {
   constructor() {

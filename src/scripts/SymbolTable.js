@@ -1,10 +1,11 @@
-import { IdAlreadyDeclaredError } from './Error';
+import { IdAlreadyDeclaredError } from '../classes/Error';
 
 export default class SymbolTable {
   constructor() {
     this.symbolTable = [[]];
     this.allRegisters = [];
     this.currOffset = 0;
+    this.totalRegisters = 0;
   }
 
   bind(entry) {
@@ -16,8 +17,10 @@ export default class SymbolTable {
       entry.Error = error;
     }
 
-    if (!entry.isStructProp && !entry.isParam)
+    if (!entry.isStructProp && !entry.isParam) {
       this.setNewOffset(entry);
+      this.setTemp(entry);
+    }
 
     currentTable.push(entry);
     this.symbolTable.push(currentTable);
@@ -50,5 +53,10 @@ export default class SymbolTable {
   setNewOffset(entry) {
     entry.Offset = this.currOffset;
     this.currOffset += entry.width;
+  }
+
+  setTemp(entry) {
+    entry.addr = `r${this.totalRegisters}`;
+    this.totalRegisters += 1;
   }
 }
