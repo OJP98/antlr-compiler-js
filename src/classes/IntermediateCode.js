@@ -3,6 +3,10 @@ export default class IntermediateCode {
     this.codeLines = codeLines;
   }
 
+  static get CodeLines() {
+    return this.codeLines;
+  }
+
   static methodDecl(methodName) {
     this.pushCodeLine(`DEF ${methodName}:`);
   }

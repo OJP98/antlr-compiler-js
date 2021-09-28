@@ -15,5 +15,6 @@ module.exports = {
     'nonblock-statement-body-position': 0,
     'no-console': 0,
     'no-param-reassign': 0,
+    'except-parens': 0,
   },
 };
