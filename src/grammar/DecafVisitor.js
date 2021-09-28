@@ -730,9 +730,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (expr.type !== DATA_TYPE.INT)
       expr.Error = new InvalidOperationType(ctx.start.line);
 
-    expr.value = -(expr.value);
-    expr.addr = Temp.New();
-    expr.Code = `${expr.addr} = ${expr.value}`
+    expr.value = -(expr.value) || `-${expr.addr}`;
+    expr.addr = expr.value;
+    expr.code = expr.value;
+
 
     return expr;
   }
@@ -754,7 +755,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const operator = ctx.op.text;
     const result = getResultSymbolFromOp(expr1, expr2, operator, ctx.start.line);
 
-    result.addr = Temp.New();
+    if (!expr1.addr.toString().includes('t') && !expr2.addr.toString().includes('t'))
+      result.addr = Temp.New();
+    else 
+      result.addr = Temp.Reuse();
     result.Code = `${result.addr} = ${expr1.addr} ${operator} ${expr2.addr}`;
 
     return result;

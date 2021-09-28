@@ -8,7 +8,11 @@ export default class Temp {
     return `t${this.totalTemps}`;
   }
 
+  static Reuse() {
+    return `t${this.totalTemps}`;
+  }
+
   static Reset() {
-    this.TotalTemps = 0;
+    this.TotalTemps = -1;
   }
 }

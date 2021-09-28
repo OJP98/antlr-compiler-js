@@ -36,6 +36,14 @@ export default class Data {
     return this.error || null;
   }
 
+  setGlobalRegister() {
+    this.addr = `G[${this.offset}]`;
+  }
+
+  setLocalRegister() {
+    this.addr = `fp[${this.offset}]`;
+  }
+
   setWidth() {
     if (this.type === DATA_TYPE.INT)
       this.width = 4;

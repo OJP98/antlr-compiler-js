@@ -19,7 +19,7 @@ export default class SymbolTable {
 
     if (!entry.isStructProp && !entry.isParam) {
       this.setNewOffset(entry);
-      this.setTemp(entry);
+      this.setRegister(entry);
     }
 
     currentTable.push(entry);
@@ -27,6 +27,7 @@ export default class SymbolTable {
   }
 
   enter() {
+    this.currOffset = 0;
     this.symbolTable.push([]);
   }
 
@@ -50,13 +51,21 @@ export default class SymbolTable {
     this.symbolTable.pop();
   }
 
+  isFirstScope() {
+    return this.symbolTable.length === 0;
+  }
+
   setNewOffset(entry) {
     entry.Offset = this.currOffset;
     this.currOffset += entry.width;
   }
 
-  setTemp(entry) {
-    entry.addr = `r${this.totalRegisters}`;
+  setRegister(entry) {
+    if (this.isFirstScope()) {
+      entry.setGlobalRegister();
+    } else {
+      entry.setLocalRegister();
+    }
     this.totalRegisters += 1;
   }
 }
