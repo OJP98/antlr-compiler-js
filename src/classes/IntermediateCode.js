@@ -3,6 +3,14 @@ export default class IntermediateCode {
     this.codeLines = codeLines;
   }
 
+  static methodDecl(methodName) {
+    this.pushCodeLine(`DEF ${methodName}:`);
+  }
+
+  static methodEnd(methodName) {
+    this.pushCodeLine(`END DEF ${methodName}`);
+  }
+
   static pushCodeLine(codeLine) {
     this.codeLines.push(codeLine);
     console.log(codeLine);

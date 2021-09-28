@@ -1,17 +1,18 @@
 // Generated from ./src/grammar/Decaf.g4 by ANTLR 4.9.2
 // jshint ignore: start
 import Array from '../classes/Array';
+import IntermediateCode from '../classes/IntermediateCode';
 import Method from '../classes/Method';
+import MethodTable from '../scripts/MethodTable';
 import Struct from '../classes/Struct';
 import StructDeclaration from '../classes/StructDeclaration';
+import StructTable from '../scripts/StructTable';
 import Symbol from '../classes/Symbol';
 import SymbolTable from '../scripts/SymbolTable';
-import MethodTable from '../scripts/MethodTable';
-import StructTable from '../scripts/StructTable';
-import Expression from '../classes/Expression';
 import Temp from '../classes/Temp';
 import antlr4 from 'antlr4';
 import { DATA_TYPE, BOOLEAN_TYPE } from '../enums/dataTypes';
+import { compareArrays, getReturnTypeFromArray } from '../js/utils';
 import {
   ArraySubscriptError,
   InvalidAssignmentError,
@@ -30,7 +31,6 @@ import {
   equalsOperation,
   getResultSymbolFromOp,
 } from '../js/operations';
-import { compareArrays, getReturnTypeFromArray } from '../js/utils';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
@@ -209,6 +209,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       methodType, methodId, ctx.start.line
     );
     this.methodTable.bind(method);
+    IntermediateCode.methodDecl(method.name);
 
     // Create a new symbol table entry
     this.symbolTable.enter();
@@ -236,6 +237,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Exit the newly created symbol table
     this.symbolTable.exit();
+    IntermediateCode.methodEnd(method.name);
     return method;
   }
 
@@ -496,12 +498,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#expressionStmt.
   visitExpressionStmt(ctx) {
     const expr = this.visit(ctx.expression());
+
     if (expr.type === DATA_TYPE.ERROR) {
       this.errors.push(expr.error);
       return expr;
     }
-    expr.type = DATA_TYPE.NONE;
-    return expr;
+
+    return new Symbol(DATA_TYPE.NONE, 'epxressionStmt', ctx.start.line);
   }
 
 
@@ -664,6 +667,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     // Is the expression of the boolean type?
     if (expr.type !== DATA_TYPE.BOOLEAN)
       expr.Error = new InvalidOperationType(ctx.start.line);
+    
+    expr.addr = Temp.New();
+    expr.value = `!${expr.value}` || `!${expr.addr}`;
+    expr.Code = `${expr.addr} = ${expr.value}`;
 
     return expr;
   }
@@ -731,9 +738,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       expr.Error = new InvalidOperationType(ctx.start.line);
 
     expr.value = -(expr.value) || `-${expr.addr}`;
-    expr.addr = expr.value;
-    expr.code = expr.value;
-
+    expr.addr = Temp.New();
+    expr.Code = `${expr.addr} = ${expr.value}`;
 
     return expr;
   }
@@ -755,10 +761,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const operator = ctx.op.text;
     const result = getResultSymbolFromOp(expr1, expr2, operator, ctx.start.line);
 
-    if (!expr1.addr.toString().includes('t') && !expr2.addr.toString().includes('t'))
-      result.addr = Temp.New();
-    else 
-      result.addr = Temp.Reuse();
+    result.addr = Temp.New();
     result.Code = `${result.addr} = ${expr1.addr} ${operator} ${expr2.addr}`;
 
     return result;
