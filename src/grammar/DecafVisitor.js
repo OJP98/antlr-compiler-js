@@ -31,6 +31,9 @@ import {
   equalsOperation,
   getResultSymbolFromOp,
 } from '../js/operations';
+import TAC, { AssignmentTAC, LabelTAC, UnaryTAC } from '../classes/TAC';
+import EXPR_OP from '../enums/expressionTypes';
+import LABEL_TYPE from '../enums/labelTypes';
 
 // This class defines a complete generic visitor for a parse tree produced by DecafParser.
 
@@ -209,7 +212,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       methodType, methodId, ctx.start.line
     );
     this.methodTable.bind(method);
-    IntermediateCode.methodDecl(method.name);
+
+    let tac = new LabelTAC(`DEF ${method.name}:`, LABEL_TYPE.DEF);
+    IntermediateCode.methodDecl(tac);
 
     // Create a new symbol table entry
     this.symbolTable.enter();
@@ -237,7 +242,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Exit the newly created symbol table
     this.symbolTable.exit();
-    IntermediateCode.methodEnd(method.name);
+
+    tac = new LabelTAC(`END DEF ${method.name}`, LABEL_TYPE.END_DEF);
+    IntermediateCode.methodEnd(tac);
     return method;
   }
 
@@ -489,7 +496,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     const resultSymbol = new Symbol(DATA_TYPE.NONE, 'assignmentStmt');
     resultSymbol.addr = symbol.addr;
-    resultSymbol.Code = `${resultSymbol.addr} = ${expr.addr}`;
+
+    IntermediateCode.pushTAC(
+      new AssignmentTAC(resultSymbol.addr, expr.addr, EXPR_OP.ASI)
+    );
 
     return resultSymbol;
   }
@@ -668,9 +678,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (expr.type !== DATA_TYPE.BOOLEAN)
       expr.Error = new InvalidOperationType(ctx.start.line);
     
+    const exprAddr = expr.addr;
     expr.addr = Temp.New();
-    expr.value = `!${expr.value}` || `!${expr.addr}`;
-    expr.Code = `${expr.addr} = ${expr.value}`;
+    expr.value = `!${expr.value}` || `!${expr.addr}`    
+
+    IntermediateCode.pushTAC(
+      new UnaryTAC(expr.addr, exprAddr, EXPR_OP.NOT)
+    );
 
     return expr;
   }
@@ -679,11 +693,18 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#eqOpExpr.
   visitEqOpExpr(ctx) {
     const [expr1, expr2] = this.visit(ctx.expression());
+    const operator = ctx.op.text;
 
     if (expr1.type === DATA_TYPE.ERROR || expr2.type === DATA_TYPE.ERROR)
       return expr1.error ? expr1 : expr2;
 
     const result = equalsOperation(expr1, expr2, ctx.start.line);
+
+    result.addr = Temp.New();
+    IntermediateCode.pushTAC(
+      new TAC(result.addr, expr1.addr, operator, expr2.addr)
+    );
+
     return result;
   }
 
@@ -704,7 +725,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#condOpExpr.
   visitCondOpExpr(ctx) {
     const [expr1, expr2] = this.visit(ctx.expression());
-    const operator = ctx.op.getText();
+    const operator = ctx.op.text;
 
     if (expr1.type === DATA_TYPE.ERROR || expr2.type === DATA_TYPE.ERROR)
       return expr1.error ? expr1 : expr2;
@@ -712,7 +733,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const result = condOperation(expr1, expr2, ctx.start.line);
 
     result.addr = Temp.New();
-    result.Code = `${result.addr} = ${expr1.addr} ${operator} ${expr2.addr}`
+    IntermediateCode.pushTAC(
+      new TAC(result.addr, expr1.addr, operator, expr2.addr)
+    );
 
     return result;
   }
@@ -737,9 +760,12 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (expr.type !== DATA_TYPE.INT)
       expr.Error = new InvalidOperationType(ctx.start.line);
 
+    const exprAddr = expr.addr;
     expr.value = -(expr.value) || `-${expr.addr}`;
     expr.addr = Temp.New();
-    expr.Code = `${expr.addr} = ${expr.value}`;
+    IntermediateCode.pushTAC(
+      new UnaryTAC(expr.addr, exprAddr, EXPR_OP.SUB)
+    )
 
     return expr;
   }
@@ -762,7 +788,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const result = getResultSymbolFromOp(expr1, expr2, operator, ctx.start.line);
 
     result.addr = Temp.New();
-    result.Code = `${result.addr} = ${expr1.addr} ${operator} ${expr2.addr}`;
+    IntermediateCode.pushTAC(
+      new TAC(result.addr, expr1.addr, operator, expr2.addr)
+    );
 
     return result;
   }

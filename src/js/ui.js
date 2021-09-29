@@ -1,4 +1,4 @@
-const selectTab = (tabName) => {
+export const selectTab = (tabName) => {
   const tabcontent = Array.from(document.getElementsByClassName('tabcontent'));
   tabcontent.forEach((tab) => { tab.style.display = 'none'; });
 
@@ -40,7 +40,7 @@ export const assignCodeToTab = (lineCodes, tabName) => {
   lineCodes.forEach((line) => {
     const p = document.createElement('p');
     p.innerHTML = `${counter}. ${line}`;
-    p.style = 'margin: 0.3rem';
+    p.style = 'margin: 0.3rem; white-space: pre';
     tabContent.appendChild(p);
     counter += 1;
   });

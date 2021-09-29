@@ -3,5 +3,7 @@ const EXPR_OP = Object.freeze({
   MUL: '*',
   DIV: '/',
   SUB: '-',
+  NOT: '!',
+  ASI: '=',
 });
 export default EXPR_OP;

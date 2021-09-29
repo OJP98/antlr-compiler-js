@@ -70,6 +70,9 @@ function main() {
     console.table(methods);
     visitorErrors.forEach((e) => errors.push(e.ErrorLog));
   }
+
   renderErrors(errors);
+  if (errors.length)
+    IntermediateCode.Initialize();
   assignCodeToTab(IntermediateCode.CodeLines, 'intermediatecode');
 }
