@@ -36,13 +36,14 @@ export const assignCodeToTab = (lineCodes, tabName) => {
     return;
   }
 
-  let counter = 1;
+  // let counter = 1;
   lineCodes.forEach((line) => {
     const p = document.createElement('p');
-    p.innerHTML = `${counter}. ${line}`;
+    // p.innerHTML = `${counter}. ${line}`;
+    p.innerHTML = `${line}`;
     p.style = 'margin: 0.3rem; white-space: pre';
     tabContent.appendChild(p);
-    counter += 1;
+    // counter += 1;
   });
 };
 

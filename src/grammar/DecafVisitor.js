@@ -335,6 +335,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#blockDecl.
   visitBlockDecl(ctx) {
+    this.symbolTable.enter();
     const varDeclarations = ctx.varDeclaration();
     const statements = ctx.statement();
     let returnTypes = [];
@@ -363,6 +364,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(returnSymbol.error);
     }
 
+    this.symbolTable.exit();
     return returnSymbol;
   }
 
@@ -377,13 +379,24 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     }
 
     if (expression.type !== DATA_TYPE.BOOLEAN) {
-      const symbolError = new symbol(DATA_TYPE.ERROR, 'ifExprEror');
-      symbolError.Error =  new InvalidExpressionTypeError('if', ctx.start.line);
+      const errorSymbol = new symbol(DATA_TYPE.ERROR, 'ifExprEror');
+      errorSymbol.Error =  new InvalidExpressionTypeError('if', ctx.start.line);
       this.errors.push(expressionError);
-      return symbolError;
+      return errorSymbol;
     }
 
+    const ifCount = IntermediateCode.IfCount;
+
+    // Generate both labels
+    IntermediateCode.gotoIfTrueLabel(`${expression.addr} > 0`);
+    IntermediateCode.gotoIfFalseLabel();
+
+    // If true, go to block
+    IntermediateCode.ifTrueLabel(ifCount);
     const block = this.visit(ctx.block());
+
+    // Else...
+    IntermediateCode.ifFalseLabel(ifCount);
 
     return block;
   }
@@ -407,9 +420,25 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return symbolError;
     }
 
+    const blocks = ctx.block();
 
-    // Get both blocks (if - else)
-    const [block1, block2] = this.visit(ctx.block());
+    const ifCount = IntermediateCode.IfCount;
+
+    // Generate both labels
+    IntermediateCode.gotoIfTrueLabel(`${expression.addr} > 0`);
+    IntermediateCode.gotoIfFalseLabel();
+
+    // If true, go to block
+    IntermediateCode.ifTrueLabel(ifCount);
+    const block1 = this.visit(blocks[0]);
+    IntermediateCode.gotoEndIfLabel(ifCount);
+
+    // Else...
+    IntermediateCode.ifFalseLabel(ifCount, true);
+    const block2 = this.visit(blocks[1]);
+
+    IntermediateCode.endIfLabel(ifCount)
+
     return [block1, block2];
 
   }
@@ -701,9 +730,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const result = equalsOperation(expr1, expr2, ctx.start.line);
 
     result.addr = Temp.New();
-    IntermediateCode.pushTAC(
-      new TAC(result.addr, expr1.addr, operator, expr2.addr)
-    );
+    const tac = new TAC(result.addr, expr1.addr, operator, expr2.addr);
+    IntermediateCode.pushTAC(tac);
 
     return result;
   }

@@ -67,12 +67,15 @@ function main() {
       errors.push(new MainNotDefinedError().ErrorLog);
 
     console.table(symbols);
-    console.table(methods);
+    // console.table(methods);
     visitorErrors.forEach((e) => errors.push(e.ErrorLog));
   }
 
   renderErrors(errors);
+
   if (errors.length)
     IntermediateCode.Initialize();
+
   assignCodeToTab(IntermediateCode.CodeLines, 'intermediatecode');
+  console.table(IntermediateCode.TacList);
 }
