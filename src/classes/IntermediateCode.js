@@ -1,3 +1,4 @@
+import LABEL_TYPE from '../enums/labelTypes';
 import { LabelTAC } from './TAC';
 
 export default class IntermediateCode {
@@ -35,69 +36,60 @@ export default class IntermediateCode {
 
   static gotoWhileLabel(whileId) {
     const string = `GOTO WHILE_LOOP_${whileId}`;
-    const tac = new LabelTAC(string, 'GOTO_START_WHILE');
-    this.pushCodeLine(string);
-    this.tacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.GOTO_START_WHILE);
+    this.pushLabel(string, tac);
   }
 
   static gotoEndWhileLabel(whileId) {
     const string = `GOTO END_WHILE_${whileId}`;
-    const tac = new LabelTAC(string, 'GOTO_END_WHILE');
-    this.pushCodeLine(string);
-    this.tacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.GOTO_END_WHILE);
+    this.pushLabel(string, tac);
   }
 
   static startWhileLabel(whileId) {
     const string = `WHILE_LOOP_${whileId}`;
-    const tac = new LabelTAC(string, 'WHILE_LOOP');
-    this.pushCodeLine(string);
-    this.TacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.WHILE_LOOP);
+    this.pushLabel(string, tac);
     this.tabs += 1;
   }
 
   static endWhileLabel(whileId) {
     this.tabs -= 1;
     const string = `END_WHILE_${whileId}:`;
-    const tac = new LabelTAC(string, 'END_WHILE');
-    this.pushCodeLine(string);
-    this.TacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.END_WHILE);
+    this.pushLabel(string, tac);
   }
 
   static gotoIfTrueLabel(addr, ifId) {
     const string = `IF ${addr} > 0 GOTO IF_TRUE_${ifId}`;
-    const tac = new LabelTAC(string, 'GOTO_IF_TRUE');
-    this.pushCodeLine(string);
-    this.tacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.GOTO_IF_TRUE);
+    this.pushLabel(string, tac);
   }
 
   static gotoIfFalseLabel(ifId) {
     const string = `GOTO IF_FALSE_${ifId}`;
-    const tac = new LabelTAC(string, 'GOTO_IF_FALSE');
-    this.pushCodeLine(string);
-    this.tacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.GOTO_IF_FALSE);
+    this.pushLabel(string, tac);
   }
 
   static gotoEndIfLabel(ifId) {
     const string = `GOTO END_IF_${ifId}`;
-    const tac = new LabelTAC(string, 'GOTO_END_IF');
-    this.pushCodeLine(string);
-    this.tacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.GOTO_END_IF);
+    this.pushLabel(string, tac);
   }
 
   static ifTrueLabel(ifId) {
     const string = `IF_TRUE_${ifId}:`;
-    const tac = new LabelTAC(string, 'IF_TRUE');
-    this.pushCodeLine(string);
-    this.tacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.IF_TRUE);
+    this.pushLabel(string, tac);
     this.tabs += 1;
   }
 
   static ifFalseLabel(ifId, isElse = false) {
     const string = `IF_FALSE_${ifId}:`;
-    const tac = new LabelTAC(string, 'IF_FALSE');
+    const tac = new LabelTAC(string, LABEL_TYPE.IF_FALSE);
     this.tabs -= 1;
-    this.pushCodeLine(string);
-    this.tacList.push(tac);
+    this.pushLabel(string, tac);
 
     if (isElse)
       this.tabs += 1;
@@ -106,9 +98,8 @@ export default class IntermediateCode {
   static endIfLabel(ifId) {
     this.tabs -= 1;
     const string = `END_IF_${ifId}:`;
-    const tac = new LabelTAC(string, 'END_IF');
-    this.pushCodeLine(string);
-    this.tacList.push(tac);
+    const tac = new LabelTAC(string, LABEL_TYPE.END_IF);
+    this.pushLabel(string, tac);
   }
 
   static pushTAC(tac) {
@@ -119,7 +110,11 @@ export default class IntermediateCode {
   static pushCodeLine(codeLine) {
     const tabs = '  '.repeat(this.tabs);
     this.codeLines.push(`${tabs} ${codeLine}`);
-    console.log(codeLine);
+  }
+
+  static pushLabel(string, tac) {
+    this.pushCodeLine(string);
+    this.tacList.push(tac);
   }
 
   static Initialize() {

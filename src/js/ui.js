@@ -69,10 +69,13 @@ export const renderErrors = (errors) => {
     const outputTag = document.createElement('h2');
     outputTag.innerHTML = 'output';
     const p = document.createElement('p');
+    const p2 = document.createElement('p');
     p.className = 'no-errors';
     p.innerHTML = 'No errors!';
+    p2.innerHTML = ' - Intermediate-Code generated';
     details.appendChild(outputTag);
     details.appendChild(p);
+    details.appendChild(p2);
     console.info('No errors found!');
   }
 };
