@@ -13,8 +13,14 @@ export default class IntermediateCode {
     return this.tacList;
   }
 
-  static get IfCount() {
-    return this.ifCount;
+  static get LabelCount() {
+    const prevIfCount = this.labelCount;
+    this.labelCount += 1;
+    return prevIfCount;
+  }
+
+  static set LabelCount(newCount) {
+    this.labelCount = newCount;
   }
 
   static methodDecl(tac) {
@@ -27,19 +33,48 @@ export default class IntermediateCode {
     this.pushTAC(tac);
   }
 
-  static gotoIfTrueLabel(cond) {
-    const string = `IF ${cond} GOTO IF_TRUE_${this.ifCount}:`;
+  static gotoWhileLabel(whileId) {
+    const string = `GOTO WHILE_LOOP_${whileId}`;
+    const tac = new LabelTAC(string, 'GOTO_START_WHILE');
+    this.pushCodeLine(string);
+    this.tacList.push(tac);
+  }
+
+  static gotoEndWhileLabel(whileId) {
+    const string = `GOTO END_WHILE_${whileId}`;
+    const tac = new LabelTAC(string, 'GOTO_END_WHILE');
+    this.pushCodeLine(string);
+    this.tacList.push(tac);
+  }
+
+  static startWhileLabel(whileId) {
+    const string = `WHILE_LOOP_${whileId}`;
+    const tac = new LabelTAC(string, 'WHILE_LOOP');
+    this.pushCodeLine(string);
+    this.TacList.push(tac);
+    this.tabs += 1;
+  }
+
+  static endWhileLabel(whileId) {
+    this.tabs -= 1;
+    const string = `END_WHILE_${whileId}:`;
+    const tac = new LabelTAC(string, 'END_WHILE');
+    this.pushCodeLine(string);
+    this.TacList.push(tac);
+  }
+
+  static gotoIfTrueLabel(addr, ifId) {
+    const string = `IF ${addr} > 0 GOTO IF_TRUE_${ifId}`;
     const tac = new LabelTAC(string, 'GOTO_IF_TRUE');
     this.pushCodeLine(string);
     this.tacList.push(tac);
   }
 
-  static gotoIfFalseLabel() {
-    const string = `GOTO IF_FALSE_${this.ifCount}:`;
+  static gotoIfFalseLabel(ifId) {
+    const string = `GOTO IF_FALSE_${ifId}`;
     const tac = new LabelTAC(string, 'GOTO_IF_FALSE');
     this.pushCodeLine(string);
     this.tacList.push(tac);
-    this.ifCount += 1;
   }
 
   static gotoEndIfLabel(ifId) {
@@ -89,7 +124,7 @@ export default class IntermediateCode {
 
   static Initialize() {
     this.tabs = 0;
-    this.ifCount = 0;
+    this.labelCount = 0;
     this.CodeLines = [];
     this.tacList = [];
   }

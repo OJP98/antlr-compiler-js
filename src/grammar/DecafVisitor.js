@@ -335,10 +335,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#blockDecl.
   visitBlockDecl(ctx) {
-    this.symbolTable.enter();
     const varDeclarations = ctx.varDeclaration();
     const statements = ctx.statement();
     let returnTypes = [];
+    this.symbolTable.enter();
 
     // Execute every var declaration without waiting for a response.
     // The visitVarDecl already adds each var to its symbol table.
@@ -379,24 +379,24 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     }
 
     if (expression.type !== DATA_TYPE.BOOLEAN) {
-      const errorSymbol = new symbol(DATA_TYPE.ERROR, 'ifExprEror');
+      const errorSymbol = new Symbol(DATA_TYPE.ERROR, 'ifExprEror');
       errorSymbol.Error =  new InvalidExpressionTypeError('if', ctx.start.line);
-      this.errors.push(expressionError);
+      this.errors.push(errorSymbol.error);
       return errorSymbol;
     }
 
-    const ifCount = IntermediateCode.IfCount;
+    const labelCount = IntermediateCode.LabelCount;
 
     // Generate both labels
-    IntermediateCode.gotoIfTrueLabel(`${expression.addr} > 0`);
-    IntermediateCode.gotoIfFalseLabel();
+    IntermediateCode.gotoIfTrueLabel(expression.addr, labelCount);
+    IntermediateCode.gotoIfFalseLabel(labelCount);
 
     // If true, go to block
-    IntermediateCode.ifTrueLabel(ifCount);
+    IntermediateCode.ifTrueLabel(labelCount);
     const block = this.visit(ctx.block());
 
     // Else...
-    IntermediateCode.ifFalseLabel(ifCount);
+    IntermediateCode.ifFalseLabel(labelCount);
 
     return block;
   }
@@ -414,30 +414,31 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // The expression should be of boolean/ type
     if (expression.type !== DATA_TYPE.BOOLEAN) {
-      const symbolError = new symbol(DATA_TYPE.ERROR, 'ifExprEror');
+      const symbolError = new Symbol(DATA_TYPE.ERROR, 'ifExprEror');
       symbolError.Error =  new InvalidExpressionTypeError('if - else', ctx.start.line);
-      this.errors.push(expressionError);
+      this.errors.push(symbolError.error);
       return symbolError;
     }
 
     const blocks = ctx.block();
-
-    const ifCount = IntermediateCode.IfCount;
+    const labelCount = IntermediateCode.LabelCount;
 
     // Generate both labels
-    IntermediateCode.gotoIfTrueLabel(`${expression.addr} > 0`);
-    IntermediateCode.gotoIfFalseLabel();
+    IntermediateCode.gotoIfTrueLabel(expression.addr, labelCount);
+    IntermediateCode.gotoIfFalseLabel(labelCount);
 
     // If true, go to block
-    IntermediateCode.ifTrueLabel(ifCount);
+    IntermediateCode.ifTrueLabel(labelCount);
     const block1 = this.visit(blocks[0]);
-    IntermediateCode.gotoEndIfLabel(ifCount);
+    // Then, go to end if
+    IntermediateCode.gotoEndIfLabel(labelCount);
 
     // Else...
-    IntermediateCode.ifFalseLabel(ifCount, true);
+    IntermediateCode.ifFalseLabel(labelCount, true);
     const block2 = this.visit(blocks[1]);
 
-    IntermediateCode.endIfLabel(ifCount)
+    // End if label
+    IntermediateCode.endIfLabel(labelCount)
 
     return [block1, block2];
 
@@ -446,6 +447,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#whileStmt.
   visitWhileStmt(ctx) {
+    const labelCount = IntermediateCode.LabelCount;
+    IntermediateCode.startWhileLabel(labelCount);
+
     const expression = this.visit(ctx.expression());
 
     if (expression.type === DATA_TYPE.ERROR) {
@@ -455,13 +459,20 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // The expression should be of boolean/ type
     if (expression.type !== DATA_TYPE.BOOLEAN) {
-      const symbolError = new symbol(DATA_TYPE.ERROR, 'ifExprEror');
+      const symbolError = new Symbol(DATA_TYPE.ERROR, 'ifExprEror');
       symbolError.Error =  new InvalidExpressionTypeError('while', ctx.start.line);
-      this.errors.push(expressionError);
+      this.errors.push(symbolError.error);
       return symbolError;
     }
 
+    IntermediateCode.gotoIfTrueLabel(expression.addr, labelCount);
+    IntermediateCode.gotoEndWhileLabel(labelCount);
+
+    IntermediateCode.ifTrueLabel(labelCount);
     const block = this.visit(ctx.block());
+
+    IntermediateCode.gotoWhileLabel(labelCount);
+    IntermediateCode.endWhileLabel(labelCount);
     return block;
   }
 

@@ -21,7 +21,7 @@ export function getResultSymbolFromOp(symbol1, symbol2, operator, line) {
   if (symbol1.type !== DATA_TYPE.INT || symbol2.type !== DATA_TYPE.INT) {
     return operationErrorSymbol(line);
   }
-  return getSymbolFromOperation(symbol1, symbol2, operator);
+  return getSymbolFromOperation(operator);
 }
 
 export function equalsOperation(symbol1, symbol2, line) {

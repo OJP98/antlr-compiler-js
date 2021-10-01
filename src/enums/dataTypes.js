@@ -10,6 +10,6 @@ export const DATA_TYPE = Object.freeze({
 });
 
 export const BOOLEAN_TYPE = Object.freeze({
-  TRUE: 'true',
-  FALSE: 'false',
+  TRUE: 1,
+  FALSE: 0,
 });
