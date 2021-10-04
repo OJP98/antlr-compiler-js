@@ -32,6 +32,7 @@ export default class IntermediateCode {
   static methodEnd(tac) {
     this.tabs -= 1;
     this.pushTAC(tac);
+    this.pushCodeLine('\n');
   }
 
   static gotoWhileLabel(whileId) {
@@ -54,7 +55,7 @@ export default class IntermediateCode {
   }
 
   static endWhileLabel(whileId) {
-    this.tabs -= 1;
+    this.tabs -= 2;
     const string = `END_WHILE_${whileId}:`;
     const tac = new LabelTAC(string, LABEL_TYPE.END_WHILE);
     this.pushLabel(string, tac);
@@ -109,7 +110,7 @@ export default class IntermediateCode {
 
   static pushCodeLine(codeLine) {
     const tabs = '  '.repeat(this.tabs);
-    this.codeLines.push(`${tabs} ${codeLine}`);
+    this.codeLines.push(`${tabs}${codeLine}`);
   }
 
   static pushLabel(string, tac) {
