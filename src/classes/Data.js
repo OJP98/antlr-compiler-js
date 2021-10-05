@@ -27,7 +27,13 @@ export default class Data {
 
   replaceOffset(newOffset) {
     this.addr = this.addr.replace(/\[(.+?)\]/g, `[${newOffset}]`);
+    return this.addr;
     // Replaces content inside [ ]
+  }
+
+  returnAddrWithOffset(addr) {
+    const tempAddr = this.addr;
+    return tempAddr.replace(/\[(.+?)\]/g, `[${addr}]`);
   }
 
   checkForErrors() {

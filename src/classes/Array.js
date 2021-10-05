@@ -5,10 +5,10 @@ export default class Array extends Data {
   constructor(type, name, length, line, value) {
     super(type, name, line);
     this.typeWidth = this.width;
-    this.value = value;
     this.length = +length;
-    this.error = this.checkForErrors();
     this.width *= this.length;
+    this.value = value;
+    this.error = this.checkForErrors();
   }
 
   get TypeWidth() {

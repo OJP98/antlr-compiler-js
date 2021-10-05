@@ -663,14 +663,24 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (location.type === DATA_TYPE.ERROR)
       return location;
 
+    // Get the struct property
     const locationStruct = struct.searchPropertyRecursively(location.name);
     if (!locationStruct) {
       const errorSymbol = new Symbol(DATA_TYPE.ERROR, location.name);
       errorSymbol.Error = new InvalidPropertyError(struct.name, location.name, ctx.parentCtx.start.line);
       return errorSymbol;
     }
-    // Get the struct property
-    return location;
+
+    // Get the offset of the struct + the property in a new addres
+    const offsetAddr = Temp.New();
+    const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset);
+    IntermediateCode.pushTAC(offsetTac);
+    const newLocation = {
+      ...location,
+      addr: struct.returnAddrWithOffset(offsetAddr)
+    };
+
+    return newLocation;
   }
 
 

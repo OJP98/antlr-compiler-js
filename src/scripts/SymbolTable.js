@@ -5,6 +5,7 @@ export default class SymbolTable {
     this.symbolTable = [[]];
     this.allRegisters = [];
     this.currOffset = 0;
+    this.prevOffset = 0;
     this.totalRegisters = 0;
   }
 
@@ -27,6 +28,7 @@ export default class SymbolTable {
   }
 
   enter() {
+    this.prevOffset = this.currOffset;
     this.currOffset = 0;
     this.symbolTable.push([]);
   }
@@ -48,6 +50,7 @@ export default class SymbolTable {
   }
 
   exit() {
+    this.currOffset = this.prevOffset;
     this.symbolTable.pop();
   }
 

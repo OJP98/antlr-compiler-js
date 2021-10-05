@@ -44,10 +44,11 @@ export default class Struct extends Data {
   }
 
   assignOffsetToProperties() {
+    const offset = 0;
     // eslint-disable-next-line no-return-assign
     this.properties = this.properties.map((prop) => ({
       ...prop,
-      offset: prop.offset += this.offset,
+      offset: prop.offset += offset,
       line: this.line,
     }));
   }
