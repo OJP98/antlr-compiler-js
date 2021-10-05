@@ -338,7 +338,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const varDeclarations = ctx.varDeclaration();
     const statements = ctx.statement();
     let returnTypes = [];
-    this.symbolTable.enter();
+
+    // If the parent is not a method declaration
+    if (ctx.parentCtx.ruleIndex !== 5)
+      this.symbolTable.enter();
 
     // Execute every var declaration without waiting for a response.
     // The visitVarDecl already adds each var to its symbol table.
@@ -364,7 +367,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(returnSymbol.error);
     }
 
-    this.symbolTable.exit();
+    if (ctx.parentCtx.ruleIndex !== 5)
+      this.symbolTable.exit();
     return returnSymbol;
   }
 
