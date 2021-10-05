@@ -19,19 +19,23 @@
       <div id="editor" class="app_editor">class Program
 {
     int d;
+
+    int method() {
+      return 10;
+    }
+
+    char method2(int a) {
+      return "b";
+    }
     
     void main()
     {
         int a;
-        int b;
-        int c;
+        char b;
 
-        if (1 == a) {
-            b = 3;
-        }
-        
-        c = a + b;
-        d = a + b;
+        a = method();
+        b = method2(a);
+
     }
 }</div>
       <div class="tab">

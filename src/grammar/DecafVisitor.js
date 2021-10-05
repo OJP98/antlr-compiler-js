@@ -484,6 +484,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (expression.type === DATA_TYPE.ERROR)
       this.errors.push(expression.error);
 
+    IntermediateCode.methodReturnLabel(expression.addr);
+
     return expression;
   }
 
@@ -501,6 +503,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (methodCall.type === DATA_TYPE.ERROR)
       this.errors.push(methodCall.error);
 
+    IntermediateCode.methodCallLabel(methodCall.name, methodCall.args?.length ?? 0);
     return new Symbol(DATA_TYPE.NONE, 'methodStmt', ctx.start.line);
   }
 
@@ -697,7 +700,16 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#methodCallExpr.
   visitMethodCallExpr(ctx) {
-    return this.visit(ctx.methodCall());
+    const method = this.visit(ctx.methodCall());
+
+    IntermediateCode.methodCallLabel(method.name, method.args.length);
+    if (method.type !== DATA_TYPE.VOID) {
+      const tempAddr = Temp.New();
+      const tac = new AssignmentTAC(tempAddr, 'R', '=');
+      method.addr = tempAddr;
+      IntermediateCode.pushTAC(tac);
+    }
+    return method;
   }
 
 
@@ -849,6 +861,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return errorSymbol;
     }
 
+    // Is there an error in between the args?
     const argError = args.find((arg) => (arg.type === DATA_TYPE.ERROR));
     if (argError)
       return argError;
@@ -862,6 +875,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       errorSymbol.Error = argsTypeError;
       return errorSymbol;
     }
+
+    // Assign a param label to each one of them
+    args.forEach((param) => IntermediateCode.methodParam(param.addr));
 
     return method;
   }

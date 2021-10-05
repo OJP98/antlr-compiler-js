@@ -11,5 +11,8 @@ const LABEL_TYPE = Object.freeze({
   END_IF: 'END_IF',
   DEF: 'DEF',
   END_DEF: 'END_DEF',
+  METHOD_CALL: 'METHOD_CALL',
+  METHOD_PARAM: 'METHOD_PARAM',
+  METHOD_RETURN: 'METHOD_RETURN',
 });
 export default LABEL_TYPE;

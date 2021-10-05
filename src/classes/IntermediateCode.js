@@ -103,6 +103,24 @@ export default class IntermediateCode {
     this.pushLabel(string, tac);
   }
 
+  static methodParam(paramAddr) {
+    const string = `PARAM ${paramAddr}`;
+    const tac = new LabelTAC(string, LABEL_TYPE.METHOD_PARAM);
+    this.pushLabel(string, tac);
+  }
+
+  static methodCallLabel(methodId, argsAmount) {
+    const string = `CALL ${methodId}, ${argsAmount}`;
+    const tac = new LabelTAC(string, LABEL_TYPE.METHOD_CALL);
+    this.pushLabel(string, tac);
+  }
+
+  static methodReturnLabel(returnAddr) {
+    const string = `RETURN ${returnAddr}`;
+    const tac = new LabelTAC(string, LABEL_TYPE.METHOD_RETURN);
+    this.pushLabel(string, tac);
+  }
+
   static pushTAC(tac) {
     this.tacList.push(tac);
     this.pushCodeLine(tac.asString);
