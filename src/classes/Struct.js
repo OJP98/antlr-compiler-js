@@ -10,6 +10,7 @@ import { DATA_TYPE } from '../enums/dataTypes';
 export default class Struct extends Data {
   constructor(type, name, line, structDecl = null, structId, length = null) {
     super(type, name, line);
+    this.typeWidth = this.width;
     this.structDecl = structDecl;
     this.structId = structId;
     this.length = length;

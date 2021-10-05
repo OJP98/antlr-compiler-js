@@ -25,6 +25,11 @@ export default class Data {
     this.offset = offset;
   }
 
+  replaceOffset(newOffset) {
+    this.addr = this.addr.replace(/\[(.+?)\]/g, `[${newOffset}]`);
+    // Replaces content inside [ ]
+  }
+
   checkForErrors() {
     return this.error || null;
   }

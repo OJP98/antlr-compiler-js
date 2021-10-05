@@ -109,8 +109,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     let symbol = null;
 
     if (structId) {
-       const structDecl = this.structTable.lookup(structId);
-       symbol = new Struct(type, varId, startLine, structDecl, structId, +num);
+      const structDecl = this.structTable.lookup(structId);
+      symbol = new Struct(type, varId, startLine, structDecl, structId, +num);
     } else {
       symbol = new Array(type, varId, num, startLine);
     }
@@ -621,6 +621,15 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       errorSymbol.Error = new NegativeArraySubscriptError(symbol.name, ctx.start.line);
       return errorSymbol;
     }
+
+    const dataTypeAddr = Temp.New();
+    const dataTypeOffset = new TAC(dataTypeAddr, symbol.typeWidth, '*', expr.addr);
+    IntermediateCode.pushTAC(dataTypeOffset);
+    symbol.replaceOffset(dataTypeAddr);
+
+    const scopeAddr = Temp.New();
+    const scopeOffset = new TAC(scopeAddr, symbol.offset, '+', dataTypeAddr);
+    IntermediateCode.pushTAC(scopeOffset);
 
     return symbol;
   }

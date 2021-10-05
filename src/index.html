@@ -18,24 +18,15 @@
     <div class="container">
       <div id="editor" class="app_editor">class Program
 {
-    int d;
+    int d[5];
 
-    int method() {
-      return 10;
-    }
-
-    char method2(int a) {
-      return "b";
-    }
-    
     void main()
     {
         int a;
-        char b;
-
-        a = method();
-        b = method2(a);
-
+        int b;
+        d[a] = 5;
+        a = d[3];
+        b = d[2 + 1];
     }
 }</div>
       <div class="tab">

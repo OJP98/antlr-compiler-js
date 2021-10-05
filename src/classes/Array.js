@@ -4,6 +4,7 @@ import { ArrayLengthError, ArrayLengthNotIntError } from './Error';
 export default class Array extends Data {
   constructor(type, name, length, line, value) {
     super(type, name, line);
+    this.typeWidth = this.width;
     this.value = value;
     this.length = +length;
     this.error = this.checkForErrors();
