@@ -623,7 +623,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     }
 
     const dataTypeAddr = Temp.New();
-    const dataTypeOffset = new TAC(dataTypeAddr, symbol.typeWidth, '*', expr.addr);
+    const dataTypeOffset = new TAC(dataTypeAddr, symbol.TypeWidth, '*', expr.addr);
     IntermediateCode.pushTAC(dataTypeOffset);
 
     const scopeAddr = Temp.New();

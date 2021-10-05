@@ -11,6 +11,10 @@ export default class Array extends Data {
     this.width *= this.length;
   }
 
+  get TypeWidth() {
+    return this.typeWidth;
+  }
+
   checkForErrors() {
     if (!Number.isInteger(this.length))
       return new ArrayLengthNotIntError(this.name, this.line, this.column);
