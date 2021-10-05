@@ -19,7 +19,7 @@ export default class Struct extends Data {
   }
 
   get TypeWidth() {
-    return this.width;
+    return this.typeWidth;
   }
 
   set StructId(structDecl) {
@@ -34,8 +34,13 @@ export default class Struct extends Data {
   assignWidthFromStructDecl() {
     if (this.structDecl) {
       this.width = this.structDecl.width;
-    } else
+      this.typeWidth = this.width;
+    } else {
       this.width = null;
+    }
+
+    if (this.length)
+      this.width *= this.length;
   }
 
   assignOffsetToProperties() {
