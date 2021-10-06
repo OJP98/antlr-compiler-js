@@ -5,7 +5,7 @@ const editor = ace.edit('editor');
 editor.setTheme('ace/theme/monokai');
 editor.session.setTabSize(4);
 editor.session.setMode('ace/mode/c_cpp');
-editor.setKeyboardHandler('ace/keyboard/vim');
+// editor.setKeyboardHandler('ace/keyboard/vim');
 editor.setAutoScrollEditorIntoView(true);
 editor.setShowPrintMargin(false);
 editor.setFontSize(20);

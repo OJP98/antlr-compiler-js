@@ -677,7 +677,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     IntermediateCode.pushTAC(offsetTac);
     const newLocation = {
       ...location,
-      addr: struct.returnAddrWithOffset(offsetAddr)
+      addr: struct.returnAddrWithOffset(offsetAddr),
+      offset: offsetAddr,
     };
 
     return newLocation;

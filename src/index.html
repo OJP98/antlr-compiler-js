@@ -18,22 +18,25 @@
     <div class="container">
       <div id="editor" class="app_editor">class Program
 {
-    int d[5];
-
-    struct X {
-        int a;
-        boolean y;
+    struct Y
+    {
+        char z;
     }
-
-    struct X x;
+    struct X
+    {
+        int m;
+        int n;
+        struct Y o;
+    }
 
     void main()
     {
-        int a;
-        int b;
-        a = x.a;
+        int x;
+        struct X H;
+        H.o.z = "a";
     }
-}</div>
+}
+      </div>
       <div class="tab">
         <div class="tabheader">
           <button class="tablinks active">Type Check</button>
