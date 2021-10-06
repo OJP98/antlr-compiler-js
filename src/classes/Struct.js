@@ -98,6 +98,7 @@ export default class Struct extends Data {
   }
 
   getArrayOfProperties() {
+    this.assignAddrToProps();
     return this.properties || [];
   }
 
