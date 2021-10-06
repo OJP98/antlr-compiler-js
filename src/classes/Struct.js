@@ -31,6 +31,21 @@ export default class Struct extends Data {
     this.assignOffsetToProperties();
   }
 
+  setGlobalRegister() {
+    this.addr = `G[${this.offset}]`;
+    this.assignAddrToProps();
+  }
+
+  setLocalRegister() {
+    this.addr = `fp[${this.offset}]`;
+    this.assignAddrToProps();
+  }
+
+  assignAddrToProps() {
+    // eslint-disable-next-line no-return-assign
+    this.properties.forEach((prop) => prop.addr = this.addr);
+  }
+
   assignWidthFromStructDecl() {
     if (this.structDecl) {
       this.width = this.structDecl.width;
@@ -44,13 +59,15 @@ export default class Struct extends Data {
   }
 
   assignOffsetToProperties() {
-    const offset = 0;
-    // eslint-disable-next-line no-return-assign
-    this.properties = this.properties.map((prop) => ({
-      ...prop,
-      offset: prop.offset += offset,
-      line: this.line,
-    }));
+    const props = [];
+
+    this.properties.forEach((prop) => {
+      const propClone = Object.assign(Object.create(Object.getPrototypeOf(prop)), prop);
+      propClone.line = this.line;
+      props.push(propClone);
+    });
+
+    this.properties = props;
   }
 
   assignPropertiesFromStructDecl() {
