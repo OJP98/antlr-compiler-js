@@ -726,8 +726,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   visitMethodCallExpr(ctx) {
     const method = this.visit(ctx.methodCall());
 
-    IntermediateCode.methodCallLabel(method.name, method.args.length);
+    if (method.type === DATA_TYPE.ERROR)
+      return method;
+
     if (method.type !== DATA_TYPE.VOID) {
+      IntermediateCode.methodCallLabel(method.name, method?.args.length || 0);
       const tempAddr = Temp.New();
       const tac = new AssignmentTAC(tempAddr, 'R', '=');
       method.addr = tempAddr;
