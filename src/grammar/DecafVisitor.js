@@ -637,9 +637,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const scopeAddr = Temp.New();
     const scopeOffset = new TAC(scopeAddr, symbol.offset, '+', dataTypeAddr);
     IntermediateCode.pushTAC(scopeOffset);
-    symbol.replaceOffset(scopeAddr.addr);
+    const newSymbol = {
+      ...symbol,
+      addr: symbol.returnAddrWithOffset(scopeAddr.addr),
+      offset: scopeOffset
+    }
 
-    return symbol;
+    return newSymbol;
   }
 
 
@@ -683,10 +687,15 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       location.addr = struct.returnAddrWithOffset(offsetAddr.addr);
       const newLocation = {
         ...location,
-        addr: struct.returnAddrWithOffset(offsetAddr.addr),
         offset: offsetAddr,
       };
       return newLocation;
+    } else if (location.offset) {
+      const offsetAddr = Temp.New();
+      const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset.addr || location.addr);
+      IntermediateCode.pushTAC(offsetTac);
+      location.addr = struct.replaceOffset(offsetAddr.addr);
+      location.offset = offsetAddr;
     }
     return location;
 
