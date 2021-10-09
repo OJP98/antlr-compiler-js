@@ -106,6 +106,7 @@ export default class IntermediateCode {
   }
 
   static methodParam(paramAddr) {
+    paramAddr = this.checkForTemporary(paramAddr);
     const string = `PARAM ${paramAddr}`;
     const tac = new LabelTAC(string, LABEL_TYPE.METHOD_PARAM);
     this.pushLabel(string, tac);
