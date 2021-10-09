@@ -469,7 +469,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return symbolError;
     }
 
-    IntermediateCode.gotoIfTrueLabel(expression.addr, labelCount);
+    // Sending addr.addr makes it so that the temporary won't be pushed back
+    IntermediateCode.gotoIfTrueLabel(expression.addr.addr, labelCount);
     IntermediateCode.gotoEndWhileLabel(labelCount);
 
     IntermediateCode.ifTrueLabel(labelCount);
@@ -477,6 +478,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     IntermediateCode.gotoWhileLabel(labelCount);
     IntermediateCode.endWhileLabel(labelCount);
+
+    expression.addr && Temp.PushBack(expression.addr);
+
     return block;
   }
 
@@ -633,7 +637,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const scopeAddr = Temp.New();
     const scopeOffset = new TAC(scopeAddr, symbol.offset, '+', dataTypeAddr);
     IntermediateCode.pushTAC(scopeOffset);
-    symbol.replaceOffset(scopeAddr);
+    symbol.replaceOffset(scopeAddr.addr);
 
     return symbol;
   }
@@ -676,10 +680,10 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       const offsetAddr = Temp.New();
       const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset);
       IntermediateCode.pushTAC(offsetTac);
-      location.addr = struct.returnAddrWithOffset(offsetAddr);
+      location.addr = struct.returnAddrWithOffset(offsetAddr.addr);
       const newLocation = {
         ...location,
-        addr: struct.returnAddrWithOffset(offsetAddr),
+        addr: struct.returnAddrWithOffset(offsetAddr.addr),
         offset: offsetAddr,
       };
       return newLocation;

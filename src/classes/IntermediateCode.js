@@ -1,5 +1,6 @@
 import LABEL_TYPE from '../enums/labelTypes';
 import { LabelTAC } from './TAC';
+import Temp from './Temp';
 
 export default class IntermediateCode {
   static set CodeLines(codeLines) {
@@ -62,6 +63,7 @@ export default class IntermediateCode {
   }
 
   static gotoIfTrueLabel(addr, ifId) {
+    addr = this.checkForTemporary(addr);
     const string = `IF ${addr} > 0 GOTO IF_TRUE_${ifId}`;
     const tac = new LabelTAC(string, LABEL_TYPE.GOTO_IF_TRUE);
     this.pushLabel(string, tac);
@@ -116,9 +118,19 @@ export default class IntermediateCode {
   }
 
   static methodReturnLabel(returnAddr) {
-    const string = `RETURN ${returnAddr}`;
+    returnAddr = this.checkForTemporary(returnAddr);
+    const string = `RETURN ${returnAddr.addr || returnAddr}`;
     const tac = new LabelTAC(string, LABEL_TYPE.METHOD_RETURN);
     this.pushLabel(string, tac);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  static checkForTemporary(temp) {
+    if (temp.addr) {
+      Temp.PushBack(temp);
+      return temp.addr;
+    }
+    return temp;
   }
 
   static pushTAC(tac) {
