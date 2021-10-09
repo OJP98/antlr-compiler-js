@@ -31,19 +31,12 @@ export default class Struct extends Data {
     this.assignOffsetToProperties();
   }
 
-  setGlobalRegister() {
-    this.addr = `G[${this.offset}]`;
-    this.assignAddrToProps();
-  }
-
-  setLocalRegister() {
-    this.addr = `fp[${this.offset}]`;
-    this.assignAddrToProps();
-  }
-
   assignAddrToProps() {
     // eslint-disable-next-line no-return-assign
-    this.properties.forEach((prop) => prop.addr = this.addr);
+    this.properties.forEach((prop) => {
+      if (prop.type === DATA_TYPE.STRUCT)
+        prop.addr = this.addr;
+    });
   }
 
   assignWidthFromStructDecl() {

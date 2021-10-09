@@ -671,17 +671,21 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return errorSymbol;
     }
 
-    // Get the offset of the struct + the property in a new addres
-    const offsetAddr = Temp.New();
-    const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset);
-    IntermediateCode.pushTAC(offsetTac);
-    const newLocation = {
-      ...location,
-      addr: struct.returnAddrWithOffset(offsetAddr),
-      offset: offsetAddr,
-    };
+    if (location.addr === null) {
+      // Get the offset of the struct + the property in a new addres
+      const offsetAddr = Temp.New();
+      const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset);
+      IntermediateCode.pushTAC(offsetTac);
+      location.addr = struct.returnAddrWithOffset(offsetAddr);
+      const newLocation = {
+        ...location,
+        addr: struct.returnAddrWithOffset(offsetAddr),
+        offset: offsetAddr,
+      };
+      return newLocation;
+    }
+    return location;
 
-    return newLocation;
   }
 
 
@@ -731,10 +735,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     if (method.type !== DATA_TYPE.VOID) {
       IntermediateCode.methodCallLabel(method.name, method?.args.length || 0);
-      const tempAddr = Temp.New();
-      const tac = new AssignmentTAC(tempAddr, 'R', '=');
-      method.addr = tempAddr;
-      IntermediateCode.pushTAC(tac);
+      method.addr = 'R';
     }
     return method;
   }
