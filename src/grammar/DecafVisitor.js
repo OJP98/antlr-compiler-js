@@ -637,13 +637,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const scopeAddr = Temp.New();
     const scopeOffset = new TAC(scopeAddr, symbol.offset, '+', dataTypeAddr);
     IntermediateCode.pushTAC(scopeOffset);
-    const newSymbol = {
-      ...symbol,
-      addr: symbol.returnAddrWithOffset(scopeAddr.addr),
-      offset: scopeOffset
-    }
+    const symbolClone = Object.assign(Object.create(Object.getPrototypeOf(symbol)), symbol);
+    symbolClone.addr = symbol.returnAddrWithOffset(scopeAddr.addr);
+    symbolClone.offset = scopeAddr;
 
-    return newSymbol;
+    return symbolClone;
   }
 
 
@@ -679,25 +677,14 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return errorSymbol;
     }
 
-    // if (location.addr === null) {
-      // Get the offset of the struct + the property in a new addres
-      const offsetAddr = Temp.New();
-      const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset);
-      IntermediateCode.pushTAC(offsetTac);
-      location.addr = struct.returnAddrWithOffset(offsetAddr.addr);
-      const newLocation = {
-        ...location,
-        offset: offsetAddr,
-      };
-      return newLocation;
-    // } else if (location.offset) {
-      // const offsetAddr = Temp.New();
-      // const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset.addr || location.addr);
-      // IntermediateCode.pushTAC(offsetTac);
-      // location.addr = struct.replaceOffset(offsetAddr.addr);
-      // location.offset = offsetAddr;
-    // }
-    // return location;
+    // Get the offset of the struct + the property in a new addres
+    const offsetAddr = Temp.New();
+    const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset);
+    IntermediateCode.pushTAC(offsetTac);
+    location.addr = struct.returnAddrWithOffset(offsetAddr.addr);
+    const locationClone = Object.assign(Object.create(Object.getPrototypeOf(location)), location);
+    locationClone.offset = offsetAddr;
+    return locationClone;
 
   }
 
@@ -735,7 +722,15 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       errorSymbol.Error = new InvalidPropertyError(struct.name, location.name, ctx.parentCtx.start.line);
       return errorSymbol;
     }
-    return location;
+
+    console.log(struct);
+    const offsetAddr = Temp.New();
+    const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset);
+    IntermediateCode.pushTAC(offsetTac);
+    location.addr = struct.returnAddrWithOffset(offsetAddr.addr);
+    const locationClone = Object.assign(Object.create(Object.getPrototypeOf(location)), location);
+    locationClone.offset = offsetAddr;
+    return locationClone;
   }
 
 

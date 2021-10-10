@@ -34,8 +34,7 @@ export default class Struct extends Data {
   assignAddrToProps() {
     // eslint-disable-next-line no-return-assign
     this.properties.forEach((prop) => {
-      if (prop.type === DATA_TYPE.STRUCT)
-        prop.addr = this.addr;
+      prop.addr = this.addr;
     });
   }
 
