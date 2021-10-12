@@ -470,7 +470,8 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     }
 
     // Sending addr.addr makes it so that the temporary won't be pushed back
-    IntermediateCode.gotoIfTrueLabel(expression.addr.addr, labelCount);
+    const expressionAddr = expression.addr.addr || expression.addr
+    IntermediateCode.gotoIfTrueLabel(expressionAddr, labelCount);
     IntermediateCode.gotoEndWhileLabel(labelCount);
 
     IntermediateCode.ifTrueLabel(labelCount);
