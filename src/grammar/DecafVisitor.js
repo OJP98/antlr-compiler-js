@@ -213,7 +213,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     );
     this.methodTable.bind(method);
 
-    let tac = new LabelTAC(`DEF ${method.name}:`, LABEL_TYPE.DEF);
+    let tac = new LabelTAC(`DEF ${method.name}`, LABEL_TYPE.DEF);
     IntermediateCode.methodDecl(tac);
 
     // Create a new symbol table entry

@@ -57,7 +57,7 @@ export default class IntermediateCode {
 
   static endWhileLabel(whileId) {
     this.tabs -= 2;
-    const string = `END_WHILE_${whileId}:`;
+    const string = `END_WHILE_${whileId}`;
     const tac = new LabelTAC(string, LABEL_TYPE.END_WHILE);
     this.pushLabel(string, tac);
   }
@@ -82,14 +82,14 @@ export default class IntermediateCode {
   }
 
   static ifTrueLabel(ifId) {
-    const string = `IF_TRUE_${ifId}:`;
+    const string = `IF_TRUE_${ifId}`;
     const tac = new LabelTAC(string, LABEL_TYPE.IF_TRUE);
     this.pushLabel(string, tac);
     this.tabs += 1;
   }
 
   static ifFalseLabel(ifId, isElse = false) {
-    const string = `IF_FALSE_${ifId}:`;
+    const string = `IF_FALSE_${ifId}`;
     const tac = new LabelTAC(string, LABEL_TYPE.IF_FALSE);
     this.tabs -= 1;
     this.pushLabel(string, tac);
@@ -100,7 +100,7 @@ export default class IntermediateCode {
 
   static endIfLabel(ifId) {
     this.tabs -= 1;
-    const string = `END_IF_${ifId}:`;
+    const string = `END_IF_${ifId}`;
     const tac = new LabelTAC(string, LABEL_TYPE.END_IF);
     this.pushLabel(string, tac);
   }
