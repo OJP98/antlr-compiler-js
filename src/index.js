@@ -16,7 +16,7 @@ import dragDrop from './js/dragDrop';
 import editor from './js/aceConfig';
 import { MainNotDefinedError } from './classes/Error';
 import assignFunctionToButtons,
-{ assignCodeToTab, renderErrors } from './js/ui';
+{ assignCodeToTab, renderDownloadFileBtn, renderErrors } from './js/ui';
 
 dragDrop();
 assignFunctionToButtons();
@@ -78,5 +78,7 @@ function main() {
     IntermediateCode.Initialize();
 
   assignCodeToTab(IntermediateCode.CodeLines, 'intermediatecode');
+  assignCodeToTab(['No content yet :(', 'but there will be!', 'just hang on, this project is about to END'], 'mipscode');
+  renderDownloadFileBtn(['No content yet :(', 'but there will be!', 'just hang on, this project is about to END']);
   console.table(IntermediateCode.TacList);
 }

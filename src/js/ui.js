@@ -1,3 +1,5 @@
+import { saveAs } from 'file-saver';
+
 export const selectTab = (tabName) => {
   const tabcontent = Array.from(document.getElementsByClassName('tabcontent'));
   tabcontent.forEach((tab) => { tab.style.display = 'none'; });
@@ -9,13 +11,14 @@ export const selectTab = (tabName) => {
 
   // eslint-disable-next-line no-restricted-globals
   event.currentTarget.className += ' active';
-  document.getElementById(tabName).style.display = 'block';
+  document.getElementById(tabName).style = 'display: flex;';
 };
 
 const assignFunctionToButtons = () => {
   const buttons = document.getElementsByClassName('tablinks');
   buttons[0].onclick = () => selectTab('typecheck');
   buttons[1].onclick = () => selectTab('intermediatecode');
+  buttons[2].onclick = () => selectTab('mipscode');
 };
 
 function removeAllChildNodes(parent) {
@@ -36,15 +39,25 @@ export const assignCodeToTab = (lineCodes, tabName) => {
     return;
   }
 
-  // let counter = 1;
   lineCodes.forEach((line) => {
     const p = document.createElement('p');
-    // p.innerHTML = `${counter}. ${line}`;
     p.innerHTML = `${line}`;
-    p.style = 'margin: 0.3rem; white-space: pre';
     tabContent.appendChild(p);
-    // counter += 1;
   });
+};
+
+export const renderDownloadFileBtn = (mipsCode) => {
+  const mipsTab = document.getElementById('mipscode');
+  const button = document.createElement('button');
+  const blob = new Blob(
+    [mipsCode.join('\n')],
+    { type: 'text/plain; charset=utf-8' },
+  );
+  button.innerHTML = 'DOWNLOAD FILE';
+  button.id = 'downloadMips';
+  button.setAttribute('download', blob);
+  button.onclick = () => saveAs(blob, 'MIPS.asm');
+  mipsTab.appendChild(button);
 };
 
 export const renderErrors = (errors) => {
@@ -70,12 +83,15 @@ export const renderErrors = (errors) => {
     outputTag.innerHTML = 'output';
     const p = document.createElement('p');
     const p2 = document.createElement('p');
+    const p3 = document.createElement('p');
     p.className = 'no-errors';
     p.innerHTML = 'No errors!';
     p2.innerHTML = ' - Intermediate-Code generated';
+    p3.innerHTML = ' - MIPS generated';
     details.appendChild(outputTag);
     details.appendChild(p);
     details.appendChild(p2);
+    details.appendChild(p3);
     console.info('No errors found!');
   }
 };
