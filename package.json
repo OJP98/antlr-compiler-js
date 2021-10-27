@@ -21,6 +21,7 @@
   "dependencies": {
     "ace-builds": "^1.4.12",
     "antlr4": "^4.9.2",
+    "file-saver": "^2.0.5",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
