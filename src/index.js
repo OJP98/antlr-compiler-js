@@ -67,6 +67,7 @@ function main() {
       errors.push(new MainNotDefinedError().ErrorLog);
 
     console.table(symbols);
+    console.table(methods);
     // console.table(methods);
     visitorErrors.forEach((e) => errors.push(e.ErrorLog));
   }

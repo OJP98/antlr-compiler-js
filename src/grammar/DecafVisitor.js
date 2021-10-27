@@ -245,6 +245,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     tac = new LabelTAC(`END DEF ${method.name}`, LABEL_TYPE.END_DEF);
     IntermediateCode.methodEnd(tac);
+    Temp.Reset();
     return method;
   }
 
@@ -339,10 +340,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     const statements = ctx.statement();
     let returnTypes = [];
 
-    // If the parent is not a method declaration
-    if (ctx.parentCtx.ruleIndex !== 5)
-      this.symbolTable.enter();
-
     // Execute every var declaration without waiting for a response.
     // The visitVarDecl already adds each var to its symbol table.
     varDeclarations.forEach(varDecl => this.visit(varDecl));
@@ -367,8 +364,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       this.errors.push(returnSymbol.error);
     }
 
-    if (ctx.parentCtx.ruleIndex !== 5)
-      this.symbolTable.exit();
     return returnSymbol;
   }
 
@@ -395,9 +390,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     IntermediateCode.gotoIfTrueLabel(expression.addr, labelCount);
     IntermediateCode.gotoIfFalseLabel(labelCount);
 
-    // If true, go to block
+    // If true, go to block and enter symbol table
     IntermediateCode.ifTrueLabel(labelCount);
+    this.symbolTable.enterAndKeepOffset();
     const block = this.visit(ctx.block());
+    this.symbolTable.exit();
 
     // Else...
     IntermediateCode.ifFalseLabel(labelCount);
@@ -433,13 +430,18 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // If true, go to block
     IntermediateCode.ifTrueLabel(labelCount);
+    this.symbolTable.enterAndKeepOffset();
     const block1 = this.visit(blocks[0]);
+    this.symbolTable.exit();
+
     // Then, go to end if
     IntermediateCode.gotoEndIfLabel(labelCount);
 
     // Else...
     IntermediateCode.ifFalseLabel(labelCount, true);
+    this.symbolTable.enterAndKeepOffset();
     const block2 = this.visit(blocks[1]);
+    this.symbolTable.exit();
 
     // End if label
     IntermediateCode.endIfLabel(labelCount)
@@ -475,7 +477,9 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     IntermediateCode.gotoEndWhileLabel(labelCount);
 
     IntermediateCode.ifTrueLabel(labelCount);
+    this.symbolTable.enterAndKeepOffset();
     const block = this.visit(ctx.block());
+    this.symbolTable.exit();
 
     IntermediateCode.gotoWhileLabel(labelCount);
     IntermediateCode.endWhileLabel(labelCount);
@@ -724,7 +728,6 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       return errorSymbol;
     }
 
-    console.log(struct);
     const offsetAddr = Temp.New();
     const offsetTac = new TAC(offsetAddr, struct.offset, '+', location.offset);
     IntermediateCode.pushTAC(offsetTac);

@@ -33,6 +33,11 @@ export default class SymbolTable {
     this.symbolTable.push([]);
   }
 
+  enterAndKeepOffset() {
+    this.prevOffset = this.currOffset;
+    this.symbolTable.push([]);
+  }
+
   empty() {
     this.symbolTable = [];
   }
