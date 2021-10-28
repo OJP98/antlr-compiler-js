@@ -18,21 +18,17 @@
     <div class="container">
       <div id="editor" class="app_editor">class Program
 {
-    struct Y
-    {
-        char z;
-    }
-    struct X
-    {
-        int m;
-        int n;
-        struct Y o;
-    }
+
+    int global;
 
     void main()
     {
-        struct X H;
-        H.m = H.m + H.n;
+        int a;
+        int b;
+
+        global = 5;
+        a = 5;
+        b = global + a;
     }
 }
       </div>
@@ -53,7 +49,7 @@
         </div>
 
         <div id="mipscode" class="tabcontent" style="display: none">
-          <p>No MIPS yet :(</p>
+          <p>No MIPS yet.</p>
         </div>
 
       </div>
