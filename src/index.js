@@ -17,6 +17,7 @@ import editor from './js/aceConfig';
 import { MainNotDefinedError } from './classes/Error';
 import assignFunctionToButtons,
 { assignCodeToTab, renderDownloadFileBtn, renderErrors } from './js/ui';
+import MipsCode from './scripts/GenerateMips';
 
 dragDrop();
 assignFunctionToButtons();
@@ -46,13 +47,13 @@ function main() {
   parser.buildParseTrees = true;
   parser.removeErrorListeners();
   parser.addErrorListener(errorListener);
+  const decafVisitor = new DecafVisitor();
 
   const tree = parser.program();
 
   if (errorListener.syntaxErrors.length) {
     errorListener.syntaxErrors.forEach((e) => errors.push(e));
   } else {
-    const decafVisitor = new DecafVisitor();
     tree.accept(decafVisitor);
 
     const symbols = decafVisitor.symbolTable.allRegisters;
@@ -74,11 +75,24 @@ function main() {
 
   renderErrors(errors);
 
-  if (errors.length)
-    IntermediateCode.Initialize();
-
   assignCodeToTab(IntermediateCode.CodeLines, 'intermediatecode');
-  assignCodeToTab(['No content yet :(', 'but there will be!', 'just hang on, this project is about to END'], 'mipscode');
-  renderDownloadFileBtn(['No content yet :(', 'but there will be!', 'just hang on, this project is about to END']);
-  console.table(IntermediateCode.TacList);
+
+  const mipsCode = new MipsCode(
+    decafVisitor.symbolTable.allRegisters,
+    decafVisitor.methodTable.methodTable,
+    decafVisitor.structTable.structTable,
+    IntermediateCode.TacList,
+  );
+
+  mipsCode.initialize();
+
+  console.table(mipsCode.instructions);
+
+  assignCodeToTab(mipsCode.CodeLines, 'mipscode');
+  renderDownloadFileBtn(mipsCode.CodeLines);
+
+  if (errors.length) {
+    IntermediateCode.Initialize();
+    mipsCode.Reset();
+  }
 }
