@@ -130,9 +130,14 @@ button {
     position: absolute;
 }
 
-#downloadMips {
-	margin: 1rem;
-	width: 40%;
-	align-self: center;
+.mipsButtons {
+	margin: 0.2rem;
+	display: flex;
 	margin-top: auto;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.mipsButtons > button {
+	margin: 0.5rem;
 }

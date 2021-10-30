@@ -46,18 +46,30 @@ export const assignCodeToTab = (lineCodes, tabName) => {
   });
 };
 
-export const renderDownloadFileBtn = (mipsCode) => {
+export const renderMipsBtns = (mipsCode) => {
   const mipsTab = document.getElementById('mipscode');
-  const button = document.createElement('button');
+  const buttonsDiv = document.createElement('div');
+  buttonsDiv.className = 'mipsButtons';
+
+  // download button
+  const downloadBtn = document.createElement('button');
   const blob = new Blob(
     [mipsCode.join('\n')],
     { type: 'text/plain; charset=utf-8' },
   );
-  button.innerHTML = 'DOWNLOAD FILE';
-  button.id = 'downloadMips';
-  button.setAttribute('download', blob);
-  button.onclick = () => saveAs(blob, 'MIPS.asm');
-  mipsTab.appendChild(button);
+  downloadBtn.innerHTML = 'DOWNLOAD FILE';
+  downloadBtn.setAttribute('download', blob);
+  downloadBtn.onclick = () => saveAs(blob, 'MIPS.asm');
+
+  // clipboard button
+  const clipboardBtn = document.createElement('button');
+  clipboardBtn.innerHTML = 'COPY TO CLIPBOARD';
+  clipboardBtn.onclick = () => navigator.clipboard.writeText([mipsCode.join('\n')]);
+
+  // append buttons
+  buttonsDiv.appendChild(downloadBtn);
+  buttonsDiv.appendChild(clipboardBtn);
+  mipsTab.appendChild(buttonsDiv);
 };
 
 export const renderErrors = (errors) => {

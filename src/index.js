@@ -16,7 +16,7 @@ import dragDrop from './js/dragDrop';
 import editor from './js/aceConfig';
 import { MainNotDefinedError } from './classes/Error';
 import assignFunctionToButtons,
-{ assignCodeToTab, renderDownloadFileBtn, renderErrors } from './js/ui';
+{ assignCodeToTab, renderMipsBtns, renderErrors } from './js/ui';
 import MipsCode from './scripts/GenerateMips';
 
 dragDrop();
@@ -89,7 +89,7 @@ function main() {
   console.table(mipsCode.instructions);
 
   assignCodeToTab(mipsCode.CodeLines, 'mipscode');
-  renderDownloadFileBtn(mipsCode.CodeLines);
+  renderMipsBtns(mipsCode.CodeLines);
 
   if (errors.length) {
     IntermediateCode.Initialize();
