@@ -104,7 +104,6 @@ export const renderErrors = (errors) => {
     details.appendChild(p);
     details.appendChild(p2);
     details.appendChild(p3);
-    console.info('No errors found!');
   }
 };
 

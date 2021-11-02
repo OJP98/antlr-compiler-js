@@ -240,8 +240,11 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
     if (method.error)
       this.errors.push(method.error)
 
+    const methodSize = this.symbolTable.getLastScopeSize();
+
     // Exit the newly created symbol table
     this.symbolTable.exit();
+    method.size = methodSize;
 
     tac = new LabelTAC(`END DEF ${method.name}`, LABEL_TYPE.END_DEF);
     IntermediateCode.methodEnd(tac);

@@ -68,6 +68,11 @@ export default class SymbolTable {
     this.currOffset += entry.width;
   }
 
+  getLastScopeSize() {
+    const lastScope = this.symbolTable[this.symbolTable.length - 1];
+    return lastScope.reduce((acc, curr) => curr.width + acc, 0);
+  }
+
   setRegister(entry) {
     if (this.isFirstScope()) {
       entry.setGlobalRegister();

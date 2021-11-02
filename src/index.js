@@ -59,7 +59,6 @@ function main() {
     const symbols = decafVisitor.symbolTable.allRegisters;
     const methods = decafVisitor.methodTable.methodTable;
     const visitorErrors = decafVisitor.errors;
-    console.log(visitorErrors);
 
     // Main program
     const mainMethod = methods.find((m) => m.name === 'main');
@@ -69,7 +68,6 @@ function main() {
 
     console.table(symbols);
     console.table(methods);
-    // console.table(methods);
     visitorErrors.forEach((e) => errors.push(e.ErrorLog));
   }
 

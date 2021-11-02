@@ -11,6 +11,7 @@ export default class Method {
     this.line = line;
     this.args = [];
     this.returnType = null;
+    this.size = 0;
   }
 
   set ReturnType(returnType) {
