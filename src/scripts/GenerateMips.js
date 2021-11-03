@@ -13,7 +13,7 @@ export default class MipsCode {
     return this.mips.CodeLines;
   }
 
-  initialize() {
-    this.mips.initialize();
+  initialize(globalSize = 0) {
+    this.mips.initialize(globalSize);
   }
 }

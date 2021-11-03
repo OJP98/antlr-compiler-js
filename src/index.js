@@ -82,7 +82,7 @@ function main() {
     IntermediateCode.TacList,
   );
 
-  mipsCode.initialize();
+  mipsCode.initialize(decafVisitor.globalSize);
 
   console.table(mipsCode.instructions);
 

@@ -43,6 +43,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   symbolTable = new SymbolTable();
   methodTable = new MethodTable();
   structTable = new StructTable();
+  globalSize = 0;
 
   symbols = [];
   errors = [];
@@ -50,6 +51,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
   // Visit a parse tree produced by DecafParser#programInit.
   visitProgramInit(ctx) {
     const res = this.visitChildren(ctx);
+    this.globalSize = this.symbolTable.getLastScopeSize();
     return res;
   }
 
