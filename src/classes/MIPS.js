@@ -3,56 +3,66 @@ export default class MIPS {
     this.reset();
   }
 
-  get CodeLines() {
+  static get CodeLines() {
     return this.codeLines;
   }
 
-  pushCodeLine(codeLine) {
+  static pushCodeLine(codeLine) {
     const tabs = '    '.repeat(this.tabs);
     this.codeLines.push(`${tabs}${codeLine}`);
   }
 
-  moveRegister(dest, src) {
+  static labelStart(methodName) {
+    this.pushCodeLine(`${methodName}:`);
+    this.tabs += 1;
+  }
+
+  static labelEnd() {
+    this.tabs -= 1;
+    this.pushCodeLine('\n');
+  }
+
+  static moveRegister(dest, src) {
     this.pushCodeLine(`move ${dest}, ${src}`);
   }
 
-  jalLabel(methodName) {
+  static jalLabel(methodName) {
     this.pushCodeLine(`jal ${methodName}`);
   }
 
-  jumpReturn() {
+  static jumpReturn() {
     this.pushCodeLine('jr $ra');
   }
 
-  operation(operation, dest, x, y) {
+  static operation(operation, dest, x, y) {
     this.pushCodeLine(`${operation} ${dest}, ${x}, ${y}`);
   }
 
-  loadAddres(dest, src) {
+  static loadAddress(dest, src) {
     this.pushCodeLine(`la ${dest}, ${src}`);
   }
 
-  loadInmediate(dest, src) {
+  static loadInmediate(dest, src) {
     this.pushCodeLine(`li ${dest}, ${src}`);
   }
 
-  loadWord(dest, src) {
+  static loadWord(dest, src) {
     this.pushCodeLine(`lw ${dest}, ${src}`);
   }
 
-  saveWord(dest, src) {
+  static saveWord(dest, src) {
     this.pushCodeLine(`sw ${dest}, ${src}`);
   }
 
-  incrementSP(amount) {
+  static incrementSP(amount) {
     this.pushCodeLine(`sub $sp, $sp, ${amount}`);
   }
 
-  reduceSP(amount) {
+  static reduceSP(amount) {
     this.pushCodeLine(`add $sp, $sp, ${amount}`);
   }
 
-  dataSection(space) {
+  static dataSection(space) {
     this.pushCodeLine('.data');
     this.pushCodeLine('.align 2');
     this.tabs += 1;
@@ -61,23 +71,21 @@ export default class MIPS {
     this.breakLine();
   }
 
-  mainSection() {
+  static mainSection() {
     this.pushCodeLine('.text');
     this.pushCodeLine('.globl main');
-    this.pushCodeLine('.main:');
-    this.tabs += 1;
   }
 
-  initialize(space = 0) {
+  static initialize(space = 0) {
     this.dataSection(space);
     this.mainSection();
   }
 
-  breakLine() {
+  static breakLine() {
     this.pushCodeLine('\n');
   }
 
-  reset() {
+  static reset() {
     this.tabs = 0;
     this.codeLines = [];
   }

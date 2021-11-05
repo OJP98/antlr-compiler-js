@@ -84,7 +84,7 @@ function main() {
 
   mipsCode.initialize(decafVisitor.globalSize);
 
-  console.table(mipsCode.instructions);
+  // console.table(mipsCode.instructions);
 
   assignCodeToTab(mipsCode.CodeLines, 'mipscode');
   renderMipsBtns(mipsCode.CodeLines);

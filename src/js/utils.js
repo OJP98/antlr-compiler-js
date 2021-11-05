@@ -43,3 +43,7 @@ export function getReturnTypeFromArray(returnTypesArray) {
 
   return new Symbol(expectedDataType, 'returnTypeFromArray');
 }
+
+export function getMethodName(label) {
+  return label.split(' ')[1];
+}

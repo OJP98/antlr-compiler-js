@@ -1,18 +1,59 @@
+import MIPS from './MIPS';
+
 export default class Descriptor {
   constructor() {
     this.reset();
   }
 
-  getReg(tac) {
-    console.log('This is the getReg function', tac, this.registers);
+  assignmentTac(tac) {
+    // x = y
+    const { result, arg1 } = tac;
+
+    let yReg = this.getRegFromVarName(arg1);
+
+    if (!yReg) {
+      yReg = this.getReg();
+      if (typeof arg1 === 'number')
+        MIPS.loadInmediate(yReg.id, arg1);
+      else
+        this.loadRegister(yReg.id, arg1);
+    }
+
+    yReg.vars.push(result);
+    this.insertLocationToAddr(result, yReg.id);
+    console.log(this);
   }
 
-  getAddrFromName(varName) {
+  processTac(tac, tacType) {
+    console.log(tac);
+    if (tacType === 'AssignmentTAC')
+      this.assignmentTac(tac);
+  }
+
+  getFirstAvailable() {
+    return this.registers.find((reg) => !reg.vars.length);
+  }
+
+  getReg() {
+    const first = this.getFirstAvailable();
+    if (first)
+      return first;
+    return null;
+  }
+
+  getAddrFromVarName(varName) {
     return this.addresses.find((addr) => addr.varName === varName);
   }
 
   getRegById(regId) {
     return this.registers.find((reg) => reg.id === regId);
+  }
+
+  getRegFromVarName(varName) {
+    const addr = this.getAddrFromVarName(varName);
+    if (!addr)
+      return null;
+    return this.getRegById(addr.locations[0]);
   }
 
   insertNewAddress(varName, regId) {
@@ -26,7 +67,7 @@ export default class Descriptor {
   }
 
   insertLocationToAddr(varName, regId) {
-    const address = this.getAddrFromName(varName);
+    const address = this.getAddrFromVarName(varName);
 
     if (address)
       address.locations.push(regId);
@@ -52,12 +93,13 @@ export default class Descriptor {
 
     // change addr. desc. for x by adding R as additional loc.
     this.insertLocationToAddr(varName, reg.id);
+    MIPS.loadAddress(regId, varName);
   }
 
   // ST x, R
   storeRegister(regId, varName) {
     // change addr. desc. for x to include its own memory loc.
-    const addr = this.getAddrFromName(varName);
+    const addr = this.getAddrFromVarName(varName);
     if (!addr)
       return;
     this.insertLocationToAddr(varName, regId);
@@ -68,7 +110,7 @@ export default class Descriptor {
     const destReg = this.getRegById(destRegId);
 
     // Change addr. desc. for x so that its only loc. is Rx
-    const addr = this.getAddrFromName(resultVar);
+    const addr = this.getAddrFromVarName(resultVar);
     addr.locations = [destReg.id];
 
     // Remove Rx from the addr. desc. of any var
@@ -85,19 +127,21 @@ export default class Descriptor {
     srcReg.vars.push(destVar);
 
     // Change addr. desc. for x so its only loc. is Ry
-    const destAddr = this.getAddrFromName(destVar);
+    const destAddr = this.getAddrFromVarName(destVar);
     destAddr.locations = [srcReg.id];
   }
 
   initializeRegisters() {
     this.registers = [
-      { id: 'r1', vars: [] },
-      { id: 'r2', vars: [] },
-      { id: 'r3', vars: [] },
-      { id: 'r4', vars: [] },
-      { id: 'r5', vars: [] },
-      { id: 'r6', vars: [] },
-      { id: 'r7', vars: [] },
+      { id: 't1', vars: [] },
+      { id: 't2', vars: [] },
+      { id: 't3', vars: [] },
+      { id: 't4', vars: [] },
+      { id: 't5', vars: [] },
+      { id: 't6', vars: [] },
+      { id: 't7', vars: [] },
+      { id: 't8', vars: [] },
+      { id: 't9', vars: [] },
     ];
   }
 
