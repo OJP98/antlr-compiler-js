@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import MIPS from './MIPS';
 // eslint-disable-next-line no-unused-vars
 import { print } from '../js/utils';
@@ -7,9 +8,35 @@ export default class Descriptor {
     this.reset();
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  operationTac(tac) {
+    // x = y + z
+    const {
+      result, arg1, operator, arg2,
+    } = tac;
+
+    const yReg = this.getReg(arg1);
+    if (typeof arg1 === 'number')
+      this.loadImmediate(yReg, arg1);
+    else if (!yReg.vars.includes(arg1))
+      this.loadRegister(yReg, arg1);
+
+    const zReg = this.getReg(arg2);
+    if (typeof arg2 === 'number')
+      this.loadImmediate(zReg, arg2);
+    else if (!zReg.vars.includes(arg2))
+      this.loadRegister(zReg, arg2);
+
+    const xReg = this.getReg(result);
+    this.setResultRegister(xReg, result);
+    MIPS.operation(operator, xReg.id, yReg.id, zReg.id);
+
+    // TODO: Should we free yReg or zReg if they are constants?
+  }
+
   inmediateAssign(result, arg1) {
     const yReg = this.getReg(result);
-    MIPS.loadInmediate(yReg.id, arg1);
+    MIPS.loadImmediate(yReg.id, arg1);
 
     if (!yReg.vars.includes(result)) {
       yReg.vars.push(result);
@@ -18,7 +45,6 @@ export default class Descriptor {
   }
 
   varAssign(result, arg1) {
-    this.cleanupVarData(result);
     const yReg = this.getReg(arg1);
 
     if (!yReg.vars.includes(arg1))
@@ -33,6 +59,7 @@ export default class Descriptor {
   assignmentTac(tac) {
     // x = y
     const { result, arg1 } = tac;
+    this.cleanupVarData(result);
     if (typeof arg1 === 'number')
       this.inmediateAssign(result, arg1);
     else
@@ -41,8 +68,11 @@ export default class Descriptor {
   }
 
   processTac(tac, tacType) {
+    console.log(tac, tacType);
     if (tacType === 'AssignmentTAC')
       this.assignmentTac(tac);
+    else if (tacType === 'TAC')
+      this.operationTac(tac);
   }
 
   getFirstAvailable() {
@@ -124,6 +154,7 @@ export default class Descriptor {
       locations: [varName, regId],
     };
     this.addresses.push(newAddr);
+
     // THIS RETURN IS NOT NECESARY
     return newAddr;
   }
@@ -131,10 +162,12 @@ export default class Descriptor {
   insertLocationToAddr(varName, regId) {
     const address = this.getAddrFromVarName(varName);
 
-    if (address)
+    if (address) {
       address.locations.push(regId);
-    else
-      this.insertNewAddress(varName, regId);
+      return address;
+    }
+
+    return this.insertNewAddress(varName, regId);
   }
 
   wipeRegIdFromAddresses(regId) {
@@ -161,22 +194,19 @@ export default class Descriptor {
       addr.locations = [varName];
   }
 
-  returnVarToMemLoc(varName) {
-    // TODO: eliminar la variable de cualquier registro y reiniciar su descriptor de direcciones
-    // para que solo exista en su direccion de memoria
-    // También ejecutar ST valorVariable, direcciónMemoria
-    print(this);
-    return varName;
-  }
-
   // LD R, x
   loadRegister(reg, varName) {
     // Change R so that it only holds x
     reg.vars = [varName];
 
     // change addr. desc. for x by adding R as additional loc.
-    this.insertLocationToAddr(varName, reg.id);
-    MIPS.loadAddress(reg.id, varName);
+    const addr = this.insertLocationToAddr(varName, reg.id);
+    MIPS.loadWord(reg.id, addr.locations.pop());
+  }
+
+  loadImmediate(reg, value) {
+    reg.vars = [value];
+    MIPS.loadImmediate(reg.id, value);
   }
 
   // ST x, R
@@ -189,15 +219,16 @@ export default class Descriptor {
   }
 
   // x = y + z == OP Rx, Ry, Rz
-  setResultRegister(destRegId, resultVar) {
-    const destReg = this.getRegById(destRegId);
-
-    // Change addr. desc. for x so that its only loc. is Rx
-    const addr = this.getAddrFromVarName(resultVar);
-    addr.locations = [destReg.id];
-
+  setResultRegister(destReg, resultVar) {
     // Remove Rx from the addr. desc. of any var
     this.wipeRegIdFromAddresses(destReg.id);
+
+    // Change addr. desc. for x so that its only loc. is Rx
+    let addr = this.getAddrFromVarName(resultVar);
+    if (!addr)
+      addr = this.insertNewAddress(resultVar, destReg.id);
+
+    addr.locations = [destReg.id];
 
     // Change reg. desc. for Rx so it only holds x
     destReg.vars = [resultVar];
@@ -216,15 +247,15 @@ export default class Descriptor {
 
   initializeRegisters() {
     this.registers = [
-      { id: 't1', vars: [] },
-      { id: 't2', vars: [] },
-      // { id: 't3', vars: [] },
-      // { id: 't4', vars: [] },
-      // { id: 't5', vars: [] },
-      // { id: 't6', vars: [] },
-      // { id: 't7', vars: [] },
-      // { id: 't8', vars: [] },
-      // { id: 't9', vars: [] },
+      { id: '$t1', vars: [] },
+      { id: '$t2', vars: [] },
+      { id: '$t3', vars: [] },
+      { id: '$t4', vars: [] },
+      { id: '$t5', vars: [] },
+      { id: '$t6', vars: [] },
+      { id: '$t7', vars: [] },
+      { id: '$t8', vars: [] },
+      { id: '$t9', vars: [] },
     ];
   }
 

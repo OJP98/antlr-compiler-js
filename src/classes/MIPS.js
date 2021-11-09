@@ -3,6 +3,19 @@ export default class MIPS {
     this.reset();
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  static operationString(operation) {
+    if (operation === '+')
+      return 'add';
+    if (operation === '-')
+      return 'sub';
+    if (operation === '/')
+      return 'div';
+    if (operation === '*')
+      return 'mult';
+    return 'NULL?';
+  }
+
   static get CodeLines() {
     return this.codeLines;
   }
@@ -39,14 +52,15 @@ export default class MIPS {
   }
 
   static operation(operation, dest, x, y) {
-    this.pushCodeLine(`${operation} ${dest}, ${x}, ${y}`);
+    const operationString = this.operationString(operation);
+    this.pushCodeLine(`${operationString} ${dest}, ${x}, ${y}`);
   }
 
   static loadAddress(dest, src) {
     this.pushCodeLine(`la ${dest}, ${src}`);
   }
 
-  static loadInmediate(dest, src) {
+  static loadImmediate(dest, src) {
     this.pushCodeLine(`li ${dest}, ${src}`);
   }
 
