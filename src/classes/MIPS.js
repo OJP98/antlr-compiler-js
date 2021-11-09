@@ -26,6 +26,10 @@ export default class MIPS {
     this.pushCodeLine(`move ${dest}, ${src}`);
   }
 
+  static storeRegister(dest, src) {
+    this.pushCodeLine(`st ${dest}, ${src}`);
+  }
+
   static jalLabel(methodName) {
     this.pushCodeLine(`jal ${methodName}`);
   }

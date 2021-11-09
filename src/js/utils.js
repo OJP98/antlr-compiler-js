@@ -47,3 +47,7 @@ export function getReturnTypeFromArray(returnTypesArray) {
 export function getMethodName(label) {
   return label.split(' ')[1];
 }
+
+export const print = (object) => {
+  console.log(JSON.parse(JSON.stringify(object)));
+};
