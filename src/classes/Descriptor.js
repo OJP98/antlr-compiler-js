@@ -31,7 +31,11 @@ export default class Descriptor {
     this.setResultRegister(xReg, result);
     MIPS.operation(operator, xReg.id, yReg.id, zReg.id);
 
-    // TODO: Should we free yReg or zReg if they are constants?
+    // If x or y is a constant, clean them up
+    if (typeof arg1 === 'number')
+      yReg.vars = [];
+    if (typeof arg2 === 'number')
+      zReg.vars = [];
   }
 
   inmediateAssign(result, arg1) {
@@ -68,7 +72,7 @@ export default class Descriptor {
   }
 
   processTac(tac, tacType) {
-    console.log(tac, tacType);
+    // console.log(tac, tacType);
     if (tacType === 'AssignmentTAC')
       this.assignmentTac(tac);
     else if (tacType === 'TAC')
@@ -84,8 +88,13 @@ export default class Descriptor {
       const addr = this.getAddrFromVarName(varName);
       const regIndex = addr.locations.indexOf((a) => a === register.id);
       addr.locations.splice(regIndex, 1);
-      MIPS.storeRegister(varName, register.id);
+
+      if (varName.includes('[')) {
+        MIPS.storeRegister(varName, register.id);
+        addr.locations = [varName];
+      }
     });
+    register.vars = [];
   }
 
   storeRegVarsInMem(register, varName) {
@@ -117,6 +126,16 @@ export default class Descriptor {
     return selected;
   }
 
+  getRegFromSpill() {
+    // Select the register with least amount of vars
+    const smallestReg = this.registers.reduce(
+      (acc, curr) => (acc.vars.length > curr.vars.length ? curr : acc),
+    );
+    // Spill its vars
+    this.spillVars(smallestReg);
+    return smallestReg;
+  }
+
   getReg(varName) {
     // First case: get reg that contains varName
     const regFromVarName = this.getRegFromVarName(varName);
@@ -133,7 +152,8 @@ export default class Descriptor {
     if (duplicateVar)
       return duplicateVar;
 
-    return null;
+    const spillReg = this.getRegFromSpill();
+    return spillReg;
   }
 
   getAddrFromVarName(varName) {
