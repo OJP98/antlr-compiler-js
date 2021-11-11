@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import MIPS from '../classes/MIPS';
 import Descriptor from '../classes/Descriptor';
 import { getMethodName } from '../js/utils';
@@ -12,7 +13,6 @@ export default class MipsCode {
     MIPS.reset();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   get CodeLines() {
     return MIPS.CodeLines;
   }
@@ -26,6 +26,7 @@ export default class MipsCode {
     this.instructions.forEach((i) => {
       this.generatePerInstruction(i);
     });
+    MIPS.terminate();
   }
 
   generatePerInstruction(instruction) {
@@ -36,13 +37,19 @@ export default class MipsCode {
       this.descriptor.processTac(instruction, tacType);
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  generateMethod(instruction) {
+    const methodName = getMethodName(instruction);
+    if (methodName === 'main')
+      MIPS.mainMethod();
+    MIPS.labelStart(methodName);
+  }
+
   generateLabel(label) {
     const { labelType } = label;
     const instruction = label.result;
 
     if (labelType === 'DEF')
-      MIPS.labelStart(getMethodName(instruction));
+      this.generateMethod(instruction);
 
     else if (labelType === 'END_DEF')
       MIPS.labelEnd();

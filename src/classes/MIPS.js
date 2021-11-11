@@ -1,6 +1,8 @@
 export default class MIPS {
   constructor() {
     this.reset();
+    this.isMain = false;
+    this.space = 0;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -16,18 +18,51 @@ export default class MIPS {
     return 'NULL?';
   }
 
+  static mainMethod() {
+    this.isMain = true;
+    this.tabs = 0;
+    this.dataSection();
+  }
+
+  static inputInt() {
+    // Mensaje para imprimir
+    this.loadImmediate('$v0', '4');
+    this.loadAddress('$a0', 'intPrompt');
+    this.pushCodeLine('syscall');
+    // Pedir entero al usuario
+    this.loadImmediate('$v0', '5');
+    this.pushCodeLine('syscall');
+    this.moveRegister('$a0', '$v0');
+    this.pushCodeLine('jr $ra');
+  }
+
+  static outputInt() {
+    this.loadImmediate('$v0', '1');
+    this.moveRegister('$a0', '$a1');
+    this.pushCodeLine('syscall');
+    this.pushCodeLine('jr $ra');
+  }
+
   static get CodeLines() {
     return this.codeLines;
   }
 
   static pushCodeLine(codeLine) {
     const tabs = '    '.repeat(this.tabs);
-    this.codeLines.push(`${tabs}${codeLine}`);
+    const str = `${tabs}${codeLine}`;
+    if (this.isMain)
+      this.mainLines.push(str);
+    else
+      this.codeLines.push(str);
   }
 
   static labelStart(methodName) {
     this.pushCodeLine(`${methodName}:`);
     this.tabs += 1;
+    if (methodName === 'InputInt')
+      this.inputInt();
+    else if (methodName === 'OutputInt')
+      this.outputInt();
   }
 
   static labelEnd() {
@@ -80,23 +115,21 @@ export default class MIPS {
     this.pushCodeLine(`add $sp, $sp, ${amount}`);
   }
 
-  static dataSection(space) {
+  static dataSection() {
     this.pushCodeLine('.data');
     this.pushCodeLine('.align 2');
     this.tabs += 1;
-    this.pushCodeLine(`G_: .space ${space}`);
+    this.pushCodeLine(`G_: .space ${this.space}`);
+    this.pushCodeLine('intPrompt: .asciiz "Ingrese un número entero: "');
     this.tabs -= 1;
     this.breakLine();
-  }
-
-  static mainSection() {
     this.pushCodeLine('.text');
-    this.pushCodeLine('.globl main');
+    this.tabs += 1;
   }
 
   static initialize(space = 0) {
-    this.dataSection(space);
-    this.mainSection();
+    this.space = space;
+    this.tabs += 1;
   }
 
   static breakLine() {
@@ -106,5 +139,20 @@ export default class MIPS {
   static reset() {
     this.tabs = 0;
     this.codeLines = [];
+    this.mainLines = [];
+  }
+
+  static terminate() {
+    this.tabs += 1;
+    this.pushCodeLine('j terminate');
+    this.tabs -= 1;
+    this.breakLine();
+    this.codeLines = this.mainLines.concat(this.codeLines);
+    this.isMain = false;
+    this.pushCodeLine('terminate:');
+    this.tabs += 1;
+    this.pushCodeLine('li $v0, 10');
+    this.pushCodeLine('syscall');
+    this.tabs -= 1;
   }
 }

@@ -174,8 +174,6 @@ export default class Descriptor {
       locations: [varName, regId],
     };
     this.addresses.push(newAddr);
-
-    // THIS RETURN IS NOT NECESARY
     return newAddr;
   }
 
