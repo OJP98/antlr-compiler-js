@@ -113,7 +113,7 @@ export default class IntermediateCode {
   }
 
   static methodCallLabel(methodId, argsAmount) {
-    const string = `CALL ${methodId}, ${argsAmount}`;
+    const string = `CALL ${methodId} ${argsAmount}`;
     const tac = new LabelTAC(string, LABEL_TYPE.METHOD_CALL);
     this.pushLabel(string, tac);
   }

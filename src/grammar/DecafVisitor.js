@@ -752,7 +752,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     if (method.type !== DATA_TYPE.VOID) {
       IntermediateCode.methodCallLabel(method.name, method?.args.length || 0);
-      method.addr = 'R';
+      method.addr = '$v0';
     }
     return method;
   }

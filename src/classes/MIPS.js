@@ -3,6 +3,7 @@ export default class MIPS {
     this.reset();
     this.isMain = false;
     this.space = 0;
+    this.params = 0;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -32,13 +33,12 @@ export default class MIPS {
     // Pedir entero al usuario
     this.loadImmediate('$v0', '5');
     this.pushCodeLine('syscall');
-    this.moveRegister('$a0', '$v0');
+    this.moveRegister('$v1', '$v0');
     this.pushCodeLine('jr $ra');
   }
 
   static outputInt() {
     this.loadImmediate('$v0', '1');
-    this.moveRegister('$a0', '$a1');
     this.pushCodeLine('syscall');
     this.pushCodeLine('jr $ra');
   }
@@ -59,10 +59,6 @@ export default class MIPS {
   static labelStart(methodName) {
     this.pushCodeLine(`${methodName}:`);
     this.tabs += 1;
-    if (methodName === 'InputInt')
-      this.inputInt();
-    else if (methodName === 'OutputInt')
-      this.outputInt();
   }
 
   static labelEnd() {
@@ -78,7 +74,7 @@ export default class MIPS {
     this.pushCodeLine(`st ${dest}, ${src}`);
   }
 
-  static jalLabel(methodName) {
+  static juampAndLink(methodName) {
     this.pushCodeLine(`jal ${methodName}`);
   }
 
@@ -104,7 +100,7 @@ export default class MIPS {
   }
 
   static saveWord(dest, src) {
-    this.pushCodeLine(`sw ${dest}, ${src}`);
+    this.pushCodeLine(`sw ${src}, ${dest}`);
   }
 
   static incrementSP(amount) {
@@ -113,6 +109,19 @@ export default class MIPS {
 
   static reduceSP(amount) {
     this.pushCodeLine(`add $sp, $sp, ${amount}`);
+  }
+
+  static methodParam(location) {
+    const param = `$a${this.params}`;
+    if (location.includes('['))
+      this.loadWord(param, location);
+    else
+      this.moveRegister(param, location);
+    this.params += 1;
+  }
+
+  static unloadParams(amount) {
+    this.params -= amount;
   }
 
   static dataSection() {
@@ -138,8 +147,10 @@ export default class MIPS {
 
   static reset() {
     this.tabs = 0;
+    this.params = 0;
     this.codeLines = [];
     this.mainLines = [];
+    this.isMain = false;
   }
 
   static terminate() {

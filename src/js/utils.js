@@ -44,8 +44,17 @@ export function getReturnTypeFromArray(returnTypesArray) {
   return new Symbol(expectedDataType, 'returnTypeFromArray');
 }
 
-export function getMethodName(label) {
-  return label.split(' ')[1];
+export function getLastWord(label) {
+  const splitted = label.split(' ');
+  const lastWord = splitted.pop();
+  return lastWord;
+}
+
+export function getMethodNameAndParamCount(label) {
+  const splitted = label.split(' ');
+  const methodName = splitted[1];
+  const paramCount = splitted[2];
+  return [methodName, paramCount];
 }
 
 export const print = (object) => {

@@ -8,7 +8,6 @@ export default class Descriptor {
     this.reset();
   }
 
-  // eslint-disable-next-line class-methods-use-this
   operationTac(tac) {
     // x = y + z
     const {
@@ -54,10 +53,13 @@ export default class Descriptor {
     if (!yReg.vars.includes(arg1))
       this.loadRegister(yReg, arg1);
 
-    if (!yReg.vars.includes(result)) {
-      yReg.vars.push(result);
-      this.insertLocationToAddr(result, yReg.id);
-    }
+    yReg.vars.push(result);
+
+    let xAddr = this.getAddrFromVarName(result);
+    if (!xAddr)
+      xAddr = this.insertNewAddress(result, yReg.id);
+
+    xAddr.locations.push(yReg.id);
   }
 
   assignmentTac(tac) {
@@ -72,7 +74,6 @@ export default class Descriptor {
   }
 
   processTac(tac, tacType) {
-    // console.log(tac, tacType);
     if (tacType === 'AssignmentTAC')
       this.assignmentTac(tac);
     else if (tacType === 'TAC')
@@ -214,12 +215,17 @@ export default class Descriptor {
 
   // LD R, x
   loadRegister(reg, varName) {
+    if (varName === '$v0') {
+      MIPS.moveRegister(reg.id, varName);
+      return;
+    }
+
     // Change R so that it only holds x
     reg.vars = [varName];
 
     // change addr. desc. for x by adding R as additional loc.
     const addr = this.insertLocationToAddr(varName, reg.id);
-    MIPS.loadWord(reg.id, addr.locations.pop());
+    MIPS.loadWord(reg.id, addr.locations[0]);
   }
 
   loadImmediate(reg, value) {

@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
 import MIPS from '../classes/MIPS';
 import Descriptor from '../classes/Descriptor';
-import { getMethodName } from '../js/utils';
+import { getLastWord, getMethodNameAndParamCount } from '../js/utils';
 
 export default class MipsCode {
   constructor(symbolTable, methodTable, structTable, instructions) {
@@ -38,10 +38,30 @@ export default class MipsCode {
   }
 
   generateMethod(instruction) {
-    const methodName = getMethodName(instruction);
-    if (methodName === 'main')
+    const methodName = getLastWord(instruction);
+    if (methodName === 'main') {
       MIPS.mainMethod();
-    MIPS.labelStart(methodName);
+      MIPS.labelStart(methodName);
+    } else if (methodName === 'InputInt') {
+      MIPS.labelStart(methodName);
+      MIPS.inputInt();
+    } else if (methodName === 'OutputInt') {
+      MIPS.labelStart(methodName);
+      MIPS.outputInt();
+    }
+  }
+
+  generateMethodCall(instruction) {
+    const [methodName, paramCount] = getMethodNameAndParamCount(instruction);
+    MIPS.juampAndLink(methodName);
+    MIPS.unloadParams(paramCount);
+  }
+
+  generateMethodParam(instruction) {
+    const varName = getLastWord(instruction);
+    const addr = this.descriptor.getAddrFromVarName(varName);
+    const lastAddr = addr ? addr.locations[addr.locations.length - 1] : varName;
+    MIPS.methodParam(lastAddr);
   }
 
   generateLabel(label) {
@@ -56,6 +76,10 @@ export default class MipsCode {
 
     else if (labelType === 'METHOD_RETURN') {
       // TODO
-    }
+    } else if (labelType === 'METHOD_PARAM')
+      this.generateMethodParam(instruction);
+
+    else if (labelType === 'METHOD_CALL')
+      this.generateMethodCall(instruction);
   }
 }
