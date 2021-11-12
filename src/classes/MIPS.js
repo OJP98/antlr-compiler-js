@@ -19,10 +19,10 @@ export default class MIPS {
     return 'NULL?';
   }
 
-  static mainMethod() {
+  static mainMethod(hasInput) {
     this.isMain = true;
     this.tabs = 0;
-    this.dataSection();
+    this.dataSection(hasInput);
   }
 
   static inputInt() {
@@ -33,14 +33,11 @@ export default class MIPS {
     // Pedir entero al usuario
     this.loadImmediate('$v0', '5');
     this.pushCodeLine('syscall');
-    this.moveRegister('$v1', '$v0');
-    this.pushCodeLine('jr $ra');
   }
 
   static outputInt() {
     this.loadImmediate('$v0', '1');
     this.pushCodeLine('syscall');
-    this.pushCodeLine('jr $ra');
   }
 
   static get CodeLines() {
@@ -62,6 +59,8 @@ export default class MIPS {
   }
 
   static labelEnd() {
+    if (!this.isMain)
+      this.jumpReturn();
     this.tabs -= 1;
     this.pushCodeLine('\n');
   }
@@ -103,12 +102,20 @@ export default class MIPS {
     this.pushCodeLine(`sw ${src}, ${dest}`);
   }
 
-  static incrementSP(amount) {
-    this.pushCodeLine(`sub $sp, $sp, ${amount}`);
+  static increaseRegister(amount) {
+    if (amount === 0)
+      return;
+    this.saveWord('($sp)', '$fp');
+    this.pushCodeLine(`sub $fp, $sp, ${amount}`);
+    // First position of the stack
+    this.loadAddress('$sp', '($fp)');
   }
 
-  static reduceSP(amount) {
-    this.pushCodeLine(`add $sp, $sp, ${amount}`);
+  static decreaseRegister(amount) {
+    if (amount === 0)
+      return;
+    this.pushCodeLine(`add $sp, $fp, ${amount}`);
+    this.loadWord('$fp', '($sp)');
   }
 
   static methodParam(location) {
@@ -120,16 +127,24 @@ export default class MIPS {
     this.params += 1;
   }
 
+  static storeParams(paramArray) {
+    paramArray.forEach((param) => {
+      this.saveWord(param.addr, `$a${this.params}`);
+      this.params += 1;
+    });
+  }
+
   static unloadParams(amount) {
     this.params -= amount;
   }
 
-  static dataSection() {
+  static dataSection(hasInput) {
     this.pushCodeLine('.data');
     this.pushCodeLine('.align 2');
     this.tabs += 1;
     this.pushCodeLine(`G_: .space ${this.space}`);
-    this.pushCodeLine('intPrompt: .asciiz "Ingrese un número entero: "');
+    if (hasInput)
+      this.pushCodeLine('intPrompt: .asciiz "Ingrese un número entero: "');
     this.tabs -= 1;
     this.breakLine();
     this.pushCodeLine('.text');

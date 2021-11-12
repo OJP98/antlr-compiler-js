@@ -21,6 +21,12 @@ class Program
 {
 
     int global;
+
+    int Test(int a, int b) {
+        int res;
+        res = a + b;
+        return res;
+    }
     
     int InputInt() {
         return 0;
@@ -38,7 +44,7 @@ class Program
 
         a = InputInt();
         b = InputInt();
-        global = a + b;
+        global = Test(a,b);
         OutputInt(global);
     }
 }

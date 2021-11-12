@@ -10,6 +10,7 @@ export default class MipsCode {
     this.structTable = structTable;
     this.instructions = instructions;
     this.descriptor = new Descriptor();
+    this.lastMethod = '';
     MIPS.reset();
   }
 
@@ -20,6 +21,10 @@ export default class MipsCode {
   initialize(globalSize = 0) {
     MIPS.initialize(globalSize);
     this.generateMips();
+  }
+
+  getMethod(methodName) {
+    return this.methodTable.find((method) => method.name === methodName);
   }
 
   generateMips() {
@@ -39,16 +44,32 @@ export default class MipsCode {
 
   generateMethod(instruction) {
     const methodName = getLastWord(instruction);
+    const method = this.getMethod(methodName);
+    const { size, name } = method;
+    this.lastMethod = name;
+    // CHECK: Should we reset both registers and addresses?
+    this.descriptor.initializeRegisters();
+    MIPS.params = 0;
+
     if (methodName === 'main') {
-      MIPS.mainMethod();
+      MIPS.mainMethod(this.methodTable.find((m) => m.name === 'OutputInt'));
       MIPS.labelStart(methodName);
-    } else if (methodName === 'InputInt') {
-      MIPS.labelStart(methodName);
-      MIPS.inputInt();
-    } else if (methodName === 'OutputInt') {
-      MIPS.labelStart(methodName);
-      MIPS.outputInt();
+      MIPS.increaseRegister(size);
+      return;
     }
+
+    MIPS.labelStart(methodName);
+    MIPS.increaseRegister(size);
+
+    if (methodName === 'OutputInt')
+      MIPS.outputInt();
+
+    if (methodName === 'InputInt')
+      MIPS.inputInt();
+
+    const params = this.getMethod(methodName).args;
+    // eslint-disable-next-line no-unused-expressions
+    params.length && MIPS.storeParams(params);
   }
 
   generateMethodCall(instruction) {
@@ -64,6 +85,20 @@ export default class MipsCode {
     MIPS.methodParam(lastAddr);
   }
 
+  generateMethodEnd(instruction) {
+    const methodName = getLastWord(instruction);
+    const method = this.getMethod(methodName);
+    MIPS.decreaseRegister(method.size);
+    MIPS.labelEnd();
+  }
+
+  generateReturn(instruction) {
+    const varName = getLastWord(instruction);
+    const addr = this.descriptor.getAddrFromVarName(varName);
+    const lastAddr = addr ? addr.locations[addr.locations.length - 1] : varName;
+    MIPS.moveRegister('$v0', lastAddr);
+  }
+
   generateLabel(label) {
     const { labelType } = label;
     const instruction = label.result;
@@ -72,11 +107,12 @@ export default class MipsCode {
       this.generateMethod(instruction);
 
     else if (labelType === 'END_DEF')
-      MIPS.labelEnd();
+      this.generateMethodEnd(instruction);
 
-    else if (labelType === 'METHOD_RETURN') {
-      // TODO
-    } else if (labelType === 'METHOD_PARAM')
+    else if (labelType === 'METHOD_RETURN' && this.lastMethod !== 'InputInt')
+      this.generateReturn(instruction);
+
+    else if (labelType === 'METHOD_PARAM')
       this.generateMethodParam(instruction);
 
     else if (labelType === 'METHOD_CALL')
