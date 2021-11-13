@@ -30,7 +30,7 @@ export default class Descriptor {
     this.setResultRegister(xReg, result);
     MIPS.operation(operator, xReg.id, yReg.id, zReg.id);
 
-    // If x or y is a constant, clean them up
+    // If x or y is a constant or a temp, clean them up
     if (typeof arg1 === 'number')
       yReg.vars = [];
     else if (arg1.includes('t'))

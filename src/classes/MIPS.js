@@ -17,7 +17,7 @@ export default class MIPS {
     if (operation === '/')
       return 'div';
     if (operation === '*')
-      return 'mult';
+      return 'mul';
     return 'NULL?';
   }
 
@@ -41,6 +41,9 @@ export default class MIPS {
   static outputInt() {
     this.labelStart('OutputInt');
     this.loadImmediate('$v0', '1');
+    this.pushCodeLine('syscall');
+    this.loadImmediate('$v0', '4');
+    this.loadAddress('$a0', 'newline');
     this.pushCodeLine('syscall');
   }
 
@@ -74,7 +77,7 @@ export default class MIPS {
   }
 
   static storeRegister(dest, src) {
-    this.pushCodeLine(`st ${dest}, ${src}`);
+    this.pushCodeLine(`st ${translate(dest)}, ${translate(src)}`);
   }
 
   static juampAndLink(methodName) {
@@ -136,6 +139,12 @@ export default class MIPS {
     this.params += 1;
   }
 
+  static immediateMethodParam(constant) {
+    const param = `$a${this.params}`;
+    this.loadImmediate(param, constant);
+    this.params += 1;
+  }
+
   static storeParams(paramArray) {
     paramArray.forEach((param) => {
       this.saveWord(param.addr, `$a${this.params}`);
@@ -153,6 +162,7 @@ export default class MIPS {
     this.pushCodeLine('.align 2');
     this.tabs += 1;
     this.pushCodeLine(`G_: .space ${this.space}`);
+    this.pushCodeLine('newline: .asciiz "\\n"');
     if (hasInput)
       this.pushCodeLine('intPrompt: .asciiz "Ingrese un número entero: "');
     this.tabs -= 1;

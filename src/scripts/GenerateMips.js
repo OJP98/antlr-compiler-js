@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable class-methods-use-this */
 import MIPS from '../classes/MIPS';
 import Descriptor from '../classes/Descriptor';
@@ -82,6 +83,12 @@ export default class MipsCode {
 
   generateMethodParam(instruction) {
     const varName = getLastWord(instruction);
+
+    if (!isNaN(varName)) {
+      MIPS.immediateMethodParam(varName);
+      return;
+    }
+
     const addr = this.descriptor.getAddrFromVarName(varName);
     const lastAddr = addr ? addr.locations[addr.locations.length - 1] : varName;
     MIPS.methodParam(lastAddr);
