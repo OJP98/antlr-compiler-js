@@ -33,8 +33,13 @@ export default class Descriptor {
     // If x or y is a constant, clean them up
     if (typeof arg1 === 'number')
       yReg.vars = [];
+    else if (arg1.includes('t'))
+      this.deleteVarFromDesc(arg1);
+
     if (typeof arg2 === 'number')
       zReg.vars = [];
+    else if (arg2.includes('t'))
+      this.deleteVarFromDesc(arg2);
   }
 
   inmediateAssign(result, arg1) {
@@ -60,6 +65,8 @@ export default class Descriptor {
       xAddr = this.insertNewAddress(result, yReg.id);
 
     xAddr.locations.push(yReg.id);
+    if (arg1.includes('t'))
+      this.deleteVarFromDesc(arg1);
   }
 
   assignmentTac(tac) {
@@ -70,7 +77,6 @@ export default class Descriptor {
       this.inmediateAssign(result, arg1);
     else
       this.varAssign(result, arg1);
-    print(this);
   }
 
   processTac(tac, tacType) {
@@ -78,6 +84,8 @@ export default class Descriptor {
       this.assignmentTac(tac);
     else if (tacType === 'TAC')
       this.operationTac(tac);
+    console.log(tac);
+    print(this);
   }
 
   getFirstAvailable() {
@@ -195,6 +203,14 @@ export default class Descriptor {
       if (varIndex > -1)
         addr.locations.splice(varIndex, 1);
     });
+  }
+
+  deleteVarFromDesc(varName) {
+    this.cleanupVarData(varName);
+    const addr = this.getAddrFromVarName(varName);
+    const varIndex = this.addresses.indexOf(addr);
+    if (varIndex > -1)
+      this.addresses.splice(varIndex, 1);
   }
 
   /**

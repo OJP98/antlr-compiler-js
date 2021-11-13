@@ -54,19 +54,21 @@ export default class MipsCode {
     if (methodName === 'main') {
       MIPS.mainMethod(this.methodTable.find((m) => m.name === 'OutputInt'));
       MIPS.labelStart(methodName);
-      MIPS.increaseRegister(size);
+      return;
+    }
+
+    if (methodName === 'OutputInt') {
+      MIPS.outputInt();
+      return;
+    }
+
+    if (methodName === 'InputInt') {
+      MIPS.inputInt();
       return;
     }
 
     MIPS.labelStart(methodName);
     MIPS.increaseRegister(size);
-
-    if (methodName === 'OutputInt')
-      MIPS.outputInt();
-
-    if (methodName === 'InputInt')
-      MIPS.inputInt();
-
     const params = this.getMethod(methodName).args;
     // eslint-disable-next-line no-unused-expressions
     params.length && MIPS.storeParams(params);
@@ -88,7 +90,8 @@ export default class MipsCode {
   generateMethodEnd(instruction) {
     const methodName = getLastWord(instruction);
     const method = this.getMethod(methodName);
-    MIPS.decreaseRegister(method.size);
+    if (methodName !== 'main' && methodName !== 'OutputInt')
+      MIPS.decreaseRegister(method.size);
     MIPS.labelEnd();
   }
 

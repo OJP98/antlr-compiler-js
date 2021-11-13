@@ -1,3 +1,5 @@
+import { translate } from '../js/utils';
+
 export default class MIPS {
   constructor() {
     this.reset();
@@ -26,6 +28,7 @@ export default class MIPS {
   }
 
   static inputInt() {
+    MIPS.labelStart('InputInt');
     // Mensaje para imprimir
     this.loadImmediate('$v0', '4');
     this.loadAddress('$a0', 'intPrompt');
@@ -36,6 +39,7 @@ export default class MIPS {
   }
 
   static outputInt() {
+    this.labelStart('OutputInt');
     this.loadImmediate('$v0', '1');
     this.pushCodeLine('syscall');
   }
@@ -95,19 +99,21 @@ export default class MIPS {
   }
 
   static loadWord(dest, src) {
-    this.pushCodeLine(`lw ${dest}, ${src}`);
+    this.pushCodeLine(`lw ${translate(dest)}, ${translate(src)}`);
   }
 
   static saveWord(dest, src) {
-    this.pushCodeLine(`sw ${src}, ${dest}`);
+    this.pushCodeLine(`sw ${translate(src)}, ${translate(dest)}`);
   }
 
   static increaseRegister(amount) {
     if (amount === 0)
       return;
+    this.pushCodeLine('sub $sp, $sp, 4');
+    this.pushCodeLine('sw, $ra, ($sp)');
+    this.pushCodeLine('sub $sp, $sp, 4');
     this.saveWord('($sp)', '$fp');
     this.pushCodeLine(`sub $fp, $sp, ${amount}`);
-    // First position of the stack
     this.loadAddress('$sp', '($fp)');
   }
 
@@ -116,6 +122,9 @@ export default class MIPS {
       return;
     this.pushCodeLine(`add $sp, $fp, ${amount}`);
     this.loadWord('$fp', '($sp)');
+    this.pushCodeLine('add $sp, $sp, 4');
+    this.pushCodeLine('lw $ra, ($sp)');
+    this.pushCodeLine('add $sp, $sp, 4');
   }
 
   static methodParam(location) {
@@ -132,6 +141,7 @@ export default class MIPS {
       this.saveWord(param.addr, `$a${this.params}`);
       this.params += 1;
     });
+    this.params -= paramArray.length;
   }
 
   static unloadParams(amount) {

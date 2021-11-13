@@ -17,7 +17,6 @@ export default class Method {
   set ReturnType(returnType) {
     this.returnType = returnType === DATA_TYPE.NONE ? DATA_TYPE.VOID : returnType;
     const error = this.checkForErrors();
-    // TODO: This was "this.Error", but needed to change it because of error repetition;
     if (error)
       this.error = error;
   }

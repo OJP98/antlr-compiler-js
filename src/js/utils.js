@@ -44,6 +44,13 @@ export function getReturnTypeFromArray(returnTypesArray) {
   return new Symbol(expectedDataType, 'returnTypeFromArray');
 }
 
+function getTextBeforeChar(text, char) {
+  const charIndex = text.indexOf(char);
+  if (charIndex === -1)
+    return null;
+  return text.substring(0, charIndex);
+}
+
 export function getLastWord(label) {
   const splitted = label.split(' ');
   const lastWord = splitted.pop();
@@ -59,4 +66,14 @@ export function getMethodNameAndParamCount(label) {
 
 export const print = (object) => {
   console.log(JSON.parse(JSON.stringify(object)));
+};
+
+export const translate = (varName) => {
+  if (!varName.includes('['))
+    return varName;
+
+  const re = /\[(.*)]/;
+  const bracketContent = varName.match(re)[1];
+  const mainContent = getTextBeforeChar(varName, '[');
+  return `${bracketContent}($${mainContent})`;
 };
