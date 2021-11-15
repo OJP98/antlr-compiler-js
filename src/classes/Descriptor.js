@@ -285,6 +285,18 @@ export default class Descriptor {
     destAddr.locations = [srcReg.id];
   }
 
+  saveMachineState() {
+    this.addresses.forEach((addr) => {
+      const { varName, locations } = addr;
+      if (varName.includes('[')) {
+        const lastAddr = locations.pop();
+        // eslint-disable-next-line no-unused-expressions
+        !lastAddr.includes('[') && MIPS.saveWord(varName, lastAddr);
+      }
+    });
+    this.reset();
+  }
+
   initializeRegisters() {
     this.registers = [
       { id: '$t1', vars: [] },

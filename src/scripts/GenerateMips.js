@@ -53,8 +53,10 @@ export default class MipsCode {
     MIPS.params = 0;
 
     if (methodName === 'main') {
-      MIPS.mainMethod(this.methodTable.find((m) => m.name === 'OutputInt'));
-      MIPS.labelStart(methodName);
+      MIPS.mainMethod(
+        size,
+        this.methodTable.find((m) => m.name === 'OutputInt'),
+      );
       return;
     }
 
@@ -77,6 +79,7 @@ export default class MipsCode {
 
   generateMethodCall(instruction) {
     const [methodName, paramCount] = getMethodNameAndParamCount(instruction);
+    this.descriptor.saveMachineState();
     MIPS.juampAndLink(methodName);
     MIPS.unloadParams(paramCount);
   }
@@ -107,6 +110,7 @@ export default class MipsCode {
     const addr = this.descriptor.getAddrFromVarName(varName);
     const lastAddr = addr ? addr.locations[addr.locations.length - 1] : varName;
     MIPS.moveRegister('$v0', lastAddr);
+    this.descriptor.reset();
   }
 
   generateLabel(label) {

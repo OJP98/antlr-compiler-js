@@ -21,10 +21,16 @@ export default class MIPS {
     return 'NULL?';
   }
 
-  static mainMethod(hasInput) {
+  static mainMethod(size, hasInput) {
     this.isMain = true;
     this.tabs = 0;
     this.dataSection(hasInput);
+    this.labelStart('main');
+    if (size > 0) {
+      this.saveWord('($sp)', '$fp');
+      this.pushCodeLine(`sub $fp, $sp, ${size}`);
+      this.loadAddress('$sp', '($fp)');
+    }
   }
 
   static inputInt() {
