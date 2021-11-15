@@ -2,7 +2,11 @@
 /* eslint-disable class-methods-use-this */
 import MIPS from '../classes/MIPS';
 import Descriptor from '../classes/Descriptor';
-import { getLastWord, getMethodNameAndParamCount } from '../js/utils';
+import {
+  getLastWord,
+  getMethodNameAndParamCount,
+  getLabelAndTemp,
+} from '../js/utils';
 
 export default class MipsCode {
   constructor(symbolTable, methodTable, structTable, instructions) {
@@ -12,6 +16,7 @@ export default class MipsCode {
     this.instructions = instructions;
     this.descriptor = new Descriptor();
     this.lastMethod = '';
+    this.lastLbl = '';
     MIPS.reset();
   }
 
@@ -113,6 +118,41 @@ export default class MipsCode {
     this.descriptor.reset();
   }
 
+  genIfCond(instruction) {
+    const [temp, label] = getLabelAndTemp(instruction);
+    const reg = this.descriptor.getAddrFromVarName(temp);
+    // this.descriptor.saveMachineState();
+    MIPS.branchGreaterThanZero(reg.locations.pop(), label);
+    this.descriptor.deleteVarFromDesc(temp);
+  }
+
+  genIfFalseCond(instruction) {
+    const label = getLastWord(instruction);
+    MIPS.jump(label);
+  }
+
+  genIfTrueLbl(instruction) {
+    MIPS.breakLine();
+    const label = getLastWord(instruction);
+    MIPS.labelStart(label);
+  }
+
+  genIfFalseLbl(instruction) {
+    MIPS.breakLine();
+    const label = getLastWord(instruction);
+    if (this.lastLbl.labelType !== 'GOTO_END_IF') {
+      MIPS.jump(label);
+      MIPS.tabs -= 1;
+    }
+    MIPS.labelStart(label);
+  }
+
+  genEndIfLbl(instruction) {
+    const label = getLastWord(instruction);
+    MIPS.jump(label);
+    MIPS.tabs -= 1;
+  }
+
   generateLabel(label) {
     const { labelType } = label;
     const instruction = label.result;
@@ -131,5 +171,28 @@ export default class MipsCode {
 
     else if (labelType === 'METHOD_CALL')
       this.generateMethodCall(instruction);
+
+    else if (labelType === 'GOTO_IF_TRUE')
+      this.genIfCond(instruction);
+
+    else if (labelType === 'GOTO_IF_FALSE')
+      this.genIfFalseCond(instruction);
+
+    else if (labelType === 'IF_TRUE')
+      this.genIfTrueLbl(instruction);
+
+    else if (labelType === 'IF_FALSE')
+      this.genIfFalseLbl(instruction);
+
+    else if (labelType === 'GOTO_END_IF')
+      this.genEndIfLbl(instruction);
+
+    else if (labelType === 'END_IF') {
+      MIPS.breakLine();
+      MIPS.tabs -= 1;
+      MIPS.labelStart(getLastWord(instruction));
+    }
+
+    this.lastLbl = label;
   }
 }

@@ -18,6 +18,8 @@ export default class MIPS {
       return 'div';
     if (operation === '*')
       return 'mul';
+    if (operation === '>')
+      return 'sgt';
     return 'NULL?';
   }
 
@@ -83,7 +85,7 @@ export default class MIPS {
   }
 
   static storeRegister(dest, src) {
-    this.pushCodeLine(`st ${translate(dest)}, ${translate(src)}`);
+    this.pushCodeLine(`lw ${translate(dest)}, ${translate(src)}`);
   }
 
   static juampAndLink(methodName) {
@@ -163,6 +165,14 @@ export default class MIPS {
     this.params -= amount;
   }
 
+  static branchGreaterThanZero(reg1, labelTrue) {
+    this.pushCodeLine(`bgtz ${reg1}, ${labelTrue}`);
+  }
+
+  static jump(label) {
+    this.pushCodeLine(`j ${label}`);
+  }
+
   static dataSection(hasInput) {
     this.pushCodeLine('.data');
     this.pushCodeLine('.align 2');
@@ -206,5 +216,11 @@ export default class MIPS {
     this.pushCodeLine('li $v0, 10');
     this.pushCodeLine('syscall');
     this.tabs -= 1;
+  }
+
+  static getLastInstruction() {
+    if (this.isMain)
+      return this.mainLines.slice();
+    return this.codeLines.slice();
   }
 }

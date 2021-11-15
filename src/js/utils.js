@@ -77,3 +77,10 @@ export const translate = (varName) => {
   const mainContent = getTextBeforeChar(varName, '[');
   return `${bracketContent}($${mainContent})`;
 };
+
+export const getLabelAndTemp = (instruction) => {
+  const splitted = instruction.split(' ');
+  const temp = splitted[1];
+  const label = splitted[5];
+  return [temp, label];
+};
