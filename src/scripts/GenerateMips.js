@@ -121,7 +121,7 @@ export default class MipsCode {
   genIfCond(instruction) {
     const [temp, label] = getLabelAndTemp(instruction);
     const reg = this.descriptor.getAddrFromVarName(temp);
-    // this.descriptor.saveMachineState();
+    this.descriptor.saveMachineState();
     MIPS.branchGreaterThanZero(reg.locations.pop(), label);
     this.descriptor.deleteVarFromDesc(temp);
   }
@@ -151,6 +151,14 @@ export default class MipsCode {
     const label = getLastWord(instruction);
     MIPS.jump(label);
     MIPS.tabs -= 1;
+  }
+
+  genEndWhileLbl(instruction) {
+    const label = getLastWord(instruction);
+    MIPS.tabs -= 1;
+    MIPS.labelStart(label);
+    MIPS.tabs -= 1;
+    MIPS.breakLine();
   }
 
   generateLabel(label) {
@@ -191,6 +199,19 @@ export default class MipsCode {
       MIPS.breakLine();
       MIPS.tabs -= 1;
       MIPS.labelStart(getLastWord(instruction));
+    } else if (labelType === 'WHILE_LOOP') {
+      // this.descriptor.saveMachineState();
+      MIPS.breakLine();
+      MIPS.labelStart(instruction);
+    } else if (labelType === 'END_WHILE')
+      this.genEndWhileLbl(instruction);
+
+    else if (labelType === 'GOTO_END_WHILE')
+      MIPS.jump(getLastWord(instruction));
+
+    else if (labelType === 'GOTO_START_WHILE') {
+      this.descriptor.saveMachineState();
+      MIPS.jump(getLastWord(instruction));
     }
 
     this.lastLbl = label;

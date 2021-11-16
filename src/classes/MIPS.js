@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 import { translate } from '../js/utils';
 
 export default class MIPS {
@@ -20,6 +21,11 @@ export default class MIPS {
       return 'mul';
     if (operation === '>')
       return 'sgt';
+    if (operation === '==')
+      return 'seq';
+    if (operation === '<')
+      return 'slt';
+    // TODO: <=, >=, ||, &&
     return 'NULL?';
   }
 
@@ -81,7 +87,10 @@ export default class MIPS {
   }
 
   static moveRegister(dest, src) {
-    this.pushCodeLine(`move ${dest}, ${src}`);
+    if (!isNaN(src))
+      this.pushCodeLine(`li ${dest}, ${src}`);
+    else
+      this.pushCodeLine(`move ${dest}, ${src}`);
   }
 
   static storeRegister(dest, src) {

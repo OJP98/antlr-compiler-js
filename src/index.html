@@ -22,16 +22,6 @@ class Program
 
     int global;
 
-    int Test(int a, int b) {
-        int res;
-        res = a + b;
-        return res;
-    }
-    
-    int InputInt() {
-        return 0;
-    }
-    
     void OutputInt(int a) {
         return;
     }
@@ -44,11 +34,11 @@ class Program
 
         a = 20;
         b = 30;
-        if (b > a) {
-          OutputInt(b);
-        } else {
-          OutputInt(a);
+        while (a < b) {
+            a = a + 1;
         }
+        OutputInt(a);
+        OutputInt(b);
     }
 }
 </div>

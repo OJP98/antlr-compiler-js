@@ -14,6 +14,8 @@ export default class Descriptor {
       result, arg1, operator, arg2,
     } = tac;
 
+    console.log(arg1, result);
+
     const yReg = this.getReg(arg1);
     if (typeof arg1 === 'number')
       this.loadImmediate(yReg, arg1);
