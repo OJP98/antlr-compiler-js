@@ -1,7 +1,12 @@
+/* eslint-disable no-useless-return */
+/* eslint-disable import/no-cycle */
+/* eslint-disable no-unused-expressions */
 /* eslint-disable class-methods-use-this */
 import MIPS from './MIPS';
 // eslint-disable-next-line no-unused-vars
-import { print } from '../js/utils';
+import {
+  getContentInsideBrackets, isStack, print, getTextBeforeChar,
+} from '../js/utils';
 
 export default class Descriptor {
   constructor() {
@@ -13,8 +18,6 @@ export default class Descriptor {
     const {
       result, arg1, operator, arg2,
     } = tac;
-
-    console.log(arg1, result);
 
     const yReg = this.getReg(arg1);
     if (typeof arg1 === 'number')
@@ -35,13 +38,15 @@ export default class Descriptor {
     // If x or y is a constant or a temp, clean them up
     if (typeof arg1 === 'number')
       yReg.vars = [];
-    else if (arg1.includes('t'))
+    else if (arg1[0] === 't')
       this.deleteVarFromDesc(arg1);
 
     if (typeof arg2 === 'number')
       zReg.vars = [];
-    else if (arg2.includes('t'))
+    else if (arg2[0] === 't')
       this.deleteVarFromDesc(arg2);
+
+    isStack(result) && this.saveToStack(result, xReg);
   }
 
   inmediateAssign(result, arg1) {
@@ -52,6 +57,7 @@ export default class Descriptor {
       yReg.vars.push(result);
       this.insertLocationToAddr(result, yReg.id);
     }
+    isStack(result) && this.saveToStack(result, yReg);
   }
 
   varAssign(result, arg1) {
@@ -69,6 +75,8 @@ export default class Descriptor {
     xAddr.locations.push(yReg.id);
     if (arg1.includes('t'))
       this.deleteVarFromDesc(arg1);
+
+    isStack(result) && this.saveToStack(result, yReg);
   }
 
   assignmentTac(tac) {
@@ -101,7 +109,7 @@ export default class Descriptor {
       addr.locations.splice(regIndex, 1);
 
       if (varName.includes('[')) {
-        MIPS.storeRegister(varName, register.id);
+        this.storeWord(varName);
         addr.locations = [varName];
       }
     });
@@ -242,8 +250,8 @@ export default class Descriptor {
     reg.vars = [varName];
 
     // change addr. desc. for x by adding R as additional loc.
-    const addr = this.insertLocationToAddr(varName, reg.id);
-    MIPS.loadWord(reg.id, addr.locations[0]);
+    this.insertLocationToAddr(varName, reg.id);
+    this.loadWord(varName);
   }
 
   loadImmediate(reg, value) {
@@ -289,14 +297,86 @@ export default class Descriptor {
 
   saveMachineState() {
     this.addresses.forEach((addr) => {
-      const { varName, locations } = addr;
-      if (varName.includes('[')) {
-        const lastAddr = locations.pop();
-        // eslint-disable-next-line no-unused-expressions
-        !lastAddr.includes('[') && MIPS.saveWord(varName, lastAddr);
+      const { varName } = addr;
+      if (varName.includes('[') && !isStack(varName)) {
+        this.storeWord(varName);
       }
     });
-    this.reset();
+    // this.reset();
+  }
+
+  methodParam(varName) {
+    const addr = this.getAddrFromVarName(varName);
+    const lastLoc = addr ? addr.locations[addr.locations.length - 1] : varName;
+
+    if (!isStack(lastLoc)) {
+      MIPS.methodParam(lastLoc);
+      return;
+    }
+
+    const fpTemp = getContentInsideBrackets(lastLoc);
+    const tempAddr = this.getAddrFromVarName(fpTemp);
+    const tempLoc = tempAddr.locations[tempAddr.locations.length - 1];
+    const isGlobal = getTextBeforeChar('[') === 'G';
+    MIPS.operation('+', tempLoc, tempLoc, isGlobal ? 'G' : '$fp');
+    MIPS.loadWord('$s0', `(${tempLoc})`);
+    MIPS.methodParam('$s0');
+
+    // Recycle temp
+    this.deleteVarFromDesc(fpTemp);
+    // Recycle var
+    this.deleteVarFromDesc(varName);
+  }
+
+  loadWord(varName) {
+    const addr = this.getAddrFromVarName(varName);
+    const lastReg = addr.locations[addr.locations.length - 1];
+
+    if (!isStack(varName)) {
+      MIPS.loadWord(lastReg, varName);
+      return;
+    }
+
+    const fpTemp = getContentInsideBrackets(varName);
+    const tempAddr = this.getAddrFromVarName(fpTemp);
+    const tempLoc = tempAddr.locations[tempAddr.locations.length - 1];
+    MIPS.operation('+', tempLoc, tempLoc, '$fp');
+    MIPS.loadWord(lastReg, `(${tempLoc})`);
+  }
+
+  storeWord(varName) {
+    const addr = this.getAddrFromVarName(varName);
+    const lastReg = addr.locations[addr.locations.length - 1];
+
+    if (!isStack(varName) && lastReg !== varName) {
+      MIPS.storeWord(varName, lastReg);
+      this.deleteVarFromDesc(varName);
+      return;
+    }
+
+    const fpTemp = getContentInsideBrackets(varName);
+    const tempAddr = this.getAddrFromVarName(fpTemp);
+    const tempLoc = tempAddr.locations[tempAddr.locations.length - 1];
+    MIPS.operation('+', tempLoc, tempLoc, '$fp');
+    MIPS.storeWord(`(${tempLoc})`, lastReg);
+
+    // Recycle temp
+    this.deleteVarFromDesc(fpTemp);
+    // Recycle var
+    this.deleteVarFromDesc(varName);
+  }
+
+  saveToStack(varName, reg) {
+    const fpTemp = getContentInsideBrackets(varName);
+    const tempAddr = this.getAddrFromVarName(fpTemp);
+    const tempRegId = tempAddr.locations.pop();
+    MIPS.operation('+', tempRegId, tempRegId, '$fp');
+    MIPS.storeWord(`(${tempRegId})`, reg.id);
+
+    // Recycle temp
+    this.deleteVarFromDesc(fpTemp);
+    // Recycle var
+    this.deleteVarFromDesc(varName);
   }
 
   initializeRegisters() {

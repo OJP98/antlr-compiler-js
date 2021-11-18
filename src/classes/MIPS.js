@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable no-restricted-globals */
 import { translate } from '../js/utils';
 
@@ -25,7 +26,11 @@ export default class MIPS {
       return 'seq';
     if (operation === '<')
       return 'slt';
-    // TODO: <=, >=, ||, &&
+    if (operation === '||')
+      return 'or';
+    if (operation === '&&')
+      return 'and';
+    // TODO: <=, >=
     return 'NULL?';
   }
 
@@ -35,7 +40,7 @@ export default class MIPS {
     this.dataSection(hasInput);
     this.labelStart('main');
     if (size > 0) {
-      this.saveWord('($sp)', '$fp');
+      this.storeWord('($sp)', '$fp');
       this.pushCodeLine(`sub $fp, $sp, ${size}`);
       this.loadAddress('$sp', '($fp)');
     }
@@ -93,10 +98,6 @@ export default class MIPS {
       this.pushCodeLine(`move ${dest}, ${src}`);
   }
 
-  static storeRegister(dest, src) {
-    this.pushCodeLine(`lw ${translate(dest)}, ${translate(src)}`);
-  }
-
   static juampAndLink(methodName) {
     this.pushCodeLine(`jal ${methodName}`);
   }
@@ -122,7 +123,7 @@ export default class MIPS {
     this.pushCodeLine(`lw ${translate(dest)}, ${translate(src)}`);
   }
 
-  static saveWord(dest, src) {
+  static storeWord(dest, src) {
     this.pushCodeLine(`sw ${translate(src)}, ${translate(dest)}`);
   }
 
@@ -132,7 +133,7 @@ export default class MIPS {
     this.pushCodeLine('sub $sp, $sp, 4');
     this.pushCodeLine('sw, $ra, ($sp)');
     this.pushCodeLine('sub $sp, $sp, 4');
-    this.saveWord('($sp)', '$fp');
+    this.pushCodeLine('sw $fp, ($sp)');
     this.pushCodeLine(`sub $fp, $sp, ${amount}`);
     this.loadAddress('$sp', '($fp)');
   }
@@ -141,7 +142,7 @@ export default class MIPS {
     if (amount === 0)
       return;
     this.pushCodeLine(`add $sp, $fp, ${amount}`);
-    this.loadWord('$fp', '($sp)');
+    this.pushCodeLine('lw $fp, ($sp)');
     this.pushCodeLine('add $sp, $sp, 4');
     this.pushCodeLine('lw $ra, ($sp)');
     this.pushCodeLine('add $sp, $sp, 4');
@@ -149,10 +150,10 @@ export default class MIPS {
 
   static methodParam(location) {
     const param = `$a${this.params}`;
-    if (location.includes('['))
-      this.loadWord(param, location);
-    else
+    if (!location.includes('['))
       this.moveRegister(param, location);
+    else
+      this.loadWord(param, location);
     this.params += 1;
   }
 
@@ -164,7 +165,7 @@ export default class MIPS {
 
   static storeParams(paramArray) {
     paramArray.forEach((param) => {
-      this.saveWord(param.addr, `$a${this.params}`);
+      this.storeWord(param.addr, `$a${this.params}`);
       this.params += 1;
     });
     this.params -= paramArray.length;

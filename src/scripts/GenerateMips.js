@@ -97,9 +97,11 @@ export default class MipsCode {
       return;
     }
 
-    const addr = this.descriptor.getAddrFromVarName(varName);
-    const lastAddr = addr ? addr.locations[addr.locations.length - 1] : varName;
-    MIPS.methodParam(lastAddr);
+    // // TODO: Get the actual address if it's fp[t2]
+    // const addr = this.descriptor.getAddrFromVarName(varName);
+    // const lastLoc = addr ? addr.locations[addr.locations.length - 1] : varName;
+    // MIPS.methodParam(lastLoc);
+    this.descriptor.methodParam(varName);
   }
 
   generateMethodEnd(instruction) {
@@ -155,10 +157,9 @@ export default class MipsCode {
 
   genEndWhileLbl(instruction) {
     const label = getLastWord(instruction);
-    MIPS.tabs -= 1;
+    MIPS.tabs -= 2;
     MIPS.labelStart(label);
     MIPS.tabs -= 1;
-    MIPS.breakLine();
   }
 
   generateLabel(label) {
@@ -199,6 +200,7 @@ export default class MipsCode {
       MIPS.breakLine();
       MIPS.tabs -= 1;
       MIPS.labelStart(getLastWord(instruction));
+      MIPS.tabs -= 1;
     } else if (labelType === 'WHILE_LOOP') {
       // this.descriptor.saveMachineState();
       MIPS.breakLine();

@@ -44,7 +44,7 @@ export function getReturnTypeFromArray(returnTypesArray) {
   return new Symbol(expectedDataType, 'returnTypeFromArray');
 }
 
-function getTextBeforeChar(text, char) {
+export function getTextBeforeChar(text, char) {
   const charIndex = text.indexOf(char);
   if (charIndex === -1)
     return null;
@@ -68,12 +68,28 @@ export const print = (object) => {
   console.log(JSON.parse(JSON.stringify(object)));
 };
 
+export const getContentInsideBrackets = (text) => {
+  const re = /\[(.*)]/;
+  return text.match(re)[1];
+};
+
+export const isStack = (varName) => {
+  if (typeof varName === 'number')
+    return false;
+
+  if (!varName.includes('['))
+    return false;
+
+  const bracketContent = getContentInsideBrackets(varName);
+  // eslint-disable-next-line no-restricted-globals
+  return isNaN(bracketContent);
+};
+
 export const translate = (varName) => {
   if (!varName.includes('['))
     return varName;
 
-  const re = /\[(.*)]/;
-  const bracketContent = varName.match(re)[1];
+  const bracketContent = getContentInsideBrackets(varName);
   const mainContent = getTextBeforeChar(varName, '[');
   return `${bracketContent}($${mainContent})`;
 };
