@@ -39,6 +39,7 @@ export default class MIPS {
     this.tabs = 0;
     this.dataSection(hasInput);
     this.labelStart('main');
+    this.loadAddress('$s7', 'G');
     if (size > 0) {
       this.storeWord('($sp)', '$fp');
       this.pushCodeLine(`sub $fp, $sp, ${size}`);
@@ -187,7 +188,7 @@ export default class MIPS {
     this.pushCodeLine('.data');
     this.pushCodeLine('.align 2');
     this.tabs += 1;
-    this.pushCodeLine(`G_: .space ${this.space}`);
+    this.pushCodeLine(`G: .space ${this.space}`);
     this.pushCodeLine('newline: .asciiz "\\n"');
     if (hasInput)
       this.pushCodeLine('intPrompt: .asciiz "Ingrese un número entero: "');

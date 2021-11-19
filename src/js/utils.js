@@ -91,6 +91,10 @@ export const translate = (varName) => {
 
   const bracketContent = getContentInsideBrackets(varName);
   const mainContent = getTextBeforeChar(varName, '[');
+
+  if (mainContent === 'G')
+    return `${bracketContent}($s7)`;
+
   return `${bracketContent}($${mainContent})`;
 };
 
