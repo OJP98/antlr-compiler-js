@@ -234,7 +234,6 @@ export default class Descriptor {
         reg.vars.splice(varIndex, 1);
     });
     const addr = this.getAddrFromVarName(varName);
-
     if (addr)
       addr.locations = [varName];
   }
@@ -296,13 +295,16 @@ export default class Descriptor {
   }
 
   saveMachineState() {
-    this.addresses.forEach((addr) => {
+    console.log('ABOUT TO SAVE MACHINE STATE');
+    const addresses = [...this.addresses];
+    addresses.forEach((addr) => {
       const { varName } = addr;
       if (varName.includes('[') && !isStack(varName)) {
         this.storeWord(varName);
       }
     });
     // this.reset();
+    print(this);
   }
 
   methodParam(varName) {
@@ -317,7 +319,7 @@ export default class Descriptor {
     const fpTemp = getContentInsideBrackets(lastLoc);
     const tempAddr = this.getAddrFromVarName(fpTemp);
     const tempLoc = tempAddr.locations[tempAddr.locations.length - 1];
-    const isGlobal = getTextBeforeChar('[') === 'G';
+    const isGlobal = getTextBeforeChar(varName, '[') === 'G';
     MIPS.operation('+', tempLoc, tempLoc, isGlobal ? 'G' : '$fp');
     MIPS.loadWord('$s0', `(${tempLoc})`);
     MIPS.methodParam('$s0');

@@ -534,16 +534,16 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
   // Visit a parse tree produced by DecafParser#assignmentStmt.
   visitAssignmentStmt(ctx) {
-    const symbol = this.visit(ctx.location());
-    if (symbol.type === DATA_TYPE.ERROR) {
-      this.errors.push(symbol.error);
-      return symbol;
-    }
-
     const expr = this.visit(ctx.expression());
     if (expr.type === DATA_TYPE.ERROR) {
       this.errors.push(expr.error);
       return expr;
+    }
+
+    const symbol = this.visit(ctx.location());
+    if (symbol.type === DATA_TYPE.ERROR) {
+      this.errors.push(symbol.error);
+      return symbol;
     }
 
     // Are both sides of the assignment of the same type?

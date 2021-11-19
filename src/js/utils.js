@@ -100,3 +100,5 @@ export const getLabelAndTemp = (instruction) => {
   const label = splitted[5];
   return [temp, label];
 };
+
+export const isGlobal = (varName) => varName.includes('G');
