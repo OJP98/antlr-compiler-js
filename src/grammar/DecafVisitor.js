@@ -89,8 +89,13 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
       symbol = new Symbol(type, varId, startLine);
     }
 
-    if (!this.declaringStructProps)
+    if (!this.declaringStructProps) {
       this.symbolTable.bind(symbol);
+      if (this.symbolTable.level > 2) {
+        const latest = this.methodTable.lastestMethod;
+        latest.size += symbol.width;
+      }
+    }
     else 
       this.structTable.newProperty(symbol);
 
@@ -246,7 +251,7 @@ export default class DecafVisitor extends antlr4.tree.ParseTreeVisitor {
 
     // Exit the newly created symbol table
     this.symbolTable.exit();
-    method.size = methodSize;
+    method.size += methodSize;
 
     tac = new LabelTAC(`END DEF ${method.name}`, LABEL_TYPE.END_DEF);
     IntermediateCode.methodEnd(tac);

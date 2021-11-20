@@ -16,4 +16,8 @@ export default class MethodTable {
   lookup(methodId) {
     return this.methodTable.find((method) => method.name === methodId);
   }
+
+  get lastestMethod() {
+    return this.methodTable[this.methodTable.length - 1];
+  }
 }

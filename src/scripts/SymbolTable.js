@@ -81,4 +81,8 @@ export default class SymbolTable {
     }
     this.totalRegisters += 1;
   }
+
+  get level() {
+    return this.symbolTable.length;
+  }
 }
