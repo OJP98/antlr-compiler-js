@@ -111,7 +111,6 @@ export default class MipsCode {
     const varName = getLastWord(instruction);
 
     if (varName === '$v0') return;
-
     const addr = this.descriptor.getAddrFromVarName(varName);
     const lastAddr = addr ? addr.locations[addr.locations.length - 1] : varName;
 
@@ -142,6 +141,7 @@ export default class MipsCode {
   }
 
   genIfFalseLbl(instruction) {
+    this.descriptor.saveMachineState();
     MIPS.breakLine();
     const label = getLastWord(instruction);
     if (this.lastLbl.labelType !== 'GOTO_END_IF') {

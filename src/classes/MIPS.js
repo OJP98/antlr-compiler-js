@@ -30,7 +30,10 @@ export default class MIPS {
       return 'or';
     if (operation === '&&')
       return 'and';
-    // TODO: <=, >=
+    if (operation === '>=')
+      return '>=';
+    if (operation === '<=')
+      return '<=';
     return 'NULL?';
   }
 
@@ -109,6 +112,18 @@ export default class MIPS {
 
   static operation(operation, dest, x, y) {
     const operationString = this.operationString(operation);
+    if (operationString === '>=') {
+      this.pushCodeLine(`slt ${dest}, ${x}, ${y}`);
+      this.pushCodeLine(`seq ${dest}, ${dest}, $zero`);
+      return;
+    }
+
+    if (operationString === '<=') {
+      this.pushCodeLine(`sgt ${dest}, ${x}, ${y}`);
+      this.pushCodeLine(`seq ${dest}, ${dest}, $zero`);
+      return;
+    }
+
     this.pushCodeLine(`${operationString} ${dest}, ${x}, ${y}`);
   }
 
