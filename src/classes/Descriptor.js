@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 /* eslint-disable no-useless-return */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-unused-expressions */
@@ -89,11 +90,31 @@ export default class Descriptor {
       this.varAssign(result, arg1);
   }
 
+  unaryTac(tac) {
+    // x = !y
+    const { result, arg1, operator } = tac;
+
+    const yReg = this.getReg(arg1);
+    if (typeof arg1 === 'number')
+      this.loadImmediate(yReg, arg1);
+    else if (!yReg.vars.includes(arg1))
+      this.loadRegister(yReg, arg1);
+
+    const xReg = this.getReg(result);
+    this.setResultRegister(xReg, result);
+    MIPS.unaryOperation(operator, xReg.id, yReg.id);
+
+    if (typeof arg1 === 'number')
+      yReg.vars = [];
+  }
+
   processTac(tac, tacType) {
     if (tacType === 'AssignmentTAC')
       this.assignmentTac(tac);
     else if (tacType === 'TAC')
       this.operationTac(tac);
+    else if (tacType === 'UnaryTAC')
+      this.unaryTac(tac);
     console.log(tac);
     print(this);
   }

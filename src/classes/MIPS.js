@@ -127,6 +127,13 @@ export default class MIPS {
     this.pushCodeLine(`${operationString} ${dest}, ${x}, ${y}`);
   }
 
+  static unaryOperation(operator, dest, x) {
+    if (operator === '!')
+      this.pushCodeLine(`sne ${dest}, ${x}, 1`);
+    else if (operator === '-')
+      this.pushCodeLine(`neg ${dest}, ${x}`);
+  }
+
   static loadAddress(dest, src) {
     this.pushCodeLine(`la ${dest}, ${src}`);
   }
