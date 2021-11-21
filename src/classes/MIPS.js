@@ -96,7 +96,7 @@ export default class MIPS {
     if (!isNaN(src))
       this.pushCodeLine(`li ${dest}, ${src}`);
     else
-      this.pushCodeLine(`move ${dest}, ${src}`);
+      this.pushCodeLine(`move ${dest}, ${translate(src)}`);
   }
 
   static juampAndLink(methodName) {

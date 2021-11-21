@@ -20,7 +20,7 @@
 class Program
 {
 
-    int global;
+    int A[10];
 
     void OutputInt(int a) {
         return;
@@ -28,8 +28,11 @@ class Program
 
     void main()
     {
-        global = 10;
-        OutputInt(global);
+        A[0] = 5;
+        A[1] = 6;
+        A[2] = 7;
+        A[3] = A[1] + A[2];
+        OutputInt(A[3]);
     }
 }
 </div>

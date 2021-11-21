@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable class-methods-use-this */
 import MIPS from '../classes/MIPS';
@@ -78,7 +79,6 @@ export default class MipsCode {
     MIPS.labelStart(methodName);
     MIPS.increaseRegister(size);
     const params = this.getMethod(methodName).args;
-    // eslint-disable-next-line no-unused-expressions
     params.length && MIPS.storeParams(params);
   }
 
@@ -96,11 +96,6 @@ export default class MipsCode {
       MIPS.immediateMethodParam(varName);
       return;
     }
-
-    // // TODO: Get the actual address if it's fp[t2]
-    // const addr = this.descriptor.getAddrFromVarName(varName);
-    // const lastLoc = addr ? addr.locations[addr.locations.length - 1] : varName;
-    // MIPS.methodParam(lastLoc);
     this.descriptor.methodParam(varName);
   }
 
@@ -114,9 +109,16 @@ export default class MipsCode {
 
   generateReturn(instruction) {
     const varName = getLastWord(instruction);
+
+    if (varName === '$v0') return;
+
     const addr = this.descriptor.getAddrFromVarName(varName);
     const lastAddr = addr ? addr.locations[addr.locations.length - 1] : varName;
-    MIPS.moveRegister('$v0', lastAddr);
+
+    if (lastAddr === varName && isNaN(varName))
+      MIPS.loadWord('$v0', lastAddr);
+    else
+      MIPS.moveRegister('$v0', lastAddr);
     this.descriptor.reset();
   }
 
@@ -202,7 +204,7 @@ export default class MipsCode {
       MIPS.labelStart(getLastWord(instruction));
       MIPS.tabs -= 1;
     } else if (labelType === 'WHILE_LOOP') {
-      // this.descriptor.saveMachineState();
+      this.descriptor.saveMachineState();
       MIPS.breakLine();
       MIPS.labelStart(instruction);
     } else if (labelType === 'END_WHILE')

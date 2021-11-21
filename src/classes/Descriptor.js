@@ -303,7 +303,7 @@ export default class Descriptor {
       }
     });
     this.addresses = addresses;
-    // this.reset();
+    this.reset();
   }
 
   methodParam(varName) {
@@ -318,8 +318,7 @@ export default class Descriptor {
     const fpTemp = getContentInsideBrackets(lastLoc);
     const tempAddr = this.getAddrFromVarName(fpTemp);
     const tempLoc = tempAddr.locations[tempAddr.locations.length - 1];
-    const esGlobal = getTextBeforeChar(varName, '[') === 'G';
-    MIPS.operation('+', tempLoc, tempLoc, esGlobal ? 'G' : '$fp');
+    MIPS.operation('+', tempLoc, tempLoc, isGlobal(varName) ? '$s7' : '$fp');
     MIPS.loadWord('$s0', `(${tempLoc})`);
     MIPS.methodParam('$s0');
 
@@ -341,7 +340,7 @@ export default class Descriptor {
     const fpTemp = getContentInsideBrackets(varName);
     const tempAddr = this.getAddrFromVarName(fpTemp);
     const tempLoc = tempAddr.locations[tempAddr.locations.length - 1];
-    MIPS.operation('+', tempLoc, tempLoc, '$fp');
+    MIPS.operation('+', tempLoc, tempLoc, isGlobal(varName) ? '$s7' : '$fp');
     MIPS.loadWord(lastReg, `(${tempLoc})`);
   }
 
@@ -349,7 +348,10 @@ export default class Descriptor {
     const addr = this.getAddrFromVarName(varName);
     const lastReg = addr.locations[addr.locations.length - 1];
 
-    if (!isStack(varName) && lastReg !== varName) {
+    if (lastReg === varName)
+      return;
+
+    if (!isStack(varName)) {
       MIPS.storeWord(varName, lastReg);
       this.deleteVarFromDesc(varName);
       return;
@@ -358,7 +360,7 @@ export default class Descriptor {
     const fpTemp = getContentInsideBrackets(varName);
     const tempAddr = this.getAddrFromVarName(fpTemp);
     const tempLoc = tempAddr.locations[tempAddr.locations.length - 1];
-    MIPS.operation('+', tempLoc, tempLoc, '$fp');
+    MIPS.operation('+', tempLoc, tempLoc, isGlobal(varName) ? '$s7' : '$fp');
     MIPS.storeWord(`(${tempLoc})`, lastReg);
 
     // Recycle temp
@@ -371,7 +373,7 @@ export default class Descriptor {
     const fpTemp = getContentInsideBrackets(varName);
     const tempAddr = this.getAddrFromVarName(fpTemp);
     const tempRegId = tempAddr.locations.pop();
-    MIPS.operation('+', tempRegId, tempRegId, '$fp');
+    MIPS.operation('+', tempRegId, tempRegId, isGlobal(varName) ? '$s7' : '$fp');
     MIPS.storeWord(`(${tempRegId})`, reg.id);
 
     // Recycle temp
