@@ -11,10 +11,12 @@ class Program
 		if (m==0) {
 			return n + 1;
 		} else {
-			if (n==1) {
-				return Ackerman(m + 1, 0);
+			if (n==0) {
+				return Ackerman(m - 1, 1);
 			} else {
-				return Ackerman(m-1, Ackerman(m,n-1));
+				int ack1;
+				ack1 = Ackerman(m, n-1);
+				return Ackerman(m-1, ack1);
 			}
 		}
 	}
@@ -23,14 +25,18 @@ class Program
 		int i;
 		int j;
 		i = 0;
+		j = 0;
 
 		while(i<10) {
 			A[i]=InputInt();
 			i = i+1;		
 		}
+		
+		i = 0;
 
 		while (i<10) {
 			OutputInt(Ackerman(A[i],j));
+			i = i + 1;
 		}
 	}
 }

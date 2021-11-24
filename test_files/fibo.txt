@@ -1,0 +1,33 @@
+class Program
+{
+    void OutputInt(int a) {}
+
+    int InputInt()
+    {return 0;}
+
+    int fib(int a)
+    {
+        int x;
+        int y;
+        int z;
+
+        if (a == 1) {
+            return 1;
+        } else {
+            x = fib(a - 1);
+            y = fib(a - 2);
+            z = x + y;
+            return z;
+        }
+    }
+
+    void main()
+    {
+        int x;
+        int res;
+
+        x = InputInt();
+        res = fib(x);
+        OutputInt(res);
+    }
+}
