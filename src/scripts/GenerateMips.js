@@ -17,6 +17,7 @@ export default class MipsCode {
     this.structTable = structTable;
     this.instructions = instructions;
     this.descriptor = new Descriptor();
+    console.log(this.instructions);
     this.lastMethod = '';
     this.lastLbl = '';
     MIPS.reset();

@@ -117,8 +117,8 @@ export default class Descriptor {
       this.operationTac(tac);
     else if (tacType === 'UnaryTAC')
       this.unaryTac(tac);
-    console.log(tac);
-    print(this);
+    // console.log(tac);
+    // print(this);
   }
 
   getFirstAvailable() {
