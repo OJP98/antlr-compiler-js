@@ -1,3 +1,4 @@
+/* eslint-disable prefer-object-spread */
 /* eslint-disable no-restricted-globals */
 /* eslint-disable no-useless-return */
 /* eslint-disable import/no-cycle */
@@ -11,6 +12,7 @@ import {
 
 export default class Descriptor {
   constructor() {
+    // this.lastMachineState = null;
     this.reset();
   }
 
@@ -324,12 +326,22 @@ export default class Descriptor {
       }
     });
     this.addresses = addresses;
+    // this.lastMachineState = Object.assign({}, this);
     this.reset();
   }
 
   methodParam(varName) {
     const addr = this.getAddrFromVarName(varName);
     const lastLoc = addr ? addr.locations[addr.locations.length - 1] : varName;
+
+    // if (lastLoc[0] === 't') {
+    //   const lastMachineLoc = this.lastMachineState.addresses.find(
+    //     (mcAddr) => mcAddr.varName === varName,
+    //   );
+    //   if (lastMachineLoc)
+    //     MIPS.methodParam(lastMachineLoc.locations.pop());
+    //   return;
+    // }
 
     if (!isStack(lastLoc)) {
       MIPS.methodParam(lastLoc);
@@ -401,6 +413,13 @@ export default class Descriptor {
     this.deleteVarFromDesc(fpTemp);
     // Recycle var
     this.deleteVarFromDesc(varName);
+  }
+
+  returnAddress(varName) {
+    const fpTemp = getContentInsideBrackets(varName);
+    const tempAddr = this.getAddrFromVarName(fpTemp);
+    const tempLoc = tempAddr.locations[tempAddr.locations.length - 1];
+    MIPS.moveRegister('$v0', tempLoc);
   }
 
   initializeRegisters() {

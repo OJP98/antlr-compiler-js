@@ -7,6 +7,7 @@ import {
   getLastWord,
   getMethodNameAndParamCount,
   getLabelAndTemp,
+  isStack,
 } from '../js/utils';
 
 export default class MipsCode {
@@ -54,7 +55,6 @@ export default class MipsCode {
     const method = this.getMethod(methodName);
     const { size, name } = method;
     this.lastMethod = name;
-    // CHECK: Should we reset both registers and addresses?
     this.descriptor.initializeRegisters();
     MIPS.params = 0;
 
@@ -114,7 +114,9 @@ export default class MipsCode {
     const addr = this.descriptor.getAddrFromVarName(varName);
     const lastAddr = addr ? addr.locations[addr.locations.length - 1] : varName;
 
-    if (lastAddr === varName && isNaN(varName))
+    if (!addr && isStack(varName))
+      this.descriptor.returnAddress(varName);
+    else if (lastAddr === varName && isNaN(varName))
       MIPS.loadWord('$v0', lastAddr);
     else
       MIPS.moveRegister('$v0', lastAddr);
