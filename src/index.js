@@ -66,7 +66,9 @@ function main() {
     if (!mainMethod)
       errors.push(new MainNotDefinedError().ErrorLog);
 
-    // console.table(symbols);
+    console.log('symbols:');
+    console.table(symbols);
+    console.log('methods:');
     console.table(methods);
     visitorErrors.forEach((e) => errors.push(e.ErrorLog));
   }
@@ -84,7 +86,8 @@ function main() {
 
   mipsCode.initialize(decafVisitor.globalSize);
 
-  // console.table(mipsCode.instructions);
+  console.log('MIPS Instructions:');
+  console.table(mipsCode.instructions);
 
   assignCodeToTab(mipsCode.CodeLines, 'mipscode');
   renderMipsBtns(mipsCode.CodeLines);
